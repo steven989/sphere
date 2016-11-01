@@ -1,0 +1,6 @@
+<%= form_for @activity, url: create_activity_path(@connection), method: :post do |f| %>
+          <%= f.label :activity_type, "Type of Activity" %>
+          <%= f.text_field :activity_type %>
+
+          <%= f.submit %>
+<% end %>

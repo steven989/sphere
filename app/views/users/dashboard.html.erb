@@ -1,11 +1,19 @@
-<%= form_for @connection, url: create_connection_path, method: :post do |f| %>
-          <%= f.label :first_name %>
-          <%= f.text_field :first_name %>
+<table>
+    <thead>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Add Activity</th>
+    </thead>
+    <tbody>
+        <% @connections.each do |connection| %>
+            <tr>
+                <td><%= connection.first_name %></td>
+                <td><%= connection.last_name %></td>
+                <td><%= link_to 'Add', new_activity_path(connection) %></td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
 
-          <%= f.label :last_name %>
-          <%= f.text_field :last_name %>
-
-          <%= f.submit %>
-<% end %>
-
+<%= link_to 'Create Connection', new_connection_path %>
 <%= link_to 'Logout', logout_path %>

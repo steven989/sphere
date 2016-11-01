@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
 
     def new
-        @user = User.new    
+        @user = User.new 
     end
 
     def create
@@ -17,7 +17,7 @@ class UsersController < ApplicationController
     end
 
     def dashboard
-        @connection = Connection.new
+        @connections = current_user.connections
     end
 
     def new_connection
@@ -35,16 +35,28 @@ class UsersController < ApplicationController
     end
 
     def new_activity
-        
+        @connection = Connection.find(params[:connection_id])
+        @activity = Activity.new
     end
 
     def create_activity
-        
+       @connection = Connection.find(params[:connection_id])
+       activity = current_user.activities.new(activity_params)
+       if activity.save
+          activity.update_attributes(connection_id:params[:connection_id])
+          redirect_to root_path, notice: "Successfully created"
+       else 
+          render action: :new_activity
+       end
     end
 
     private
     def connection_params
         params.require(:connection).permit(:first_name,:last_name)
+    end
+
+    def activity_params
+       params.require(:activity).permit(:activity_type) 
     end
 
     def user_params
