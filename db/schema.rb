@@ -11,16 +11,41 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161101233351) do
+ActiveRecord::Schema.define(version: 20161106200852) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "activities", force: :cascade do |t|
-    t.integer  "user_id",       null: false
+    t.integer  "user_id",                null: false
     t.integer  "connection_id"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "activity_type"
+    t.string   "initiator"
+    t.string   "activity"
+    t.date     "date"
+    t.text     "activity_description"
+    t.integer  "activity_definition_id"
+  end
+
+  create_table "activity_definitions", force: :cascade do |t|
+    t.string   "activity"
+    t.integer  "point_shared_experience_one_to_one"
+    t.integer  "point_shared_experience_group_private"
+    t.integer  "point_shared_experience_group_public"
+    t.integer  "point_provide_help"
+    t.integer  "point_receive_help"
+    t.integer  "point_provide_gift"
+    t.integer  "point_receive_gift"
+    t.integer  "point_shared_outcome"
+    t.integer  "point_shared_challenge"
+    t.integer  "point_communication_digital"
+    t.integer  "point_communication_in_person"
+    t.integer  "point_shared_interest"
+    t.integer  "point_intimacy"
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
     t.string   "activity_type"
   end
 
