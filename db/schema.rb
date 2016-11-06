@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161106200852) do
+ActiveRecord::Schema.define(version: 20161106231013) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,11 +22,11 @@ ActiveRecord::Schema.define(version: 20161106200852) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
     t.string   "activity_type"
-    t.string   "initiator"
     t.string   "activity"
     t.date     "date"
     t.text     "activity_description"
     t.integer  "activity_definition_id"
+    t.integer  "initiator"
   end
 
   create_table "activity_definitions", force: :cascade do |t|
@@ -43,10 +43,9 @@ ActiveRecord::Schema.define(version: 20161106200852) do
     t.integer  "point_communication_digital"
     t.integer  "point_communication_in_person"
     t.integer  "point_shared_interest"
-    t.integer  "point_intimacy"
+    t.integer  "point_intimacy",                        null: false
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
-    t.string   "activity_type"
   end
 
   create_table "connections", force: :cascade do |t|

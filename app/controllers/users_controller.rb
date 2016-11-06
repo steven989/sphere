@@ -18,6 +18,7 @@ class UsersController < ApplicationController
 
     def dashboard
         @connections = current_user.connections
+        @activities = current_user.activities
     end
 
     def new_connection
@@ -43,7 +44,7 @@ class UsersController < ApplicationController
        @connection = Connection.find(params[:connection_id])
        activity = current_user.activities.new(activity_params)
        if activity.save
-          activity.update_attributes(connection_id:params[:connection_id])
+          activity.update_attributes(connection_id:params[:connection_id],activity:ActivityDefinition.find(activity.activity_definition_id).activity)
           redirect_to root_path, notice: "Successfully created"
        else 
           render action: :new_activity
@@ -56,7 +57,7 @@ class UsersController < ApplicationController
     end
 
     def activity_params
-       params.require(:activity).permit(:activity_type) 
+       params.require(:activity).permit(:activity_definition_id,:date,:activity_description,:initiator) 
     end
 
     def user_params

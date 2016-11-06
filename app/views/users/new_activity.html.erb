@@ -1,6 +1,12 @@
 <%= form_for @activity, url: create_activity_path(@connection), method: :post do |f| %>
-          <%= f.label :activity_type, "Type of Activity" %>
-          <%= f.text_field :activity_type %>
+          <%= f.label :activity, "Type of Activity" %>
+          <%= f.collection_select :activity_definition_id, ActivityDefinition.all, :id, :activity, prompt:true %> <br>
+          <%= f.label :date %>
+          <%= f.date_field :date, value: Time.now.strftime('%Y-%m-%d') %> <br>
+          <%= f.label :activity_description, "Description" %>
+          <%= f.text_area :activity_description %> <br>
+          <%= f.label :initiator, "Who initiated the activity?" %>
+          <%= f.select :initiator, [["I did",0],["Connection did",1],["Someone else did",2]] %> <br>
 
           <%= f.submit %>
 <% end %>
