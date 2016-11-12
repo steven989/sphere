@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161106231013) do
+ActiveRecord::Schema.define(version: 20161112213112) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,10 +48,38 @@ ActiveRecord::Schema.define(version: 20161106231013) do
     t.datetime "updated_at",                            null: false
   end
 
+  create_table "connection_score_histories", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "connection_id"
+    t.date     "date_of_score"
+    t.integer  "score_quality"
+    t.integer  "score_time"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  create_table "connection_scores", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "connection_id"
+    t.date     "date_of_score"
+    t.integer  "score_quality"
+    t.integer  "score_time"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
   create_table "connections", force: :cascade do |t|
     t.integer  "user_id"
     t.string   "first_name"
     t.string   "last_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "system_settings", force: :cascade do |t|
+    t.string   "name"
+    t.string   "data_type"
+    t.string   "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
