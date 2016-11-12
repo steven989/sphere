@@ -10,7 +10,7 @@ class Connection < ActiveRecord::Base
 
 
     def update_score
-        self.log_score(self.calculate_quality_score)
+        self.log_score(self.calculate_quality_score, self.calculate_time_score)
     end
 
     def calculate_quality_score
@@ -29,12 +29,20 @@ class Connection < ActiveRecord::Base
         score
     end
 
-    def log_score(quality_score)
+    def calculate_time_score
+        date_of_last_activity = self.activities.where("date is not null").order(date: :desc).first.date
+        number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
+        target_contact_interval_in_days = self.target_contact_interval_in_days
+        score = ((number_of_days_since_last_activity.to_f / target_contact_interval_in_days.to_f)*10000.00).round
+        score
+    end
+
+    def log_score(quality_score,time_score)
       connection_score = ConnectionScore.where(user_id:self.user_id,connection_id:self.id).take
       if connection_score.blank?
-        ConnectionScore.create(user_id:self.user_id,connection_id:self.id,date_of_score:Date.today,score_quality:quality_score)
+        ConnectionScore.create(user_id:self.user_id,connection_id:self.id,date_of_score:Date.today,score_quality:quality_score,score_time:time_score)
       else
-        connection_score.update_attributes(date_of_score:Date.today,score_quality:quality_score)
+        connection_score.update_attributes(date_of_score:Date.today,score_quality:quality_score,score_time:time_score)
       end
     end
 

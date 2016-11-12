@@ -1,9 +1,12 @@
 <%= form_for @connection, url: create_connection_path, method: :post do |f| %>
           <%= f.label :first_name %>
-          <%= f.text_field :first_name %>
+          <%= f.text_field :first_name %> <br>
 
           <%= f.label :last_name %>
-          <%= f.text_field :last_name %>
+          <%= f.text_field :last_name %> <br>
+
+          <%= f.label :target_contact_interval_in_days, "How often do you want to reach out? (Days)" %>
+          <%= f.number_field :target_contact_interval_in_days, value: @default_contact_interval %> <br>
 
           <%= f.submit %>
 <% end %>

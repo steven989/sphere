@@ -6,6 +6,10 @@ class SystemSetting < ActiveRecord::Base
         SystemSetting.where(name:name).take
     end
 
+    def update_value(value)
+        self.update_attributes(value:value)
+    end
+
     def validate_setting_name_uniqueness
         if SystemSetting.where(name:self.name) > 0 
             errors.add(:name,"There is already a setting by the name of #{self.name}")

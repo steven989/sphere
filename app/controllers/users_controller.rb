@@ -23,6 +23,7 @@ class UsersController < ApplicationController
 
     def new_connection
        @connection = Connection.new 
+       @default_contact_interval = SystemSetting.search("default_contact_interval").value_in_specified_type
     end
 
     def create_connection
@@ -54,7 +55,7 @@ class UsersController < ApplicationController
 
     private
     def connection_params
-        params.require(:connection).permit(:first_name,:last_name)
+        params.require(:connection).permit(:first_name,:last_name,:target_contact_interval_in_days)
     end
 
     def activity_params
