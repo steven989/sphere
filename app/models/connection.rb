@@ -8,6 +8,11 @@ class Connection < ActiveRecord::Base
         first_name+" "+last_name
     end
 
+
+    def update_score
+        self.log_score(self.calculate_quality_score)
+    end
+
     def calculate_quality_score
         score = 0
         activities = self.activities
@@ -16,12 +21,21 @@ class Connection < ActiveRecord::Base
             score += activities.joins{activity_definition.outer}.sum("activity_definitions.#{key.to_s} * #{value}").to_i
         end
         # 2) Add a bonus in for being initiated by connection
-        percent_of_events_initiated_by_connection = activities.where(initiator:1).length.to_f / activites.length.to_f
+        percent_of_events_initiated_by_connection = activities.where(initiator:1).length.to_f / activities.length.to_f
         initator_bonus_settings = SystemSetting.search("initiator_bonus").value_in_specified_type
         bonus_multiplier = initiator_bonus_multiplier(percent_of_events_initiated_by_connection,initator_bonus_settings[:maximum_bonus_percent],initator_bonus_settings[:optimal_percent_of_events_initiated_by_connection],initator_bonus_settings[:point_of_zero_bonus_above_50_percent_of_events])
         
         score *= bonus_multiplier        
         score
+    end
+
+    def log_score(quality_score)
+      connection_score = ConnectionScore.where(user_id:self.user_id,connection_id:self.id).take
+      if connection_score.blank?
+        ConnectionScore.create(user_id:self.user_id,connection_id:self.id,date_of_score:Date.today,score_quality:quality_score)
+      else
+        connection_score.update_attributes(date_of_score:Date.today,score_quality:quality_score)
+      end
     end
 
     def initiator_bonus_multiplier(percent_of_events_initiated_by_connection,maximum_bonus_percent,optimal_percent_of_events_initiated_by_connection,point_of_zero_bonus_above_50_percent_of_events)
