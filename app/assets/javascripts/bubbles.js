@@ -60,7 +60,6 @@
                     }
                 };
             });
-            console.log(positionedBubblesArray)
             visualizeBubbles();
         }
 

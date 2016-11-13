@@ -40,6 +40,8 @@ class UsersController < ApplicationController
         connection = Connection.new(connection_params)
         if connection.save
             connection.update_attributes(user_id: current_user.id,active:true)
+            current_user.activities.create(connection_id:connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
+            connection.update_score
             redirect_to root_path, notice: "Successfully created"
         else
             redirect_to root_path, alert: "Could not be created"
