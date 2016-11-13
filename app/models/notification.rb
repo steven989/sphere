@@ -1,10 +1,26 @@
-class SystemSetting < ActiveRecord::Base
-    validate :validate_setting_data_type 
-    validates :name, uniqueness: true
+class Notification < ActiveRecord::Base
+    validate :validate_data_type 
+    belongs_to :user
 
-    def self.search(name)
-        SystemSetting.where(name:name).take
+
+    def self.create_expiry_notification(user_id,connection_id,expiry_date,remaining_days_until_expiry)
+        # 1) Destroy any existing expiry notifications
+        Notification.where(user_id:user_id,notification_type:"connection_expiration").each {|notification| notification.destroy if notification.value_in_specified_type[:connection_id].to_i == connection_id }
+        # 2) Create a notification
+        Notification.create(
+          user_id: user_id,
+          notification_type:"connection_expiration",
+          notification_date:Date.today,
+          expiry_date:expiry_date,
+          data_type:"hash",
+          value:"{connection_id:#{connection_id},remaining_days_until_expiry:#{remaining_days_until_expiry}}"
+          )
     end
+
+    def self.delete_all_expired_notifications
+        Notification.where{ expiry_date < Date.today }.destroy_all
+    end
+
 
     def update_value(value)
         self.update_attributes(value:value)
@@ -33,13 +49,8 @@ class SystemSetting < ActiveRecord::Base
         end        
     end
 
-    def validate_setting_name_uniqueness
-        if SystemSetting.where(name:self.name) > 0 
-            errors.add(:name,"There is already a setting by the name of #{self.name}")
-        end
-    end
 
-    def validate_setting_data_type
+    def validate_data_type
         begin
             if self.data_type.downcase == 'hash'
                 value_class = eval(self.value).class 
@@ -74,4 +85,5 @@ class SystemSetting < ActiveRecord::Base
         end
         result
     end
+
 end
