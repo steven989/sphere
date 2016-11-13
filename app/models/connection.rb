@@ -4,6 +4,8 @@ class Connection < ActiveRecord::Base
     has_one :connection_score
     has_many :connection_score_histories
 
+    scope :active, -> { where(active:true) } 
+
     def name
         first_name+" "+last_name
     end

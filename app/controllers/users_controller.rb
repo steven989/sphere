@@ -17,7 +17,7 @@ class UsersController < ApplicationController
     end
 
     def dashboard
-        @connections = current_user.connections
+        @connections = current_user.connections.active
         @raw_bubbles_data = @connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2] } }.to_json
         bubbles_parameters_object = SystemSetting.search("bubbles_parameters").value_in_specified_type
         @bubbles_parameters = {
@@ -39,7 +39,7 @@ class UsersController < ApplicationController
     def create_connection
         connection = Connection.new(connection_params)
         if connection.save
-            connection.update_attributes(user_id: current_user.id)
+            connection.update_attributes(user_id: current_user.id,active:true)
             redirect_to root_path, notice: "Successfully created"
         else
             redirect_to root_path, alert: "Could not be created"
@@ -57,6 +57,7 @@ class UsersController < ApplicationController
        if activity.save
           activity.update_attributes(connection_id:params[:connection_id],activity:ActivityDefinition.find(activity.activity_definition_id).activity)
           @connection.update_score
+          @connection.update_attributes(active:true)
           redirect_to root_path, notice: "Successfully created"
        else 
           render action: :new_activity

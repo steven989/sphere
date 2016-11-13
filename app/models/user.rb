@@ -12,24 +12,31 @@ class User < ActiveRecord::Base
   validates :email, uniqueness: true
 
 
-  def create_notifications
-    # 1) Notification for soon-to-expire connections
+  def daily_connection_tasks # put all daily connection-level tasks here so that there is one loop that runs instead of multiple loops
+    
     expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
+    
     self.connections.each do |connection|
+      # 1) create upcoming expiry notifications
       target_contact_interval_in_days = connection.target_contact_interval_in_days
       date_of_last_activity = connection.activities.where("date is not null").order(date: :desc).first.date
       number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
       remaining_days_until_expiry = [target_contact_interval_in_days - number_of_days_since_last_activity,0].max
-
       if remaining_days_until_expiry <= expiring_connection_notification_period_in_days
         Notification.create_expiry_notification(self.id,connection.id,date_of_last_activity+target_contact_interval_in_days.days,remaining_days_until_expiry)
       end
+
+      # 2) update status of expired notifications
+      if number_of_days_since_last_activity > target_contact_interval_in_days
+        connection.update_attributes(active:false)
+      end
+
     end
   end
 
-  def calculate_quality_score_for_all_connections
+  def calculate_quality_score_for_active_connections
  
-      self.connections.each do |connection|
+      self.connections.active.each do |connection|
         connection.update_score
       end
       
