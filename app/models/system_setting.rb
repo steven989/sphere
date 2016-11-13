@@ -19,14 +19,21 @@ class SystemSetting < ActiveRecord::Base
     def validate_setting_data_type
         begin
             if self.data_type == 'hash'
-                eval(self.value)
+                value_class = eval(self.value).class 
+                result = value_class == Hash
             elsif self.data_type == 'array'
-                eval(self.value)
+                value_class = eval(self.value).class 
+                result = value_class == Array
             elsif self.data_type == 'integer'
-                self.value.to_i
+                value_class = self.value.to_i.class 
+                result = value_class == Fixnum
             end
         rescue => error
             errors.add(:value,error.message)
+        else 
+            unless result
+                errors.add(:value,"Specified type is #{self.data_type} but value is of type #{value_class}")
+            end
         end
     end
 
