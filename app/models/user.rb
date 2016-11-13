@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   has_many :connection_scores
   has_many :connection_score_histories
   has_many :notifications
+  has_many :connection_notes
 
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
   validates :password_confirmation, presence: true, if: -> { new_record? || changes[:crypted_password] }
