@@ -1,7 +1,7 @@
 class Connection < ActiveRecord::Base
     belongs_to :user
     has_many :activities
-    has_many :connection_scores
+    has_one :connection_score
     has_many :connection_score_histories
 
     def name

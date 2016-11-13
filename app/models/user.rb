@@ -13,8 +13,7 @@ class User < ActiveRecord::Base
   def calculate_quality_score_for_all_connections
  
       self.connections.each do |connection|
-        quality_score = connection.calculate_quality_score
-        connection.log_score(quality_score)
+        connection.update_score
       end
       
   end

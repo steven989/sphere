@@ -1,3 +1,9 @@
+<script>
+$(function(){
+    $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>)
+})
+</script>
+
 <h3>Connections</h3>
 <%= link_to 'Create Connection', new_connection_path %>
 <table border=1>
@@ -37,6 +43,7 @@
     </tbody>
 </table>
 
+<div id="canvas" style="background:gray; width:600px; height:600px; position: relative;"></div>
 
 
 <%= link_to 'Logout', logout_path %>

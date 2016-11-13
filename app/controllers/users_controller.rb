@@ -18,6 +18,16 @@ class UsersController < ApplicationController
 
     def dashboard
         @connections = current_user.connections
+        @raw_bubbles_data = @connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2] } }.to_json
+        bubbles_parameters_object = SystemSetting.search("bubbles_parameters").value_in_specified_type
+        @bubbles_parameters = {
+          sizeOfGapBetweenBubbles:bubbles_parameters_object[:min_gap_between_bubbles],
+          minDistance:bubbles_parameters_object[:min_distance_from_center_of_central_bubble],
+          minBubbleSize:bubbles_parameters_object[:min_size_of_bubbles],
+          maxBubbleSize:bubbles_parameters_object[:max_size_of_bubbles],
+          numberOfRecursion:bubbles_parameters_object[:number_of_recursions],
+          radiusOfCentralBubble:bubbles_parameters_object[:radius_of_central_bubble],
+          centralBubbleDisplay:current_user.email}.to_json
         @activities = current_user.activities
     end
 
