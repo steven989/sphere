@@ -8,6 +8,29 @@ class SystemSetting < ActiveRecord::Base
 
     def update_value(value)
         self.update_attributes(value:value)
+        self
+    end
+
+    def update_hash_value(values)
+        if self.value_in_specified_type.class != Hash 
+            false
+        else
+            total_value_old = self.value_in_specified_type
+            values.each { |key,value| total_value_old[key] = value }
+            self.update_value(total_value_old.to_s)
+            self
+        end
+    end
+
+    def delete_hash_key(key)
+        if self.value_in_specified_type.class != Hash 
+            false
+        else
+            total_value_old = self.value_in_specified_type
+            total_value_old.delete(key.to_sym)
+            self.update_value(total_value_old.to_s)
+            self
+        end        
     end
 
     def validate_setting_name_uniqueness
