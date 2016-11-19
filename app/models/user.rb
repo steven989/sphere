@@ -6,6 +6,13 @@ class User < ActiveRecord::Base
   has_many :connection_score_histories
   has_many :notifications
   has_many :connection_notes
+  has_many :user_statistics
+  has_many :user_challenges
+  has_many :user_badges
+  has_many :badges, through: :user_badges
+  has_many :current_challenges, through: :user_challenges, class_name: "Challenge", foreign_key: "challenge_id", source: :challenge
+  has_many :completed_challenges, through: :user_challenge_completeds, class_name: "Challenge", foreign_key: "challenge_id", source: :challenge
+  has_many :level_histories
 
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
   validates :password_confirmation, presence: true, if: -> { new_record? || changes[:crypted_password] }

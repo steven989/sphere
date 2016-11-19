@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161113225056) do
+ActiveRecord::Schema.define(version: 20161119205941) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,24 @@ ActiveRecord::Schema.define(version: 20161113225056) do
     t.integer  "point_intimacy",                        null: false
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
+  end
+
+  create_table "badges", force: :cascade do |t|
+    t.string   "name"
+    t.string   "description"
+    t.string   "criteria"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  create_table "challenges", force: :cascade do |t|
+    t.string   "name"
+    t.text     "instructions"
+    t.text     "description"
+    t.string   "criteria"
+    t.string   "reward"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "connection_notes", force: :cascade do |t|
@@ -86,6 +104,21 @@ ActiveRecord::Schema.define(version: 20161113225056) do
     t.boolean  "active"
   end
 
+  create_table "level_histories", force: :cascade do |t|
+    t.integer  "level"
+    t.date     "date_achieved"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  create_table "levels", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "level"
+    t.string   "criteria"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "notifications", force: :cascade do |t|
     t.integer  "user_id"
     t.string   "notification_type"
@@ -97,6 +130,14 @@ ActiveRecord::Schema.define(version: 20161113225056) do
     t.datetime "updated_at",        null: false
   end
 
+  create_table "statistic_definitions", force: :cascade do |t|
+    t.string   "name"
+    t.string   "description"
+    t.string   "definition"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
   create_table "system_settings", force: :cascade do |t|
     t.string   "name"
     t.string   "data_type"
@@ -104,6 +145,39 @@ ActiveRecord::Schema.define(version: 20161113225056) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.string   "description"
+  end
+
+  create_table "user_badges", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "badge_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_challenge_completeds", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "challenge_id"
+    t.date     "date_shown_to_user"
+    t.date     "date_completed"
+    t.string   "method_of_completion"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  create_table "user_challenges", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "challenge_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  create_table "user_statistics", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "statistic_definition_id"
+    t.string   "name"
+    t.float    "value"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "users", force: :cascade do |t|
