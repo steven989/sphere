@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161119205941) do
+ActiveRecord::Schema.define(version: 20161120001631) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -112,7 +112,6 @@ ActiveRecord::Schema.define(version: 20161119205941) do
   end
 
   create_table "levels", force: :cascade do |t|
-    t.integer  "user_id"
     t.integer  "level"
     t.string   "criteria"
     t.datetime "created_at", null: false
@@ -134,8 +133,10 @@ ActiveRecord::Schema.define(version: 20161119205941) do
     t.string   "name"
     t.string   "description"
     t.string   "definition"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+    t.string   "operation_type"
+    t.string   "operation_trigger"
   end
 
   create_table "system_settings", force: :cascade do |t|

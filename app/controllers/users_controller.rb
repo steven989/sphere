@@ -60,6 +60,7 @@ class UsersController < ApplicationController
           activity.update_attributes(connection_id:params[:connection_id],activity:ActivityDefinition.find(activity.activity_definition_id).activity)
           @connection.update_score
           @connection.update_attributes(active:true)
+          StatisticDefinition.triggers("individual","create_activity",current_user)
           redirect_to root_path, notice: "Successfully created"
        else 
           render action: :new_activity
