@@ -12,4 +12,78 @@
  *
  *= require_tree .
  *= require_self
+ *= require jquery-ui
+ *= require_tree ../../../vendor/assets/stylesheets/.
  */
+
+
+body {
+    background: #F6F6F6 !important;
+}
+
+#loading > div > div {
+  background: #0d9ddb !important;
+}
+
+#profile {
+        z-index: 2;
+        position: fixed !important;
+        height: 75px !important;
+        background-color: #0d9ddb !important;
+        float: none !important;
+        top: 0px !important;
+}
+
+#logo {
+    position: absolute;
+    color: white;
+    top: 20px;
+    left: 20px;
+}
+
+#addConnection, #accountSettings {
+    position: absolute;
+    color: white;
+}
+
+#addConnection {
+    top: 20px;
+    right: 120px;
+}
+
+#accountSettings {
+    top: 20px;
+    right: 20px;
+}
+
+#topTabs-container-home {
+    width: 100%;
+    position:absolute;    
+    top:75px;
+}
+
+.topTabs-header.clearfix {
+    box-shadow: none !important;
+    height:100px;
+    width: 100%;
+}
+
+#navigation {
+    float: none !important;
+    width: 68%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#navigation li {
+    border: none !important;
+    width: 25%;
+    height: 100%;
+}
+
+
+
+
+
+

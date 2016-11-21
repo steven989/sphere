@@ -3,6 +3,29 @@ $(function(){
     $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>)
 })
 </script>
+<div id="profile">
+    <div id="logo">
+        Sphere Beta
+    </div>
+    <div id="addConnection">
+        Add
+    </div>
+    <div id="accountSettings">
+        Settings
+    </div>
+</div>
+
+<div id="topTabs-container-home">
+    <div class="topTabs-header clearfix">
+        <ul class="etabs tabs" id="navigation">
+            <li class="tab active">MY SPHERE</li>
+            <li class="tab">CHALLENGES</li>
+            <li class="tab">PROGRESS</li>
+            <li class="tab">ACHIEVEMENTS</li>
+        </ul>        
+    </div> 
+</div>
+
 
 <h3>Connections</h3>
 <%= link_to 'Create Connection', new_connection_path %>
