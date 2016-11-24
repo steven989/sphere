@@ -5,15 +5,32 @@
         var rawDataArray = bubblesData;
         var scaledBubblesArray;
         var positionedBubblesArray = [];
+        var minBubbleSize = options.minBubbleSize; //radius of the smallest bubble
+        var maxBubbleSize = options.maxBubbleSize; //radius of the largest bubble
+
+
+        // Resize the canvas to ensure bubbles will fit
+        var size_array = rawDataArray.map(function(bubbleDataObject){
+                return bubbleDataObject.size;
+            });
+        var actualMinBubbleSize = Math.min.apply(null,size_array);
+        var actualMaxBubbleSize = Math.max.apply(null,size_array);
+        var scaledSizeArrayForCanvasSizingPurposes = size_array.map(function(bubbleRawSize){
+            return scale(bubbleRawSize,actualMinBubbleSize,actualMaxBubbleSize,minBubbleSize,maxBubbleSize);
+        });
+        var total_bubble_area = scaledSizeArrayForCanvasSizingPurposes.reduce(function(cumulativeArea,bubbleSize){return cumulativeArea + Math.pow(bubbleSize,2)*Math.PI},0);
+        var canvas_length_and_height = Math.max(Math.min(Math.sqrt(total_bubble_area/0.15),$('body').width()),450);
+        _this.width(canvas_length_and_height);
+        _this.height(canvas_length_and_height);
         var canvasWidth = _this.width();
         var canvasHeight = _this.height();
-
         var centerBubble = {x:canvasWidth/2,y:canvasHeight/2,radius:options.radiusOfCentralBubble,display:options.centralBubbleDisplay};
+
+        // keep declaring variables
         var sizeOfGapBetweenBubbles = options.sizeOfGapBetweenBubbles;
         var minDistance = options.minDistance;   //distance to the center of the closest bubble
         var maxDistance = canvasHeight/2 - (options.maxBubbleSize)/2;  //distance to the center of the farthest bubble
-        var minBubbleSize = options.minBubbleSize; //radius of the smallest bubble
-        var maxBubbleSize = options.maxBubbleSize; //radius of the largest bubble
+
         var numberOfRecursion = options.numberOfRecursion;
 
         // need a set of counters for the generateNextAlpha function
@@ -30,13 +47,14 @@
             // 0) clear the existing array and scale the raw bubble data
             clearExistingBubbles();
             scaledBubblesArray = scaleRawArray(bubblesArray,minDistance,maxDistance,minBubbleSize,maxBubbleSize);
-            // 1) add the center bubble
+
+            // 2) add the center bubble
             positionedBubblesArray.push({id:0,x:centerBubble.x,y:centerBubble.y,radius:centerBubble.radius,display:centerBubble.display});
 
-            // 2) order bubblesArray using size from the closest to the farthest
+            // 3) order bubblesArray using size from the closest to the farthest
             scaledBubblesArray = scaledBubblesArray.sort(function(a,b){return a.distance > b.distance});
 
-            // 3) loop through the reordered bubblesArray
+            // 4) loop through the reordered bubblesArray
             scaledBubblesArray.forEach(function(scaledBubble){
                 //3.1) generate the next alpha value
                 var alpha = generateNextAlpha();

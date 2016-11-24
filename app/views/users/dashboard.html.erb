@@ -58,6 +58,16 @@ $(function(){
             }
         });
     })
+
+    $('#navigation-tabs-container').easytabs({
+        updateHash: false,
+        tabs: "ul.etabs > li",
+        animate: true,
+        transitionIn: 'fadeIn',
+        transitionOut: 'fadeOut',
+        updateHash: true
+    });
+
 })
 </script>
 <div id="profile">
@@ -72,7 +82,7 @@ $(function(){
     </div>
 </div>
 
-<div id="topTabs-container-home">
+<div id="navigation-tabs-container">
     <div class="topTabs-header clearfix">
         <ul class="etabs tabs" id="navigation">
             <li class="tab"><a href="#mySphere">MY SPHERE</a></li>
@@ -84,31 +94,7 @@ $(function(){
     <div class="topTabsContent">
         <div id="mySphere">
 
-            <div id="canvas" style="background:gray; width:600px; height:600px; position: relative;"></div>
-
-            <h3>Connections</h3>
-            <%= link_to 'Create Connection', new_connection_path %>
-            <table border=1>
-                <thead>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Add Activity</th>
-                    <th>Add Note</th>
-                </thead>
-                <tbody>
-                    <% @connections.each do |connection| %>
-                        <tr>
-                            <td><%= connection.first_name %></td>
-                            <td><%= connection.last_name %></td>
-                            <td><%= link_to 'Add', new_activity_path(connection) %></td>
-                            <td><%= form_tag create_connection_note_path(connection), method: 'POST' do %><%= text_field_tag :notes %><%= submit_tag "Note" %><% end %></td>
-                        </tr>
-                    <% end %>
-                </tbody>
-            </table>
-
-            
-            
+            <div id="canvas" style="background:gray;position: relative; margin: auto;"></div>            
             
         </div>
         <div id="challenges"></div>

@@ -18,5 +18,5 @@
 //= require_tree ../../../vendor/assets/javascripts/.
 
 $(function(){
-    vex.defaultOptions.className = 'vex-theme-default'
+    vex.defaultOptions.className = 'vex-theme-default';
 })

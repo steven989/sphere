@@ -56,10 +56,14 @@ body {
     right: 20px;
 }
 
-#topTabs-container-home {
+#navigation-tabs-container {
     width: 100%;
     position:absolute;    
     top:75px;
+}
+
+.topTabsContent {
+    padding:0px !important;
 }
 
 .topTabs-header.clearfix {
