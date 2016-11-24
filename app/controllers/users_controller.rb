@@ -37,14 +37,29 @@ class UsersController < ApplicationController
     end
 
     def create_connection
-        connection = Connection.new(connection_params)
-        if connection.save
-            connection.update_attributes(user_id: current_user.id,active:true)
-            current_user.activities.create(connection_id:connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
-            connection.update_score
-            redirect_to root_path, notice: "Successfully created"
+        if params[:name].blank?
+              status = false
+              message = "Name required"
         else
-            redirect_to root_path, alert: "Could not be created"
+          first_name = Connection.parse_first_name(params[:name])
+          last_name = Connection.parse_last_name(params[:name])
+          connection = Connection.new(first_name:first_name,last_name:last_name,phone:params[:phone],email:params[:email],target_contact_interval_in_days:params[:target_contact_interval_in_days])
+          if connection.save
+              connection.update_attributes(user_id: current_user.id,active:true)
+              current_user.activities.create(connection_id:connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
+              connection.update_score
+              status = true
+              message = "Connection successfully added"
+          else
+              status = false
+              message = "Could not be created"
+          end
+        end
+
+        respond_to do |format|
+          format.json {
+            render json: {status:status, message:message}
+          } 
         end
     end
 
@@ -68,9 +83,6 @@ class UsersController < ApplicationController
     end
 
     private
-    def connection_params
-        params.require(:connection).permit(:first_name,:last_name,:target_contact_interval_in_days)
-    end
 
     def activity_params
        params.require(:activity).permit(:activity_definition_id,:date,:activity_description,:initiator) 

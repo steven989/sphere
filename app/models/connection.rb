@@ -11,6 +11,15 @@ class Connection < ActiveRecord::Base
         first_name+" "+last_name
     end
 
+    def self.parse_first_name(name)
+      name.split(" ")[0].humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
+    end
+
+    def self.parse_last_name(name)
+       last_name_array = name.split(" ")
+       last_name_array.slice!(0)
+       last_name_array.join(" ").humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
+    end
 
     def update_score
         self.log_score(self.calculate_quality_score, self.calculate_time_score)
@@ -35,7 +44,7 @@ class Connection < ActiveRecord::Base
     def calculate_time_score
         date_of_last_activity = self.activities.where("date is not null").order(date: :desc).first.date
         number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
-        target_contact_interval_in_days = self.target_contact_interval_in_days
+        target_contact_interval_in_days = self.target_contact_interval_in_days ||= SystemSetting.search("default_contact_interval").value_in_specified_type
         score = ((number_of_days_since_last_activity.to_f / target_contact_interval_in_days.to_f)*10000.00).round
         score
     end
@@ -61,5 +70,5 @@ class Connection < ActiveRecord::Base
           end
           value.instance_of?(Complex) ? 1 : value
     end
-    
+      
 end
