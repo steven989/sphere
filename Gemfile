@@ -38,6 +38,12 @@ gem 'fog-aws'
 gem 'rmagick'
 # Save creditials securely
 gem 'figaro', '~> 1.0'
+# Google API
+gem 'google-api-client'
+# Authentication to API providers
+gem 'omniauth'
+# Oauth for Google
+gem "omniauth-google-oauth2"
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
