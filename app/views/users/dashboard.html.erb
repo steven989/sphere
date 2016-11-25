@@ -3,8 +3,23 @@ $(function(){
     $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
 
     function prettifyBubbles(canvas){
-        var formData = new FormData();
-        canvas.children('.connectionBubble').each(function(){
+        canvas.find('.connectionBubble').each(function(){
+
+            // 1) expiration progress bar
+            $(this).parent('.connectBubbleContainer').circleProgress({
+                value: 0.75,
+                thickness:5,
+                lineCap:'round',
+                size: $(this).parent('.connectBubbleContainer').width(),
+                fill: {color: '#ed1c24'},
+                emptyFill: 'rgba(0,0,0,0)'
+            });
+            // 2) Notification icons
+            var coordinates = getNotificationCoordinate(315,$(this).parent('.connectBubbleContainer').width()/2,14);
+            $(this).parent('.connectBubbleContainer').append('<span class="badge badge-yellow" style="width:28px; height:28px; position:absolute;left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:15px;padding-top:4px;">1d</span>');
+
+            // 3) Dialog on clicking each bubble
+            var formData = new FormData();
             $(this).off("click").on("click",function(){
                 var _this = $(this);
                 vex.dialog.open({
@@ -121,6 +136,12 @@ $(function(){
         updateHash: true
     });
 
+
+    function getNotificationCoordinate(angleInDegrees,attacheeRadiusInPixels,selfRadiusInPixels) {
+        var x = Math.cos(angleInDegrees*(Math.PI/180))*attacheeRadiusInPixels + attacheeRadiusInPixels - selfRadiusInPixels;
+        var y = Math.sin(angleInDegrees*(Math.PI/180))*attacheeRadiusInPixels + attacheeRadiusInPixels - selfRadiusInPixels;
+        return {x:x,y:y};
+    }
 
 })
 </script>

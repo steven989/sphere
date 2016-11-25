@@ -5,15 +5,16 @@ class Notification < ActiveRecord::Base
 
     def self.create_expiry_notification(user_id,connection_id,expiry_date,remaining_days_until_expiry)
         # 1) Destroy any existing expiry notifications
-        Notification.where(user_id:user_id,notification_type:"connection_expiration").each {|notification| notification.destroy if notification.value_in_specified_type[:connection_id].to_i == connection_id }
+        Notification.where(user_id:user_id,connection_id:connection_id,notification_type:"connection_expiration").each {|notification| notification.destroy }
         # 2) Create a notification
         Notification.create(
           user_id: user_id,
+          connection_id: connection_id,
           notification_type:"connection_expiration",
           notification_date:Date.today,
           expiry_date:expiry_date,
           data_type:"hash",
-          value:"{connection_id:#{connection_id},remaining_days_until_expiry:#{remaining_days_until_expiry}}"
+          value:"{remaining_days_until_expiry:#{remaining_days_until_expiry}}"
           )
     end
 

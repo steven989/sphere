@@ -40,6 +40,9 @@ class User < ActiveRecord::Base
         connection.update_attributes(active:false)
       end
 
+      # 3) Update time score
+
+
     end
   end
 

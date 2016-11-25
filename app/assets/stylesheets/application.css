@@ -114,6 +114,7 @@ label[for=photoUploader] {
     }
 
 
+/* Bubbles related */
 .connectionBubble:hover .initialsDisplayedInBubble {
     opacity:0;
 }
@@ -124,6 +125,8 @@ label[for=photoUploader] {
 .connectionBubble:hover .overlayWithName {
     opacity:1;
 }
+
+
 
 /*FOR RESPONSIVE DESIGN*/
 @media (max-width: 500px) { 
