@@ -33,9 +33,11 @@ gem 'squeel'
 # Image upload
 gem 'carrierwave', '>= 1.0.0.rc', '< 2.0'
 # Work with Amazon S3
-gem 'fog'
+gem 'fog-aws'
 # Modify images
 gem 'rmagick'
+# Save creditials securely
+gem 'figaro', '~> 1.0'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

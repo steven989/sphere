@@ -86,6 +86,32 @@ body {
     height: 100%;
 }
 
+#photoUploader { display: none; }
+label[for=photoUploader] {
+    font-family: 'eausans_book';
+    margin-top: 10px;
+    width: 100%; 
+    padding: 5px;
+    background: #fff;
+    padding-left: 10px;
+    border-radius: 3px;
+    border:1px solid rgba(0,0,0,0.1);
+    font-size: 12px;
+    color: #656268;
+    position: relative;
+}
+    label[for=uploader]:after {
+        content: "+";
+        text-align: center;
+        font-size: 18px;
+        color: #fff;
+        position: absolute;
+        right: 5px;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        background: #fd8a78;
+    }
 
 
 /*FOR RESPONSIVE DESIGN*/

@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   get 'users/new' => 'users#new', as: 'create_account'
 
   post 'connections/:id/create_note' => 'connections#create_note', as: 'create_connection_note'
+  put  'connections/update' => 'connections#update', as: 'update_connection'
 
   get 'login' => 'user_sessions#new', :as => :login
   get 'logout' => 'user_sessions#destroy', :as => :logout

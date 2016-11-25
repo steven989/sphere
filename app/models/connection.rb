@@ -4,8 +4,8 @@ class Connection < ActiveRecord::Base
     has_one :connection_score
     has_many :connection_score_histories
     has_many :connection_notes
-
     scope :active, -> { where(active:true) } 
+    mount_uploader :photo, PhotoUploader
 
     def name
         first_name+" "+last_name

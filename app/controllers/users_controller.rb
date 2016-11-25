@@ -52,7 +52,7 @@ class UsersController < ApplicationController
               message = "Connection successfully added"
           else
               status = false
-              message = "Could not be created"
+              message = "Could not be created #{connection.errors.full_messages.join(', ')}"
           end
         end
 

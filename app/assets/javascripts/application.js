@@ -15,6 +15,7 @@
 //= require jquery-ui
 //= require turbolinks
 //= require_tree .
+//= require_tree ../../../vendor/assets/javascripts/priority/.
 //= require_tree ../../../vendor/assets/javascripts/.
 
 $(function(){

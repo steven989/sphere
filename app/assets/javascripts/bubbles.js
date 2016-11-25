@@ -1,5 +1,5 @@
 (function ($) {
-    $.fn.bubblify = function (bubblesData,options) {
+    $.fn.bubblify = function (bubblesData,options,callback) {
         _this = $(this)
         var result = [];
         var rawDataArray = bubblesData;
@@ -136,9 +136,13 @@
 
         function visualizeBubbles() {
             positionedBubblesArray.forEach(function(positionedBubble){
-                _this.append('<div style="width:'+positionedBubble.radius*2+'px; height:'+positionedBubble.radius*2+'px; background:white; border-radius:100%; position:absolute; left:'+(positionedBubble.x - positionedBubble.radius)+'px; bottom:'+(positionedBubble.y - positionedBubble.radius)+'px;text-align:center; vertical-align:middle">'+positionedBubble.display+'</div>');
+                _this.append('<div class="connectionBubble" data-connection-id="'+positionedBubble.id+'" style="width:'+positionedBubble.radius*2+'px; height:'+positionedBubble.radius*2+'px; background:white; border-radius:100%; position:absolute; left:'+(positionedBubble.x - positionedBubble.radius)+'px; bottom:'+(positionedBubble.y - positionedBubble.radius)+'px;text-align:center; vertical-align:middle">'+positionedBubble.display+'</div>');
 
             });
+            if (callback instanceof Function) {
+                callback(_this);    
+            }
+            
         }
 
         //utility functions to scale the bubbles array

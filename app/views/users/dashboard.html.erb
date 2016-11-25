@@ -1,31 +1,84 @@
-
 <script>
-var addConnectionJSVar;
-var test;
 $(function(){
-    $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>)
+    $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
+
+    function prettifyBubbles(canvas){
+        var formData = new FormData();
+        canvas.children('.connectionBubble').each(function(){
+            $(this).off("click").on("click",function(){
+                var _this = $(this);
+                vex.dialog.open({
+                    input:[
+                        '<div class="editConnectionPopupContent">',
+                            '<input name="photoUploader" id="photoUploader" type="file" accept="image/*">',
+                            '<label for="photoUploader">',
+                            'Choose a display picture',
+                            '</label>',
+                            '<div class="alert hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>',
+                        '</div>'
+                    ].join(''),
+                    buttons:[
+                        $.extend({}, vex.dialog.buttons.YES, { text: 'Update' }),
+                        $.extend({}, vex.dialog.buttons.NO, { text: 'Cancel' })
+                    ],
+                    afterOpen: function(){
+                                $(".editConnectionPopupContent #photoUploader").on("change",function(){
+                                        $(".editConnectionPopupContent label[for=photoUploader]").html($(".editConnectionPopupContent #photoUploader").prop("files")[0].name);
+                                });
+                            },
+                    onSubmit: function(data){
+                        formData.append("connection_id",_this.data('connection-id'));
+                        formData.append("photo", $('.editConnectionPopupContent #photoUploader').prop("files")[0]);
+                        event.preventDefault();
+                        event.stopPropagation();
+                      $.ajax({
+                        url: '<%= update_connection_path %>',
+                        type: 'PUT',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        dataType: 'JSON'
+                      }).done(function(data){
+                            if (data.status) {
+                                $(".editConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
+                                setTimeout(function(){
+                                    vex.closeAll();
+                                },2000)
+                            } else {
+                                $(".editConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                                
+                            }
+                          })
+                    }
+                });
+            });
+        });
+    }
+
     $('#addConnection').off('click').on('click',function(){
-         addConnectionJSVar = vex.dialog.open({
+         vex.dialog.open({
             input: [
-            '<button class="btn" style="width:100%; margin-bottom:5px; background-color:#3b5998; color:white;">Import from Facebook</button>',
-            '<br>',
-            '<button class="btn btn-blue" style="width:100%; margin-bottom:10px; background-color:#0077b5; color:white;">Import from LinkedIn</button>',
-            '<h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:13px;color:#787878;background-color:#f0f0f0;padding:0 19px;font-weight:bold;">Or enter manually</span></h2>',
-            '<div class="vex-custom-field-wrapper">',
-                '<div class="vex-custom-input-wrapper">',
-                    '<input name="name" type="text" placeholder="Name" required>',
+            '<div class="addConnectionPopupContent">',
+                '<button class="btn" style="width:100%; margin-bottom:5px; background-color:#3b5998; color:white;">Import from Facebook</button>',
+                '<br>',
+                '<button class="btn btn-blue" style="width:100%; margin-bottom:10px; background-color:#0077b5; color:white;">Import from LinkedIn</button>',
+                '<h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:13px;color:#787878;background-color:#f0f0f0;padding:0 19px;font-weight:bold;">Or enter manually</span></h2>',
+                '<div class="vex-custom-field-wrapper">',
+                    '<div class="vex-custom-input-wrapper">',
+                        '<input name="name" type="text" placeholder="Name" required>',
+                    '</div>',
+                    '<div class="vex-custom-input-wrapper">',
+                        '<input name="email" type="text" placeholder="Email">',
+                    '</div>',
+                    '<div class="vex-custom-input-wrapper">',
+                        '<input name="phone" type="text" placeholder="Phone">',
+                    '</div>',
+                    '<div class="vex-custom-input-wrapper">',
+                        '<input name="target_contact_interval_in_days" type="number" placeholder="How often to reach out? (days)" required>',
+                    '</div>',
                 '</div>',
-                '<div class="vex-custom-input-wrapper">',
-                    '<input name="email" type="text" placeholder="Email">',
-                '</div>',
-                '<div class="vex-custom-input-wrapper">',
-                    '<input name="phone" type="text" placeholder="Phone">',
-                '</div>',
-                '<div class="vex-custom-input-wrapper">',
-                    '<input name="target_contact_interval_in_days" type="number" placeholder="How often to reach out? (days)" required>',
-                '</div>',
-            '</div>',
-            '<div class="alert hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>'
+                '<div class="alert hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>',
+            '</div>'
             ].join(''),
             buttons: [
                 $.extend({}, vex.dialog.buttons.YES, { text: 'Add' }),
@@ -38,20 +91,20 @@ $(function(){
                 url: '<%= create_connection_path %>',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({name:$('input[name="name"]')[0].value,email:$('input[name="email"]')[0].value,phone:$('input[name="phone"]')[0].value,target_contact_interval_in_days:$('input[name="target_contact_interval_in_days"]')[0].value}),
+                data: JSON.stringify({name:$('.addConnectionPopupContent input[name="name"]')[0].value,email:$('.addConnectionPopupContent input[name="email"]')[0].value,phone:$('.addConnectionPopupContent input[name="phone"]')[0].value,target_contact_interval_in_days:$('.addConnectionPopupContent input[name="target_contact_interval_in_days"]')[0].value}),
                 dataType: 'JSON'
               }).done(function(data){
                 if (data.status) {
-                    $("#connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
+                    $(".addConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
                     setTimeout(function(){
-                        $("#connectionFormAlert").addClass('hidden');
-                        $('input[name="name"]')[0].value = "";
-                        $('input[name="phone"]')[0].value = "";
-                        $('input[name="email"]')[0].value = "";
-                        $('input[name="target_contact_interval_in_days"]')[0].value = "";
+                        $(".addConnectionPopupContent #connectionFormAlert").addClass('hidden');
+                        $('.addConnectionPopupContent input[name="name"]')[0].value = "";
+                        $('.addConnectionPopupContent input[name="phone"]')[0].value = "";
+                        $('.addConnectionPopupContent input[name="email"]')[0].value = "";
+                        $('.addConnectionPopupContent input[name="target_contact_interval_in_days"]')[0].value = "";
                     },2000)
                 } else {
-                    $("#connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                    $(".addConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                     
                 }
               })
@@ -67,6 +120,7 @@ $(function(){
         transitionOut: 'fadeOut',
         updateHash: true
     });
+
 
 })
 </script>
