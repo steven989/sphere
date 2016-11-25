@@ -24,7 +24,7 @@
         _this.height(canvas_length_and_height);
         var canvasWidth = _this.width();
         var canvasHeight = _this.height();
-        var centerBubble = {x:canvasWidth/2,y:canvasHeight/2,radius:options.radiusOfCentralBubble,display:options.centralBubbleDisplay};
+        var centerBubble = {x:canvasWidth/2,y:canvasHeight/2,radius:options.radiusOfCentralBubble,display:options.centralBubbleDisplay,photo_url:options.centralBubblePhotoURL};
 
         // keep declaring variables
         var sizeOfGapBetweenBubbles = options.sizeOfGapBetweenBubbles;
@@ -49,7 +49,7 @@
             scaledBubblesArray = scaleRawArray(bubblesArray,minDistance,maxDistance,minBubbleSize,maxBubbleSize);
 
             // 2) add the center bubble
-            positionedBubblesArray.push({id:0,x:centerBubble.x,y:centerBubble.y,radius:centerBubble.radius,display:centerBubble.display});
+            positionedBubblesArray.push({id:0,x:centerBubble.x,y:centerBubble.y,radius:centerBubble.radius,display:centerBubble.display,photo_url:centerBubble.photo_url});
 
             // 3) order bubblesArray using size from the closest to the farthest
             scaledBubblesArray = scaledBubblesArray.sort(function(a,b){return a.distance > b.distance});
@@ -68,13 +68,13 @@
                 
                 //3.5) if 3.4 returns true, then place this into the positioned array. Otherwise run the failedInitialPositionVerification function for the next round of positioning
                 if (positionVerificationResult) {
-                    positionedBubblesArray.push({id:scaledBubble.id,x:candidateX,y:candidateY,radius:scaledBubble.radius,display:scaledBubble.display});
+                    positionedBubblesArray.push({id:scaledBubble.id,x:candidateX,y:candidateY,radius:scaledBubble.radius,display:scaledBubble.display,photo_url:scaledBubble.photo_url});
                 } else {
                     var result = failedInitialPositionVerification(scaledBubble.id,alpha,r,scaledBubble.radius,10,0,numberOfRecursion);
                     if (result.positionVerified) {
-                        positionedBubblesArray.push({id:scaledBubble.id,x:result.x,y:result.y,radius:scaledBubble.radius,display:scaledBubble.display});
+                        positionedBubblesArray.push({id:scaledBubble.id,x:result.x,y:result.y,radius:scaledBubble.radius,display:scaledBubble.display,photo_url:scaledBubble.photo_url});
                     } else {
-                        positionedBubblesArray.push({id:scaledBubble.id,x:candidateX,y:candidateY,radius:scaledBubble.radius,display:scaledBubble.display});
+                        positionedBubblesArray.push({id:scaledBubble.id,x:candidateX,y:candidateY,radius:scaledBubble.radius,display:scaledBubble.display,photo_url:scaledBubble.photo_url});
                     }
                 };
             });
@@ -136,7 +136,11 @@
 
         function visualizeBubbles() {
             positionedBubblesArray.forEach(function(positionedBubble){
-                _this.append('<div class="connectionBubble" data-connection-id="'+positionedBubble.id+'" style="width:'+positionedBubble.radius*2+'px; height:'+positionedBubble.radius*2+'px; background:white; border-radius:100%; position:absolute; left:'+(positionedBubble.x - positionedBubble.radius)+'px; bottom:'+(positionedBubble.y - positionedBubble.radius)+'px;text-align:center; vertical-align:middle">'+positionedBubble.display+'</div>');
+                var displayNameArray = positionedBubble.display.split(" ");
+                var firstName = displayNameArray.splice(0,1);
+                var lastName = displayNameArray.join(" ");
+                var contentInBubble = positionedBubble.photo_url == null ? '<span class="initialsDisplayedInBubble" style="transition:opacity 0.3s ease;float:left; display:block;position:relative;top:50%;transform: translateY(-50%) translateX(-50%);left:50%;font-size:2rem;color:#fff;font-weight:bold;">'+positionedBubble.display.split(" ").map(function(name){return name.charAt(0).toUpperCase() }).join("")+'<span>' : '<img src="'+positionedBubble.photo_url+'" style="float:left; width:100%;height:100%;">'
+                _this.append('<div class="connectionBubble" data-connection-id="'+positionedBubble.id+'" style="cursor:pointer;width:'+positionedBubble.radius*2+'px; height:'+positionedBubble.radius*2+'px; background:#9f9f9f; border-radius:50%; overflow:hidden; position:absolute; left:'+(positionedBubble.x - positionedBubble.radius)+'px; bottom:'+(positionedBubble.y - positionedBubble.radius)+'px;text-align:center; vertical-align:middle;">'+'<div class="overlayWithName" style="transition:opacity 0.3s ease;height:100%; width:100%; border-radius:50%; position:absolute;top:0px;left:0px;background-color:rgba(0,0,0,0.4);"><span style="color:rgba(255,255,255,1);float:left;display:block;position:relative;top:50%;transform: translateY(-50%) translateX(-50%);left:50%;font-size:'+positionedBubble.radius/3+'px;line-height:'+positionedBubble.radius/2+'px;color:#fff;font-weight:bold;">'+firstName+'<br>'+lastName+'</span></div>'+contentInBubble+'</div>');
 
             });
             if (callback instanceof Function) {
@@ -161,7 +165,8 @@
                     id:bubbleDataObject.id,
                     distance:Math.round(scale(bubbleDataObject.distance,0,10000,minDistance,maxDistance)*100.00)/100.00,
                     radius:Math.round(scale(bubbleDataObject.size,minmaxSize[0],minmaxSize[1],minBubbleSize,maxBubbleSize)*100.00)/100.00,
-                    display:bubbleDataObject.display
+                    display:bubbleDataObject.display,
+                    photo_url:bubbleDataObject.photo_url
                 }
             });
         }

@@ -7,7 +7,8 @@ class ConnectionsController < ApplicationController
 
     def update
         connection = Connection.find(params[:connection_id])
-        unless (params[:photo] == "undefined") || (params[:photo] == "null") || params[:photo].blank?
+        photo_uploaded = !((params[:photo] == "undefined") || (params[:photo] == "null") || params[:photo].blank?)
+        if photo_uploaded
             connection.remove_photo!
             connection.save
             connection.photo = params[:photo]
@@ -15,7 +16,8 @@ class ConnectionsController < ApplicationController
         connection.assign_attributes(
             id:params[:connection_id]
         )
-        if connection.save 
+        if connection.save
+            connection.update_attributes(photo_access_url:connection.photo.url) if photo_uploaded
             status = true
             message = "Connection successfully updated"
         else

@@ -7,7 +7,7 @@ CarrierWave.configure do |config|
     region:                ENV['S3_REGION'],                  # optional, defaults to 'us-east-1'
   }
   config.fog_directory  = ENV['S3_BUCKET_NAME']                          # required
-  config.fog_public     = false                                        # optional, defaults to true
+  config.fog_public     = true                                        # optional, defaults to true
   config.fog_attributes = { 'Cache-Control' => "max-age=#{365.day.to_i}" } # optional, defaults to {}
   config.cache_dir      = "#{Rails.root}/tmp/uploads"
 end
