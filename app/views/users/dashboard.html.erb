@@ -37,7 +37,7 @@ $(function(){
                     closeOnConfirm:false,
                     modifier:'bubbleModal'
                 });
-                $('.bubbleModalView#editConnection .modalBottomRight').off('click').on('click',function(){
+                $('.bubbleModalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
                     formData.append("connection_id",_this.data('connection-id'));
                     formData.append("photo", $('.bubbleModalView#editConnection #photoUploader').prop("files")[0]);
                   $.ajax({
