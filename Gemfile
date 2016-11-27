@@ -48,6 +48,16 @@ gem 'omniauth-google-oauth2'
 gem 'httparty'
 # Parse date and time from string
 gem 'chronic'
+# Oauth for Facebook
+gem 'omniauth-facebook'
+# APIs for Facebook
+gem 'koala', "~> 2.2"
+# API for Fullcontact, to get pictures and additional information about connections
+gem 'fullcontact'
+# Google contacts 
+gem 'google_contacts_api'
+# Oauth2
+gem 'oauth2'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

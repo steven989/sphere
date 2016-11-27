@@ -33,4 +33,36 @@ class ConnectionsController < ApplicationController
 
     end
 
+    def import
+        provider = params[:provider]
+        if !current_user.authorized_by(provider,"contacts")
+            actions = [{action:"popup_refresh_main_on_close",url:"http://localhost:3000/auth/google_contacts"}]
+            status = false
+            message = "Please connect Sphere with your Google Contacts in the popup"
+            data=nil
+        else
+            access_token = session ? session[:access_token] : nil
+            expires_at = session ? session[:expires_at] : nil
+            puts '---------------------------------------------------'
+            puts access_token
+            puts expires_at
+            puts '---------------------------------------------------'
+            result = Connection.import_from_google(current_user,access_token,expires_at)
+            data = result[:data]
+            status = result[:status]
+            message = result[:message]
+            access_token = result[:access_token]
+            session[:access_token] = access_token[:access_token]
+            session[:expires_at] = access_token[:expires_at]
+            actions=[{action:"transitionViews",from:"[data-remodal-id=importModal] .modalView#mainImportView",to:"[data-remodal-id=importModal] .modalView#listSelect"}]
+        end
+
+        respond_to do |format|
+          format.json {
+            render json: {status:status, message:message,actions:actions,data:data}
+          } 
+        end
+    end
+
+
 end

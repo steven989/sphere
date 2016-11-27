@@ -1,5 +1,6 @@
 class AuthorizationsController < ApplicationController
 
+    # OAuth2 callback routes
     def google_login
         puts '---------------------------------------------------'
         puts "login"
@@ -32,9 +33,22 @@ class AuthorizationsController < ApplicationController
     end
 
     def google_contacts
-        puts '---------------------------------------------------'
-        puts params.inspect
-        puts '---------------------------------------------------'        
+        authorization = current_user.authorizations.where(provider:'google').take
+        if authorization
+            updated_authorization_scope = (eval(authorization.scope.blank? ? "[]" : authorization.scope)+["email", "profile", "contacts"]).uniq.to_s
+            authorization.assign_attributes(
+                scope:updated_authorization_scope,
+                data:"{email:'#{request.env['omniauth.auth']['extra']['raw_info']['email']}',name:'#{request.env['omniauth.auth']['extra']['raw_info']['name']}',access_token:'#{request.env['omniauth.auth']['credentials']['token']}',refresh_token:'#{request.env['omniauth.auth']['credentials']['refresh_token']}'}"
+            )
+        else
+            authorization = current_user.authorizations.new(provider:"google",scope:"['email','profile','contacts']",data:"{email:'#{request.env['omniauth.auth']['extra']['raw_info']['email']}',name:'#{request.env['omniauth.auth']['extra']['raw_info']['name']}',access_token:'#{request.env['omniauth.auth']['credentials']['token']}',refresh_token:'#{request.env['omniauth.auth']['credentials']['refresh_token']}'}")
+        end
+        
+        if authorization.save
+
+        else
+            authorization.error
+        end
     end
 
 end

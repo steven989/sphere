@@ -71,5 +71,28 @@ class Connection < ActiveRecord::Base
           end
           value.instance_of?(Complex) ? 1 : value
     end
-      
+    
+    def self.import_from_google(user,access_token=nil,expires_at=nil)
+        if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
+          token_object = user.authorizations.where(provider:'google').take.refresh_token!  
+        else
+          token_object = {access_token:access_token,expires_at:expires_at}
+        end
+
+
+        begin
+          client = OAuth2::Client.new(ENV['GOOGLE_OAUTH_CLIENT_ID'],ENV['GOOGLE_OAUTH_CLIENT_SECRET'])
+          oauth_access_token_for_user = OAuth2::AccessToken.new(client,token_object[:access_token])
+          google_contacts_user = GoogleContactsApi::User.new(oauth_access_token_for_user)
+          contacts = google_contacts_user.contacts.map {|contact| {name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }} 
+        rescue => error
+            status = false
+            message = error.message                  
+        else
+          status = true
+          message = "Contacts successfully imported from Google"
+          {status:status,message:message,data:contacts,access_token:token_object}
+        end
+    end
+
 end

@@ -39,9 +39,12 @@ class UsersController < ApplicationController
     end
 
     def create_connection
-        if params[:name].blank?
+        if params[:name].blank? || params[:target_contact_interval_in_days].blank?
               status = false
-              message = "Name required"
+              message = "Please fill in required fields"
+              actions=[]
+              actions.push({action:"change_css",element:".modalView#mainImportView input[name=name]",css:{attribute:"border",value:"1px solid red"}}) if params[:name].blank?
+              actions.push({action:"change_css",element:".modalView#mainImportView input[name=target_contact_interval_in_days]",css:{attribute:"border",value:"1px solid red"}}) if params[:target_contact_interval_in_days].blank?
         else
           first_name = Connection.parse_first_name(params[:name])
           last_name = Connection.parse_last_name(params[:name])
@@ -52,15 +55,17 @@ class UsersController < ApplicationController
               connection.update_score
               status = true
               message = "Connection successfully added"
+              actions=[]
           else
               status = false
               message = "Could not be created #{connection.errors.full_messages.join(', ')}"
+              actions=[]
           end
         end
 
         respond_to do |format|
           format.json {
-            render json: {status:status, message:message}
+            render json: {status:status, message:message,actions:actions}
           } 
         end
     end

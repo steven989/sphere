@@ -1,4 +1,5 @@
 <script>
+var test;
 $(function(){
     var modalInstance;
 
@@ -25,21 +26,21 @@ $(function(){
             $(this).off("click").on("click",function(){
                 var formData = new FormData();                
                 var _this = $(this);
-                $('.bubbleModalView').each(function(){
+                $('[data-remodal-id=bubbleModal].modalView').each(function(){
                     if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
                         else {$(this).removeClass('hidden')};
                 });
                 $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
-                $('.bubbleModalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
-                $('.bubbleModalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
+                $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
+                $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
 
                     modalInstance = $('[data-remodal-id=bubbleModal]').remodal({
                     closeOnConfirm:false,
-                    modifier:'bubbleModal'
-                });
-                $('.bubbleModalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
+                    modifier:'standardModal'
+                    });
+                $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
                     formData.append("connection_id",_this.data('connection-id'));
-                    formData.append("photo", $('.bubbleModalView#editConnection #photoUploader').prop("files")[0]);
+                    formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
                   $.ajax({
                     url: '<%= update_connection_path %>',
                     type: 'PUT',
@@ -49,17 +50,17 @@ $(function(){
                     dataType: 'JSON'
                   }).done(function(data){
                         if (data.status) {
-                            $(".bubbleModalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
+                            $(".modalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
                             setTimeout(function(){
                                 modalInstance.close();
                             },2000)
                         } else {
-                            $(".bubbleModalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                            $(".modalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                             
                         }
                       });
                 })
-                resetBubblesModal();
+                resetModal($('[data-remodal-id=bubbleModal]'),3);
                 modalInstance.open();
 
             });
@@ -68,35 +69,54 @@ $(function(){
 
     // Transitioning mechanism of different views within the bubble popup modal
     $('[data-remodal-id=bubbleModal] .transitionButton').off('click').on('click',function(){
-        $($(this).data('current')).addClass('hidden');
-        $($(this).data('target')).removeClass('hidden');
+        transition($($(this).data('current')),$($(this).data('target')));
     });
 
+    // This function implements the transition so that it can be used by other things
+    function transition(from,to) {
+        from.addClass('hidden');
+        to.removeClass('hidden');        
+    }
+
     // Photo upload label within bubble modal to change display when a file is selected
-    $(".bubbleModalView#editConnection #photoUploader").on("change",function(){
-            $(".bubbleModalView#editConnection label[for=photoUploader]").html($(".bubbleModalView#editConnection #photoUploader").prop("files")[0].name);
+    $(".modalView#editConnection #photoUploader").on("change",function(){
+            $(".modalView#editConnection label[for=photoUploader]").html($(".modalView#editConnection #photoUploader").prop("files")[0].name);
     });
 
     // make plans
-    $('.bubbleModalView#makePlan .modalBottomRightButton').off('click').on('click',function(){
-      var form = $('.bubbleModalView#makePlan form');
+    $('.modalView#makePlan .modalBottomRightButton').off('click').on('click',function(){
+      var form = $('.modalView#makePlan form');
       modalAjaxFormSubmission(form);
     })
 
-    // reset the looks of the bubbles modal
-    function resetBubblesModal(reset_values) {
-        // Reset the height of the modal
-        $('.remodal.bubbleModal').css("height","400px");
-        // Reset the border color of fields. Except for checkboxes
-        $('.remodal.bubbleModal').find('input').each(function(){
-            if ($(this).prop('type') != "checkbox") {
-                $(this).css("border","1px solid rgba(0,0,0,0.1)");    
-            }
-        });
-        // Reset the fields that should be hidden by default
-        $('.remodal.bubbleModal').find('.default_hidden').each(function(){
-            $(this).removeClass('hidden').addClass('hidden');
-        });
+    // Modal resets
+    function resetModal(modal,resetType) {
+
+        if (resetType == 1 || resetType == 3) {
+            // Reset css
+            modal.parent().find('*').filter(function(){
+                return $(this).data('default-css') != undefined;
+            }).each(function(){
+                var _this = $(this); 
+                eval($(this).data('default-css')).forEach(function(cssReset){ 
+                    _this.css(cssReset.attribute,cssReset.value);
+                });
+            });
+
+            // Reset the fields that should be hidden by default
+            modal.parent().find('.default_hidden').each(function(){
+                $(this).removeClass('hidden').addClass('hidden');
+            });
+        }
+
+        if (resetType == 2 || resetType == 3) { 
+            // Reset values
+            modal.parent().find('input').each(function(){
+                if($(this).prop('type') != 'hidden') {
+                    $(this).val('');    
+                }
+            })
+        }
     }
 
     // General modal ajax submission function
@@ -107,7 +127,7 @@ $(function(){
         data: form.serialize(),
         dataType: 'JSON'
       }).done(function(data){
-            resetBubblesModal();
+            resetModal(form.closest('.remodal'),1);
             if (data.status) {
                 form.find('.alert').html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
                     setTimeout(function(){
@@ -118,80 +138,29 @@ $(function(){
             } else {
                 form.find('.alert').html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
             }
-            data.actions.forEach(function(actionObject){
-                if(actionObject.action=="popup_refresh_main_on_close") {
-                    var win = window.open(actionObject.url);
-                var checkConnect = setInterval(function() {
-                        if (!win || !win.closed) return;
-                        clearInterval(checkConnect);
-                        window.location.reload();
-                    }, 100);                        
-                } else if (actionObject.action=="unhide") {
-                    $(actionObject.element).removeClass('hidden');
-                } else if (actionObject.action == "change_css") {
-                    $(actionObject.element).css(actionObject.css.attribute,actionObject.css.value);
-                }
-            });
+
+            if (data.actions != undefined && data.actions.length > 0) {
+                performActions(data.actions);
+            }
           });
     }
 
+    // Add connections
+
+    $('.modalView#mainImportView .modalBottomFullButton').off('click').on('click',function(){
+      var form = $('.modalView#mainImportView form');
+      modalAjaxFormSubmission(form);
+    })    
 
 
     $('#addConnection').off('click').on('click',function(){
-         vex.dialog.open({
-            input: [
-            '<div class="addConnectionPopupContent">',
-                '<button class="btn" style="width:100%; margin-bottom:5px; background-color:#3b5998; color:white;">Import from Facebook</button>',
-                '<br>',
-                '<button class="btn btn-blue" style="width:100%; margin-bottom:10px; background-color:#0077b5; color:white;">Import from LinkedIn</button>',
-                '<h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:13px;color:#787878;background-color:#f0f0f0;padding:0 19px;font-weight:bold;">Or enter manually</span></h2>',
-                '<div class="vex-custom-field-wrapper">',
-                    '<div class="vex-custom-input-wrapper">',
-                        '<input name="name" type="text" placeholder="Name" required>',
-                    '</div>',
-                    '<div class="vex-custom-input-wrapper">',
-                        '<input name="email" type="text" placeholder="Email">',
-                    '</div>',
-                    '<div class="vex-custom-input-wrapper">',
-                        '<input name="phone" type="text" placeholder="Phone">',
-                    '</div>',
-                    '<div class="vex-custom-input-wrapper">',
-                        '<input name="target_contact_interval_in_days" type="number" placeholder="How often to reach out? (days)" required>',
-                    '</div>',
-                '</div>',
-                '<div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>',
-            '</div>'
-            ].join(''),
-            buttons: [
-                $.extend({}, vex.dialog.buttons.YES, { text: 'Add' }),
-                $.extend({}, vex.dialog.buttons.NO, { text: 'Cancel' })
-            ],            
-            onSubmit: function(data){
-                event.preventDefault();
-                event.stopPropagation();
-              $.ajax({
-                url: '<%= create_connection_path %>',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({name:$('.addConnectionPopupContent input[name="name"]')[0].value,email:$('.addConnectionPopupContent input[name="email"]')[0].value,phone:$('.addConnectionPopupContent input[name="phone"]')[0].value,target_contact_interval_in_days:$('.addConnectionPopupContent input[name="target_contact_interval_in_days"]')[0].value}),
-                dataType: 'JSON'
-              }).done(function(data){
-                if (data.status) {
-                    $(".addConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
-                    setTimeout(function(){
-                        $(".addConnectionPopupContent #connectionFormAlert").addClass('hidden');
-                        $('.addConnectionPopupContent input[name="name"]')[0].value = "";
-                        $('.addConnectionPopupContent input[name="phone"]')[0].value = "";
-                        $('.addConnectionPopupContent input[name="email"]')[0].value = "";
-                        $('.addConnectionPopupContent input[name="target_contact_interval_in_days"]')[0].value = "";
-                    },2000)
-                } else {
-                    $(".addConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
-                    
-                }
-              })
-            }
+        modalInstance = $('[data-remodal-id=importModal]').remodal({
+        closeOnConfirm:false,
+        modifier:'standardModal'
         });
+        resetModal($('[data-remodal-id=importModal]'),3);
+        modalInstance.open();
+
     })
 
     $('#navigation-tabs-container').easytabs({
@@ -208,6 +177,57 @@ $(function(){
         var x = Math.cos(angleInDegrees*(Math.PI/180))*attacheeRadiusInPixels + attacheeRadiusInPixels - selfRadiusInPixels;
         var y = Math.sin(angleInDegrees*(Math.PI/180))*attacheeRadiusInPixels + attacheeRadiusInPixels - selfRadiusInPixels;
         return {x:x,y:y};
+    }
+
+    // Importing contacts
+    $('#importContactsGoogle').off("click").on("click",function(){
+        buttonAjax($(this));
+    });
+
+    // Standard ajax call for buttons
+    function buttonAjax(button) {
+        var data = eval(button.data('data-to-send'));
+        var alertElement = $(button.data('alert-element'));
+          $.ajax({
+            url: button.attr('href'),
+            type: button.data('method'),
+            data: data,
+            dataType: 'JSON'
+          }).done(function(data){
+                console.log(data);
+                if (data.status) {
+                        if(data.message != undefined) {
+                            alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
+                        }
+                } else {
+                    if(data.message != undefined) {
+                        alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                    }
+                }
+                if (data.actions != undefined && data.actions.length > 0) {
+                    performActions(data.actions);    
+                }
+          })
+    }
+
+    // Predefined set of actions can be called by passing an array of actions into this function. Useful for rails to call specific follow up actions
+    function performActions(actionsArray) {
+        actionsArray.forEach(function(actionObject){
+            if(actionObject.action=="popup_refresh_main_on_close") {
+                var win = window.open(actionObject.url);
+            var checkConnect = setInterval(function() {
+                    if (!win || !win.closed) return;
+                    clearInterval(checkConnect);
+                    window.location.reload();
+                }, 100);                        
+            } else if (actionObject.action=="unhide") {
+                $(actionObject.element).removeClass('hidden');
+            } else if (actionObject.action == "change_css") {
+                $(actionObject.element).css(actionObject.css.attribute,actionObject.css.value);
+            } else if (actionObject.action == "transitionViews") {
+                transition($(actionObject.from),$(actionObject.to));
+            }
+        });
     }
 
 })
@@ -245,58 +265,101 @@ $(function(){
     </div>
 </div>
 
-<div data-remodal-id="bubbleModal">
+<div data-remodal-id="bubbleModal" data-default-css="([{'attribute':'height','value':'400px'}])">
   <button data-remodal-action="close" class="remodal-close"></button>
-    <div class="bubbleModalView" id="plans">
+    <div class="modalView" id="plans">
         <div class="modalContentContainer">
             <div style="color:#656268; font-size:20px;">Shaun Bauer</div>
             <div style="color:#656268; margin-top: 15px; font-size:15px;font-weight:lighter">Last Hangout: Drinks 2 months ago</div>
-            <div style="height:140px;margin-top:35px;" class="transitionButton" data-current="#plans" data-target="#editConnection">Icons</div>
+            <div style="height:140px;margin-top:35px;" class="transitionButton" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">Icons</div>
             <div style="margin-top:22px;font-size:15px;color:#656268">No current plans :(</div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereBlueBackground" data-current="#plans" data-target="#makePlan">Make Plans</div>
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">Make Plans</div>
             <div class="modalBottomRightButton sphereRedBackground">Remind Me</div>
         </div>
     </div>
-    <div class="bubbleModalView hidden" id="makePlan">
+    <div class="modalView hidden" id="makePlan">
         <div class="modalContentContainer">
             <form action="<%= plans_path %>" method="POST" >
-                <input type="date" class="input-text" name="date" placeholder="Which day"/>
-                <input type="text" class="input-text" name="time" placeholder="What time (e.g. 12:30pm)" required />
-                <input type="number" class="input-text" name="duration" placeholder="For how many hours (e.g. 0.5)" required />
-                <input type="text" class="input-text" name="name" placeholder="Meeting/activity name" required />
-                <input type="text" class="input-text" name="location" placeholder="Location (optional)" />
-                <input type="text" class="input-text" name="details" placeholder="Details (optional)" />
+                <input type="date" class="input-text" name="date" placeholder="Which day" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="text" class="input-text" name="time" placeholder="What time (e.g. 12:30pm)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="number" class="input-text" name="duration" placeholder="For how many hours (e.g. 0.5)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="text" class="input-text" name="name" placeholder="Meeting/activity name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="text" class="input-text" name="location" placeholder="Location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="text" class="input-text" name="details" placeholder="Details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
                 <input type="hidden" name="connection_id">
                 <%= check_box_tag :notify,nil,checked:true %>
                 <label for="notify">Send invite?</label>
-                <input type="text" class="input-text hidden default_hidden" name="connection_email">
+                <input type="text" class="input-text hidden default_hidden" name="connection_email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" >
                 <div class="alert hidden default_hidden" id="makePlanFormAlert" style="margin-top:1px;line-height:15px;"></div>
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="#makePlan" data-target="#plans">Back</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">Back</div>
             <div class="modalBottomRightButton sphereBlueBackground">Put in Calendar</div>
         </div>
     </div>
-    <div class="bubbleModalView hidden" id="editConnection">
+    <div class="modalView hidden" id="editConnection">
         <div class="modalContentContainer">
             <form id="connectionInfo">
                 <input name="photoUploader" id="photoUploader" type="file" accept="image/*">
                 <label for="photoUploader">
                     Choose a display picture
                 </label>
-                <div class="alert hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
+                <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="#editConnection" data-target="#plans">Back</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">Back</div>
             <div class="modalBottomRightButton sphereBlueBackground">Update</div>
         </div>
     </div>
 </div>
 
+
+<div data-remodal-id="importModal" data-default-css="([{'attribute':'height','value':'400px'}])">
+  <button data-remodal-action="close" class="remodal-close"></button>
+    <div class="modalView" id="mainImportView">
+        <div class="modalContentContainer">
+            <div class="addConnectionPopupContent" >
+                <button class="btn" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" data-alert-element="[data-remodal-id=importModal] .alert" id="importContactsGoogle" style="width:100%; margin-bottom:5px; background-color:#3b5998; color:white;">Import from Google</button>
+                <br>
+                <button class="btn btn-blue" style="width:100%; margin-bottom:10px; background-color:#0077b5; color:white;">Import from Outlook</button>
+                <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:13px;color:#787878;background-color:#f0f0f0;padding:0 19px;font-weight:bold;">Or enter manually</span></h2>
+                <form action="<%= create_connection_path %>" method="POST">
+                    <div class="vex-custom-field-wrapper">
+                        <div class="vex-custom-input-wrapper">
+                            <input name="name" type="text" placeholder="Name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required>
+                        </div>
+                        <div class="vex-custom-input-wrapper">
+                            <input name="email" type="text" placeholder="Email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])">
+                        </div>
+                        <div class="vex-custom-input-wrapper">
+                            <input name="phone" type="text" placeholder="Phone" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])">
+                        </div>
+                        <div class="vex-custom-input-wrapper">
+                            <input name="target_contact_interval_in_days" type="number" placeholder="How often to reach out? (days)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required>
+                        </div>
+                    </div>
+                    <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
+                </form>
+            </div>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereBlueBackground">Add to Sphere</div>
+        </div>
+    </div>
+    <div class="modalView" id="listSelect">
+        <div class="modalContentContainer">
+            The list will go here
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomLeftButton sphereRedBackground">Back</div>
+            <div class="modalBottomRightButton sphereBlueBackground">Add to Sphere</div>
+        </div>
+    </div>
+</div>
 
 
 <%= link_to 'Logout', logout_path %>
