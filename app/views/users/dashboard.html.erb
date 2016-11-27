@@ -1,5 +1,7 @@
 <script>
 $(function(){
+    var modalInstance;
+
     $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
 
     function prettifyBubbles(canvas){
@@ -19,56 +21,121 @@ $(function(){
             $(this).parent('.connectBubbleContainer').append('<span class="badge badge-yellow" style="width:28px; height:28px; position:absolute;left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:15px;padding-top:4px;">1d</span>');
 
             // 3) Dialog on clicking each bubble
-            var formData = new FormData();
+            
             $(this).off("click").on("click",function(){
+                var formData = new FormData();                
                 var _this = $(this);
-                vex.dialog.open({
-                    input:[
-                        '<div class="editConnectionPopupContent">',
-                            '<input name="photoUploader" id="photoUploader" type="file" accept="image/*">',
-                            '<label for="photoUploader">',
-                            'Choose a display picture',
-                            '</label>',
-                            '<div class="alert hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>',
-                        '</div>'
-                    ].join(''),
-                    buttons:[
-                        $.extend({}, vex.dialog.buttons.YES, { text: 'Update' }),
-                        $.extend({}, vex.dialog.buttons.NO, { text: 'Cancel' })
-                    ],
-                    afterOpen: function(){
-                                $(".editConnectionPopupContent #photoUploader").on("change",function(){
-                                        $(".editConnectionPopupContent label[for=photoUploader]").html($(".editConnectionPopupContent #photoUploader").prop("files")[0].name);
-                                });
-                            },
-                    onSubmit: function(data){
-                        formData.append("connection_id",_this.data('connection-id'));
-                        formData.append("photo", $('.editConnectionPopupContent #photoUploader').prop("files")[0]);
-                        event.preventDefault();
-                        event.stopPropagation();
-                      $.ajax({
-                        url: '<%= update_connection_path %>',
-                        type: 'PUT',
-                        processData: false,
-                        contentType: false,
-                        data: formData,
-                        dataType: 'JSON'
-                      }).done(function(data){
-                            if (data.status) {
-                                $(".editConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
-                                setTimeout(function(){
-                                    vex.closeAll();
-                                },2000)
-                            } else {
-                                $(".editConnectionPopupContent #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
-                                
-                            }
-                          })
-                    }
+                $('.bubbleModalView').each(function(){
+                    if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
+                        else {$(this).removeClass('hidden')};
                 });
+                $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
+                $('.bubbleModalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
+                $('.bubbleModalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
+
+                    modalInstance = $('[data-remodal-id=bubbleModal]').remodal({
+                    closeOnConfirm:false,
+                    modifier:'bubbleModal'
+                });
+                $('.bubbleModalView#editConnection .modalBottomRight').off('click').on('click',function(){
+                    formData.append("connection_id",_this.data('connection-id'));
+                    formData.append("photo", $('.bubbleModalView#editConnection #photoUploader').prop("files")[0]);
+                  $.ajax({
+                    url: '<%= update_connection_path %>',
+                    type: 'PUT',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    dataType: 'JSON'
+                  }).done(function(data){
+                        if (data.status) {
+                            $(".bubbleModalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
+                            setTimeout(function(){
+                                modalInstance.close();
+                            },2000)
+                        } else {
+                            $(".bubbleModalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                            
+                        }
+                      });
+                })
+                resetBubblesModal();
+                modalInstance.open();
+
             });
         });
     }
+
+    // Transitioning mechanism of different views within the bubble popup modal
+    $('[data-remodal-id=bubbleModal] .transitionButton').off('click').on('click',function(){
+        $($(this).data('current')).addClass('hidden');
+        $($(this).data('target')).removeClass('hidden');
+    });
+
+    // Photo upload label within bubble modal to change display when a file is selected
+    $(".bubbleModalView#editConnection #photoUploader").on("change",function(){
+            $(".bubbleModalView#editConnection label[for=photoUploader]").html($(".bubbleModalView#editConnection #photoUploader").prop("files")[0].name);
+    });
+
+    // make plans
+    $('.bubbleModalView#makePlan .modalBottomRightButton').off('click').on('click',function(){
+      var form = $('.bubbleModalView#makePlan form');
+      modalAjaxFormSubmission(form);
+    })
+
+    // reset the looks of the bubbles modal
+    function resetBubblesModal(reset_values) {
+        // Reset the height of the modal
+        $('.remodal.bubbleModal').css("height","400px");
+        // Reset the border color of fields. Except for checkboxes
+        $('.remodal.bubbleModal').find('input').each(function(){
+            if ($(this).prop('type') != "checkbox") {
+                $(this).css("border","1px solid rgba(0,0,0,0.1)");    
+            }
+        });
+        // Reset the fields that should be hidden by default
+        $('.remodal.bubbleModal').find('.default_hidden').each(function(){
+            $(this).removeClass('hidden').addClass('hidden');
+        });
+    }
+
+    // General modal ajax submission function
+    function modalAjaxFormSubmission(form) {
+      $.ajax({
+        url: form.prop('action'),
+        type: form.prop('method'),
+        data: form.serialize(),
+        dataType: 'JSON'
+      }).done(function(data){
+            resetBubblesModal();
+            if (data.status) {
+                form.find('.alert').html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
+                    setTimeout(function(){
+                        form.find('.alert').addClass('hidden');
+                        form.children().each(function(){$(this).val("")});
+                        modalInstance.close();
+                    },2000)
+            } else {
+                form.find('.alert').html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+            }
+            data.actions.forEach(function(actionObject){
+                if(actionObject.action=="popup_refresh_main_on_close") {
+                    var win = window.open(actionObject.url);
+                var checkConnect = setInterval(function() {
+                        if (!win || !win.closed) return;
+                        clearInterval(checkConnect);
+                        window.location.reload();
+                    }, 100);                        
+                } else if (actionObject.action=="unhide") {
+                    $(actionObject.element).removeClass('hidden');
+                } else if (actionObject.action == "change_css") {
+                    $(actionObject.element).css(actionObject.css.attribute,actionObject.css.value);
+                }
+            });
+          });
+    }
+
+
 
     $('#addConnection').off('click').on('click',function(){
          vex.dialog.open({
@@ -92,7 +159,7 @@ $(function(){
                         '<input name="target_contact_interval_in_days" type="number" placeholder="How often to reach out? (days)" required>',
                     '</div>',
                 '</div>',
-                '<div class="alert hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>',
+                '<div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>',
             '</div>'
             ].join(''),
             buttons: [
@@ -175,6 +242,58 @@ $(function(){
         <div id="challenges"></div>
         <div id="progress"></div>
         <div id="achievements"></div>
+    </div>
+</div>
+
+<div data-remodal-id="bubbleModal">
+  <button data-remodal-action="close" class="remodal-close"></button>
+    <div class="bubbleModalView" id="plans">
+        <div class="modalContentContainer">
+            <div style="color:#656268; font-size:20px;">Shaun Bauer</div>
+            <div style="color:#656268; margin-top: 15px; font-size:15px;font-weight:lighter">Last Hangout: Drinks 2 months ago</div>
+            <div style="height:140px;margin-top:35px;" class="transitionButton" data-current="#plans" data-target="#editConnection">Icons</div>
+            <div style="margin-top:22px;font-size:15px;color:#656268">No current plans :(</div>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground" data-current="#plans" data-target="#makePlan">Make Plans</div>
+            <div class="modalBottomRightButton sphereRedBackground">Remind Me</div>
+        </div>
+    </div>
+    <div class="bubbleModalView hidden" id="makePlan">
+        <div class="modalContentContainer">
+            <form action="<%= plans_path %>" method="POST" >
+                <input type="date" class="input-text" name="date" placeholder="Which day"/>
+                <input type="text" class="input-text" name="time" placeholder="What time (e.g. 12:30pm)" required />
+                <input type="number" class="input-text" name="duration" placeholder="For how many hours (e.g. 0.5)" required />
+                <input type="text" class="input-text" name="name" placeholder="Meeting/activity name" required />
+                <input type="text" class="input-text" name="location" placeholder="Location (optional)" />
+                <input type="text" class="input-text" name="details" placeholder="Details (optional)" />
+                <input type="hidden" name="connection_id">
+                <%= check_box_tag :notify,nil,checked:true %>
+                <label for="notify">Send invite?</label>
+                <input type="text" class="input-text hidden default_hidden" name="connection_email">
+                <div class="alert hidden default_hidden" id="makePlanFormAlert" style="margin-top:1px;line-height:15px;"></div>
+            </form>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="#makePlan" data-target="#plans">Back</div>
+            <div class="modalBottomRightButton sphereBlueBackground">Put in Calendar</div>
+        </div>
+    </div>
+    <div class="bubbleModalView hidden" id="editConnection">
+        <div class="modalContentContainer">
+            <form id="connectionInfo">
+                <input name="photoUploader" id="photoUploader" type="file" accept="image/*">
+                <label for="photoUploader">
+                    Choose a display picture
+                </label>
+                <div class="alert hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
+            </form>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="#editConnection" data-target="#plans">Back</div>
+            <div class="modalBottomRightButton sphereBlueBackground">Update</div>
+        </div>
     </div>
 </div>
 

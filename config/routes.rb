@@ -15,4 +15,10 @@ Rails.application.routes.draw do
   get 'logout' => 'user_sessions#destroy', :as => :logout
   resources :user_sessions
 
+  resources :plans
+  # Authorization callback routes
+  get 'auth/google_oauth2/login/callback' => 'authorizations#google_login', as: 'google_login_redirect'
+  get 'auth/google_oauth2/calendar/callback' => 'authorizations#google_calendar', as: 'google_calendar_redirect'
+  get 'auth/google_oauth2/contacts/callback' => 'authorizations#google_contacts', as: 'google_contacts_redirect'
+
 end

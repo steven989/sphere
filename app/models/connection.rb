@@ -4,6 +4,7 @@ class Connection < ActiveRecord::Base
     has_one :connection_score
     has_many :connection_score_histories
     has_many :connection_notes
+    has_many :plans
     scope :active, -> { where(active:true) } 
     mount_uploader :photo, PhotoUploader
 

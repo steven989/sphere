@@ -14,11 +14,19 @@ class User < ActiveRecord::Base
   has_many :user_challenge_completeds
   has_many :completed_challenges, through: :user_challenge_completeds, class_name: "Challenge", foreign_key: "challenge_id", source: :challenge
   has_many :level_histories
+  has_many :authorizations
+  has_many :plans
 
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
   validates :password_confirmation, presence: true, if: -> { new_record? || changes[:crypted_password] }
 
   validates :email, uniqueness: true
+
+
+  def authorized_by(provider,scope)
+      providers = authorizations.where("provider ilike ? and scope ilike ?",provider,"%#{scope}%")
+      providers.length == 1 ? true : false
+  end
 
 
   def daily_connection_tasks # put all daily connection-level tasks here so that there is one loop that runs instead of multiple loops

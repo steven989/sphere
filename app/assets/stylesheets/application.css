@@ -126,6 +126,70 @@ label[for=photoUploader] {
     opacity:1;
 }
 
+.remodal.bubbleModal {
+    border-radius: 8px;
+    padding:0px;
+    height: 400px;
+    max-height: 100%;
+    width: 100%;
+    max-width:625px;
+    overflow:hidden;
+}
+
+.remodal.bubbleModal .bubbleModalView {
+    height: 100%;
+    position: relative;
+}
+
+.remodal.bubbleModal .bubbleModalView .modalContentContainer {
+    position: absolute;
+    left: 0px;
+    top: 10%;
+    width: 100%;
+    height:100%;
+    overflow-y:scroll;
+}
+
+.remodal.bubbleModal .bubbleModalView .modalButtonContainer {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    bottom: 0px;
+    left: 0px;
+}
+
+.remodal.bubbleModal .bubbleModalView .modalButtonContainer .modalBottomLeftButton {
+    width: 50%;
+    cursor: pointer;
+    height: 100%;
+    float:left;
+    font-size: 18px;
+    color: #FFFFFF;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.sphereRedBackground {
+    background-color:#FE0000;
+}
+
+.sphereBlueBackground {
+    background-color: #0099E5;
+}
+
+.remodal.bubbleModal .bubbleModalView .modalButtonContainer .modalBottomRightButton {
+    width: 50%;
+    cursor: pointer;
+    height: 100%;
+    float:right;
+
+    font-size: 18px;
+    color: #FFFFFF;
+    text-align: center;
+    padding-top: 15px;
+}
+
+
 
 
 /*FOR RESPONSIVE DESIGN*/

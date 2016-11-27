@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161125044842) do
+ActiveRecord::Schema.define(version: 20161126231856) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,15 @@ ActiveRecord::Schema.define(version: 20161125044842) do
     t.integer  "point_intimacy",                        null: false
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
+  end
+
+  create_table "authorizations", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "provider"
+    t.text     "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string   "scope"
   end
 
   create_table "badges", force: :cascade do |t|
@@ -133,6 +142,22 @@ ActiveRecord::Schema.define(version: 20161125044842) do
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
     t.integer  "connection_id"
+  end
+
+  create_table "plans", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "connection_id"
+    t.date     "date"
+    t.time     "time"
+    t.string   "timezone"
+    t.string   "name"
+    t.string   "location"
+    t.string   "status"
+    t.string   "calendar_id"
+    t.string   "calendar_event_id"
+    t.boolean  "invite_sent"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   create_table "statistic_definitions", force: :cascade do |t|

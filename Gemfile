@@ -39,11 +39,15 @@ gem 'rmagick'
 # Save creditials securely
 gem 'figaro', '~> 1.0'
 # Google API
-gem 'google-api-client'
+gem 'google-api-client', '~> 0.9', require: 'google/apis/calendar_v3'
 # Authentication to API providers
 gem 'omniauth'
 # Oauth for Google
-gem "omniauth-google-oauth2"
+gem 'omniauth-google-oauth2'
+# HTTP requests
+gem 'httparty'
+# Parse date and time from string
+gem 'chronic'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
