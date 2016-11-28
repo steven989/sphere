@@ -79,7 +79,6 @@ class Connection < ActiveRecord::Base
           token_object = {access_token:access_token,expires_at:expires_at}
         end
 
-
         begin
           client = OAuth2::Client.new(ENV['GOOGLE_OAUTH_CLIENT_ID'],ENV['GOOGLE_OAUTH_CLIENT_SECRET'])
           oauth_access_token_for_user = OAuth2::AccessToken.new(client,token_object[:access_token])

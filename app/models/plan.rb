@@ -2,7 +2,7 @@ class Plan < ActiveRecord::Base
     belongs_to :user
     belongs_to :connection
 
-    def self.create_event(user,connection=nil,connection_email_override=nil,event_parameters,calendar_id)
+    def self.create_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,calendar_id="primary")
         date = event_parameters[:date]
         time = event_parameters[:time]
         duration = event_parameters[:duration].to_f
@@ -13,10 +13,16 @@ class Plan < ActiveRecord::Base
 
         connection_email = !connection_email_override.blank? ? connection_email_override : connection.email
 
+        # Check to see if there's an existing valid access token we can use without making a server request
+        if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
+          token_object = user.authorizations.where(provider:'google').take.refresh_token!  
+        else
+          token_object = {access_token:access_token,expires_at:expires_at}
+        end
+
         # Authenticate with Google and retrieve primary calendar
         begin
             service = Google::Apis::CalendarV3::CalendarService.new
-            token_object = user.authorizations.where(provider:'google').take.refresh_token!
             access_token = AccessToken.new(token_object[:access_token])
             service.authorization = access_token
             calendar = service.get_calendar(calendar_id)
@@ -79,6 +85,6 @@ class Plan < ActiveRecord::Base
                 end
             end
         end
-        {status:status,message:message}
+        {status:status,message:message,access_token:token_object}
     end
 end

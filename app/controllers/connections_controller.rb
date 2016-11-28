@@ -43,17 +43,14 @@ class ConnectionsController < ApplicationController
         else
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil
-            puts '---------------------------------------------------'
-            puts access_token
-            puts expires_at
-            puts '---------------------------------------------------'
             result = Connection.import_from_google(current_user,access_token,expires_at)
             data = result[:data]
             status = result[:status]
             message = result[:message]
-            access_token = result[:access_token]
-            session[:access_token] = access_token[:access_token]
-            session[:expires_at] = access_token[:expires_at]
+            if result[:access_token]
+                session[:access_token] = result[:access_token][:access_token]
+                session[:expires_at] = result[:access_token][:expires_at]
+            end
             actions=[{action:"transitionViews",from:"[data-remodal-id=importModal] .modalView#mainImportView",to:"[data-remodal-id=importModal] .modalView#listSelect"}]
         end
 

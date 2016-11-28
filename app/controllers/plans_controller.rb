@@ -39,16 +39,28 @@ class PlansController < ApplicationController
             status = false
             message = "Oops. Our robot can't seem to understand your time input of '#{time}'. Try something esle"
         else
-            result = Plan.create_event(current_user,connection,connection_email,{date:date,
-                                                        time:time,
-                                                        duration:duration,
-                                                        summary:summary,
-                                                        location:location,
-                                                        details:details,
-                                                        notify:notify
-                                                        },"primary"
-                            )
-            
+            access_token = session ? session[:access_token] : nil
+            expires_at = session ? session[:expires_at] : nil            
+            result = Plan.create_event(current_user,
+                                        {   date:date,
+                                            time:time,
+                                            duration:duration,
+                                            summary:summary,
+                                            location:location,
+                                            details:details,
+                                            notify:notify
+                                        },
+                                       connection,
+                                       connection_email,
+                                       access_token,
+                                       expires_at,
+                                       "primary"
+                                    )
+
+            if result[:access_token]
+                session[:access_token] = result[:access_token][:access_token]
+                session[:expires_at] = result[:access_token][:expires_at]
+            end
             status = result[:status]
             message= result[:message]
             actions = [{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
