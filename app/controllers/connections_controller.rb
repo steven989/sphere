@@ -51,7 +51,7 @@ class ConnectionsController < ApplicationController
                 session[:access_token] = result[:access_token][:access_token]
                 session[:expires_at] = result[:access_token][:expires_at]
             end
-            actions=[{action:"transitionViews",from:"[data-remodal-id=importModal] .modalView#mainImportView",to:"[data-remodal-id=importModal] .modalView#listSelect"}]
+            actions=[{action:"transitionViews",from:"[data-remodal-id=importModal] .modalView#mainImportView",to:"[data-remodal-id=importModal] .modalView#listSelect"},{action:"function_call",function:"populateImportSelectionList(returnedData)"}]
         end
 
         respond_to do |format|

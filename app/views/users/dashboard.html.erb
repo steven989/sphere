@@ -2,6 +2,7 @@
 var test;
 $(function(){
     var modalInstance;
+    var returnedData;
 
     $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
 
@@ -26,7 +27,7 @@ $(function(){
             $(this).off("click").on("click",function(){
                 var formData = new FormData();                
                 var _this = $(this);
-                $('[data-remodal-id=bubbleModal].modalView').each(function(){
+                $('[data-remodal-id=bubbleModal] .modalView').each(function(){
                     if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
                         else {$(this).removeClass('hidden')};
                 });
@@ -204,6 +205,9 @@ $(function(){
                         alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                     }
                 }
+                if (data.data != undefined) {
+                    returnedData = data.data;
+                }
                 if (data.actions != undefined && data.actions.length > 0) {
                     performActions(data.actions);    
                 }
@@ -226,8 +230,24 @@ $(function(){
                 $(actionObject.element).css(actionObject.css.attribute,actionObject.css.value);
             } else if (actionObject.action == "transitionViews") {
                 transition($(actionObject.from),$(actionObject.to));
+            } else if (actionObject.action == "function_call") {
+                eval(actionObject.function);
             }
         });
+    }
+
+    // This function takes the JSON list of contacts and populate it onto the popup
+    function populateImportSelectionList(list) {
+        $('.modalView#listSelect .importSelectionTable tbody').html("");
+        var incrementer = 0;
+        list.forEach(function(contact){
+            contact.incID = incrementer;
+            $('.modalView#listSelect #importSelectionTable tbody').append('<tr><td class="import" data-inc-id='+incrementer+' ><%= check_box_tag :import %></td><td class="name">'+contact.name+'</td><td class="email">'+contact.email+'</td><td class="phone">'+contact.phone.join(', ')+'</td><td class="other_emails">'+contact.other_emails.join(', ')+'</td></tr>');
+            incrementer++;
+        });
+        var options = {valueNames:['name','email','phone','other_emails']};
+        var importSelect = new List('importContacts',options);
+        
     }
 
 })
@@ -352,7 +372,21 @@ $(function(){
     </div>
     <div class="modalView" id="listSelect">
         <div class="modalContentContainer">
-            The list will go here
+            <div id="importContacts">
+                <input type="text" class="search" placeholder="Search">
+                <button class="btn sort" data-sort="name">Sort by Name</button>
+                <table id="importSelectionTable">
+                    <thead>
+                        <th>Import?</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone Numbers</th>
+                        <th>Other Emails</th>
+                    </thead>
+                    <tbody class="list">
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton sphereRedBackground">Back</div>
