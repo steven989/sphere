@@ -193,8 +193,6 @@ $(function(){
 
     // Standard ajax call for buttons
     function buttonAjax(button,data) {
-        console.log(data);
-        console.log(eval(data));
         var alertElement = $(button.data('alert-element'));
           $.ajax({
             url: button.attr('href'),
