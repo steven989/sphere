@@ -38,4 +38,5 @@ class Level < ActiveRecord::Base
         criteria
     end
 
+
 end

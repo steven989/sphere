@@ -23,6 +23,10 @@ class User < ActiveRecord::Base
   validates :email, uniqueness: true
 
 
+  def is? (user_type)
+    user_type == self.user_type
+  end
+
   def authorized_by(provider,scope)
       providers = authorizations.where("provider ilike ? and scope ilike ?",provider,"%#{scope}%")
       providers.length == 1 ? true : false
@@ -60,6 +64,43 @@ class User < ActiveRecord::Base
         connection.update_score
       end
       
+  end
+
+
+  def self.find_users_matching_criteria(criteria,return_all_stats=false)
+    if return_all_stats
+      stats = StatisticDefinition.all.map {|stat| stat.name}
+    else
+      stat_specified = criteria.scan(/@[^@]+@/).uniq
+      stats = stat_specified.map {|stat| stat.gsub("@","").downcase}
+    end
+    sql_base_table_select_statement = stats.map {|stat| "max(case when b.name ilike '#{stat}' then b.value else null end) as #{stat}"}.join(",")
+    sql_base_table_select_statement_with_leading_comma = ","+sql_base_table_select_statement
+
+    begin
+      sql = "SELECT a.* FROM (SELECT a.id as user_id#{sql_base_table_select_statement_with_leading_comma} FROM users a LEFT JOIN user_statistics b on a.id = b.user_id GROUP BY a.id) a WHERE (#{User.decode_criteria_into_sql_where_statement(criteria)})"
+      result = ActiveRecord::Base.connection.exec_query(sql)
+    rescue => error
+      status = false
+      message = error.message
+      data = nil
+    else
+      status = true
+      message = "User query successfully completed"
+      data = result.to_a
+    end
+    {status:status,message:message,data:data}
+  end
+
+  def self.decode_criteria_into_sql_where_statement(criteria)
+      stat_specified = criteria.scan(/@[^@]+@/).uniq
+      operators_specified = criteria.scan(/#[^#]+#/).uniq
+      operator_dictionary = {"and" => "AND", "or" => "OR"}        
+      stat_with_replacement = stat_specified.map {|stat| {stat => "a.#{stat.gsub('@','')}"} }
+      operator_with_replacement = operators_specified.map {|operator| {operator => "#{operator_dictionary[operator.gsub('#','').downcase]}"} }
+      stat_with_replacement.each {|replacement| criteria.gsub!(replacement.keys[0],replacement.values[0]) }
+      operator_with_replacement.each {|replacement| criteria.gsub!(replacement.keys[0],replacement.values[0]) }
+      criteria
   end
 
 
