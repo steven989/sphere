@@ -83,7 +83,7 @@ class Connection < ActiveRecord::Base
           client = OAuth2::Client.new(ENV['GOOGLE_OAUTH_CLIENT_ID'],ENV['GOOGLE_OAUTH_CLIENT_SECRET'])
           oauth_access_token_for_user = OAuth2::AccessToken.new(client,token_object[:access_token])
           google_contacts_user = GoogleContactsApi::User.new(oauth_access_token_for_user)
-          contacts = google_contacts_user.contacts.map {|contact| {name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }} 
+          contacts = google_contacts_user.contacts.map {|contact| {id:contact.id,name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }} 
         rescue => error
             status = false
             message = error.message                  
@@ -92,6 +92,152 @@ class Connection < ActiveRecord::Base
           message = "Contacts successfully imported from Google"
           {status:status,message:message,data:contacts,access_token:token_object}
         end
+    end
+
+    def self.insert_contact(user,name,email=nil,other_emails=nil,phones)
+          # If email matches an existing contact, merge the contacts and emails addresses (keep the current name and email in app, add any new emails to "additional emails") Otherwise create a new entry in the contacts
+          
+          if email || other_emails
+            unified_email_array = []
+            unified_email_array.push(email) if email
+            unified_email_array += other_emails.split("|>-<+|%") if other_emails
+            unified_email_array = unified_email_array.map {|email| email.gsub(" ","")} #remove any spaces in the email
+            unified_email_array = unified_email_array.uniq
+          else 
+            unified_email_array = nil
+          end
+
+          if phones
+            unified_phones_array = phones.split("|>-<+|%")
+          else
+            unified_phones_array = nil
+          end
+
+          if !unified_email_array.blank?
+            sql_where_statement = unified_email_array.map {|email| "(email ilike '%#{email}%') OR (additional_emails ilike '%#{email}%')" }.join(" OR ")
+            matched_connections = user.connections.where(sql_where_statement)
+
+            if matched_connections.length > 0
+              matched_connection = matched_connections.take
+              # Merge emails
+              matched_connection_email = matched_connection.email
+              matched_connection_other_emails = eval((matched_connection.additional_emails.blank? ? "[]" : matched_connection.additional_emails)) #will return either [] or ["some_values"]
+              if matched_connection_email.blank?
+                primary_email_to_update_string = unified_email_array.slice!(0)
+                updated_additional_emails_array = unified_email_array
+                updated_additional_emails_string = updated_additional_emails_array.to_s
+              else
+                primary_email_to_update = nil
+                matched_connection_email.gsub!(" ","")
+                additional_emails_to_merge = unified_email_array.delete_if {|email| email == matched_connection_email}
+                updated_additional_emails_array = (matched_connection_other_emails + additional_emails_to_merge).uniq
+                updated_additional_emails_string = updated_additional_emails_array.to_s
+              end
+
+              # Merge phone numbers
+              matched_connection_phone = matched_connection.phone
+              matched_connection_other_phones = eval((matched_connection.additional_phones.blank? ? "[]" : matched_connection.additional_phones)) #will return either [] or ["some_values"]
+              if matched_connection_phone.blank?
+                if unified_phones_array.blank?
+                  primary_phone_to_update = nil
+                  updated_additional_phones_string = nil
+                else
+                  primary_phone_to_update = unified_phones_array.slice!(0)
+                  updated_additional_phones_array = (matched_connection_other_phones + unified_phones_array).uniq
+                  updated_additional_phones_string = updated_additional_phones_array.to_s
+                end
+              else
+                additional_phones_to_merge = unified_phones_array.delete_if {|phone| phone == matched_connection_phone}
+                updated_additional_phones_array = (matched_connection_other_phones + additional_phones_to_merge).uniq
+                primary_phone_to_update = nil
+                updated_additional_phones_string = updated_additional_phones_array.to_s
+              end
+
+              (matched_connection.email = primary_email_to_update_string) if primary_email_to_update_string
+              (matched_connection.additional_emails = updated_additional_emails_string) if updated_additional_emails_string
+              (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
+              (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
+
+              if matched_connection.save
+                status = true
+                message = "Connection successfully updated"
+              else
+                status = false
+                message = "Connection could not be saved be saved. #{matched_connection.errors.full_messages.join(', ')}"
+              end
+            else
+              primary_phone_to_update = unified_phones_array.slice!(0)
+              updated_additional_phones_array = unified_phones_array.uniq
+              updated_additional_phones_string = updated_additional_phones_array.to_s
+
+              first_name_to_create = Connection.parse_first_name(name)
+              last_name_to_create = Connection.parse_last_name(name)
+              email_to_create = email.blank? ? nil : email
+              other_emails_to_create = other_emails.blank? ? "[]" : other_emails
+              phone_to_create = primary_phone_to_update
+              other_phones_to_create = updated_additional_phones_string
+
+              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true)
+              if new_connection.save
+                status = true
+                message = "Connection successfully created"
+              else
+                status = false
+                message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
+              end
+            end
+          else
+              primary_phone_to_update = unified_phones_array.slice!(0)
+              updated_additional_phones_array = unified_phones_array.uniq
+              updated_additional_phones_string = updated_additional_phones_array.to_s
+
+              first_name_to_create = Connection.parse_first_name(name)
+              last_name_to_create = Connection.parse_last_name(name)
+              email_to_create = email.blank? ? nil : email
+              other_emails_to_create = other_emails.blank? ? "[]" : other_emails
+              phone_to_create = primary_phone_to_update
+              other_phones_to_create = updated_additional_phones_string
+
+              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true)
+              if new_connection.save
+                status = true
+                message = "Connection successfully created"
+                data = nil
+              else
+                status = false
+                message = "#{name} could not be saved be saved. #{new_connection.errors.full_messages.join(', ')}"
+                data = name
+              end
+          end
+          {status:status,message:message,data:data}
+    end
+
+    def self.create_from_import(user,contacts_imported)
+      result_array = []
+        contacts_imported.each do |contact|
+          name = contact["name"]
+          email = contact["email"]
+          phone = contact["phone"]
+          other_emails = contact["other_emails"]
+
+          result = Connection.insert_contact(user,name,email,other_emails,phone)
+          result_array.push(result)
+        end
+      issues = result_array.select {|result| result[:status] == false}
+      if issues.length > 0 
+        status = false
+        message = issues.map {|issue| issue[:message] }.join(", ")
+        data = issues.map {|issue| issue[:data] }
+      else
+        status = true
+        message = "Connections successfully created"
+        data = nil
+      end
+      {status:status,message:message,data:data}
+    end
+
+    def find_photo
+      
     end
 
 end

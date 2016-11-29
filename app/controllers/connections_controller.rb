@@ -61,5 +61,17 @@ class ConnectionsController < ApplicationController
         end
     end
 
+    def create_from_import
+        result = Connection.create_from_import(current_user,params[:contactsToImport].values)
+        actions = [{action:"function_call",function:"closeModalInstance(2000)"}]
+        message = result[:status] ? result[:message] : "Oops. Looks like our robots had some errors saving the contacts. Here are the details: #{result[:message]}"
+
+        respond_to do |format|
+          format.json {
+            render json: {status:result[:status], message:message,actions:actions,data:result[:data]}
+          } 
+        end
+    end
+
 
 end

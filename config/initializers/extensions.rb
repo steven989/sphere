@@ -1,0 +1,1 @@
+require "#{Rails.root}/lib/gem_extensions/extend_google_contacts_api.rb"

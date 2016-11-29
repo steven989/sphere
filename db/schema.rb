@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161126231856) do
+ActiveRecord::Schema.define(version: 20161128153407) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,14 +108,16 @@ ActiveRecord::Schema.define(version: 20161126231856) do
     t.integer  "user_id"
     t.string   "first_name"
     t.string   "last_name"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
     t.integer  "target_contact_interval_in_days"
     t.boolean  "active"
     t.string   "email"
     t.string   "phone"
     t.string   "photo"
     t.string   "photo_access_url"
+    t.string   "additional_emails",               default: "[]"
+    t.string   "additional_phones",               default: "[]"
   end
 
   create_table "level_histories", force: :cascade do |t|

@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   post 'connections/:id/create_note' => 'connections#create_note', as: 'create_connection_note'
   put  'connections/update' => 'connections#update', as: 'update_connection'
   put  'connections/import' => 'connections#import', as: 'import_connection'
+  post  'connections/create_from_import' => 'connections#create_from_import', as: 'create_from_import'
 
   get 'login' => 'user_sessions#new', :as => :login
   get 'logout' => 'user_sessions#destroy', :as => :logout

@@ -52,9 +52,7 @@ $(function(){
                   }).done(function(data){
                         if (data.status) {
                             $(".modalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
-                            setTimeout(function(){
-                                modalInstance.close();
-                            },2000)
+                            closeModalInstance(2000);
                         } else {
                             $(".modalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                             
@@ -67,6 +65,14 @@ $(function(){
             });
         });
     }
+
+    // close modal instance 
+    function closeModalInstance(timer) {
+        setTimeout(function(){
+            modalInstance.close();
+        },timer);        
+    }
+
 
     // Transitioning mechanism of different views within the bubble popup modal
     $('[data-remodal-id=bubbleModal] .transitionButton').off('click').on('click',function(){
@@ -182,20 +188,21 @@ $(function(){
 
     // Importing contacts
     $('#importContactsGoogle').off("click").on("click",function(){
-        buttonAjax($(this));
+        buttonAjax($(this),$(this).data('data-to-send'));
     });
 
     // Standard ajax call for buttons
-    function buttonAjax(button) {
-        var data = eval(button.data('data-to-send'));
+    function buttonAjax(button,data) {
+        console.log(data);
+        console.log(eval(data));
         var alertElement = $(button.data('alert-element'));
           $.ajax({
             url: button.attr('href'),
             type: button.data('method'),
-            data: data,
+            data: eval(data),
             dataType: 'JSON'
           }).done(function(data){
-                console.log(data);
+            console.log(data);
                 if (data.status) {
                         if(data.message != undefined) {
                             alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
@@ -214,7 +221,7 @@ $(function(){
           })
     }
 
-    // Predefined set of actions can be called by passing an array of actions into this function. Useful for rails to call specific follow up actions
+    // Predefined set of actions can be called by passing an array of actions into this function. Useful for Rails to call specific follow up actions
     function performActions(actionsArray) {
         actionsArray.forEach(function(actionObject){
             if(actionObject.action=="popup_refresh_main_on_close") {
@@ -240,13 +247,37 @@ $(function(){
     function populateImportSelectionList(list) {
         $('.modalView#listSelect .importSelectionTable tbody').html("");
         var incrementer = 0;
-        list.forEach(function(contact){
+        var contacts = list;
+        console.log(contacts);
+        returnedData,list = null; //this is to clear up the reference to the object to make it available for garbage collection after we're done
+        contacts.forEach(function(contact){
             contact.incID = incrementer;
-            $('.modalView#listSelect #importSelectionTable tbody').append('<tr><td class="import" data-inc-id='+incrementer+' ><%= check_box_tag :import %></td><td class="name">'+contact.name+'</td><td class="email">'+contact.email+'</td><td class="phone">'+contact.phone.join(', ')+'</td><td class="other_emails">'+contact.other_emails.join(', ')+'</td></tr>');
+            $('.modalView#listSelect #importSelectionTable tbody').append('<tr data-inc-id='+incrementer+'><td class="import" ><input type="checkbox" data-inc-id='+incrementer+' data-name="'+contact.name+'" data-email="'+contact.email+'" data-phone="'+contact.phone.join('|>-<+|%')+'" data-other-emails="'+contact.other_emails.join('|>-<+|%')+'" ></td><td class="name" >'+contact.name+'</td><td class="email">'+contact.email+'</td><td class="phone">'+contact.phone.join(', ')+'</td><td class="other_emails">'+contact.other_emails.join(', ')+'</td></tr>');
             incrementer++;
         });
-        var options = {valueNames:['name','email','phone','other_emails']};
-        var importSelect = new List('importContacts',options);
+        
+        $('#importContacts .search').off("keyup").on("keyup",function(){
+            var keyword = $(this).val().toLowerCase();
+            var matchedItemsIDs = contacts.filter(function(c){ return ((c.name+" "+c.email+" "+c.phone.join(', ')+" "+c.other_emails.join(', ')).toLowerCase().indexOf(keyword) > -1 ) }).map(function(c){return c.incID });
+            $('#importContacts table tbody tr').each(function(){
+                if ( matchedItemsIDs.indexOf($(this).data('inc-id')) > -1 ) {
+                    $(this).removeClass("hidden");
+                } else {
+                    $(this).removeClass("hidden").addClass('hidden');
+                }
+            });
+
+        });
+        $('.modalView#listSelect .modalBottomRightButton').off("click").on('click',function(){
+            var contactListToSend = [];
+            $('#importContacts table tbody tr td.import input[type=checkbox]').each(function(){
+                if ($(this).prop('checked')) {
+                    contactListToSend.push({name:$(this).data('name'),email:$(this).data('email'),phone:$(this).data('phone'),other_emails:$(this).data('other-emails') })
+                }
+            });
+            buttonAjax($(this),{contactsToImport:contactListToSend});
+        });
+
         
     }
 
@@ -373,6 +404,7 @@ $(function(){
     <div class="modalView" id="listSelect">
         <div class="modalContentContainer">
             <div id="importContacts">
+                <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;position:absolute;top:0px;left:0px;"></div>
                 <input type="text" class="search" placeholder="Search">
                 <button class="btn sort" data-sort="name">Sort by Name</button>
                 <table id="importSelectionTable">
@@ -390,7 +422,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton sphereRedBackground">Back</div>
-            <div class="modalBottomRightButton sphereBlueBackground">Add to Sphere</div>
+            <div class="modalBottomRightButton sphereBlueBackground" href="<%= create_from_import_path %>" data-method="POST">Add to Sphere</div>
         </div>
     </div>
 </div>
