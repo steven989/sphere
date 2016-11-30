@@ -1,0 +1,260 @@
+<script>
+var test;
+
+$(function(){
+    var receivedDataFromAJAX;
+    $('#sidebar').easytabs({
+        panelContext: $('.mainPanels')
+    });
+
+
+    $('.loadInputForm').off("click").on("click",function(){
+        loadInputForm($(this).data('input-form-model'));
+    });
+
+    function readyInputs(modelName){
+        var model = $('.inputs#'+modelName);
+        // update all checkbox
+        model.find('.toggleAll#toggle_all_update').off("change").on("change",function(){
+            _this = $(this);
+            model.find("input.updateCheck").each(function(){
+                $(this).prop('checked',_this.prop('checked'));
+            });
+        });
+        // delete all checkbox
+        model.find('.toggleAll#toggle_all_delete').off("change").on("change",function(){
+            _this = $(this);
+            model.find("input.deleteCheck").each(function(){
+                $(this).prop('checked',_this.prop('checked'));
+            });
+        });
+        // individual update auto select upon editing fields
+        model.find('.updateInput').off("input").on("input",function(){
+            $(this).closest('.update-instance').find('input.updateCheck').prop('checked',true);
+        });
+        model.find('.updateInput').off("change").on("change",function(){
+            $(this).closest('.update-instance').find('input.updateCheck').prop('checked',true);
+        });
+        // add rows
+        model.find('button.addRows').off("click").on("click",function(){
+            var rowsToAdd = $(this).siblings('input#rows_to_add').val();
+            for(var i=0;i<rowsToAdd;i++){
+                model.find('tbody').append('<tr class="update-instance" data-instance-id='+Date.now().toString()+i.toString()+'><td><%= check_box_tag :update,nil,nil,class:"updateCheck" %></td><td><%= number_field_tag :level,nil,class:"updateInput" %></td><td><%= text_field_tag :criteria, nil,class:"updateInput" %></td><td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td></tr>')
+            };
+            readyInputs(modelName);
+        })
+
+        // custom validation
+        model.find('button.validations').off("click").on("click",function(){
+            eval($(this).data('validations-to-run')).forEach(function(fn){
+                eval(fn);
+            });
+        });
+        
+        // send data to server
+        model.find('button.updateToServer').off("click").on("click",function(){
+            var rowsToSend = model.find('.update-instance').filter(function(){
+                return ($(this).find('input.updateCheck').prop("checked") == true || $(this).find('input.deleteCheck').prop("checked") == true);
+            })
+            var dataToSend = [];
+            rowsToSend.each(function(){
+                var dataObject = {};
+
+                dataObject["delete"] = $(this).find('input.deleteCheck').prop('checked');
+                dataObject["inputId"] = $(this).data('instance-id');
+                $(this).find('.updateInput').each(function(){
+                    dataObject[$(this).prop('name')] = $(this).val();
+                });
+                dataToSend.push(dataObject);
+            });
+            if (dataToSend.length > 0) {
+                buttonAjax($(this),dataToSend);
+            } else {
+                alert("You must select at least 1 row to update")
+            }
+        });
+    }
+
+    function loadInputForm(modelName) {
+        var baseUrl = '<%= render_model_input_form_path %>';
+      $.ajax({
+        url: baseUrl+'?modelName='+modelName,
+        type: 'GET',
+        dataType: 'html'
+      }).done(function(data){
+        $('.inputs#'+modelName).html(data);
+        readyInputs(modelName);
+      });
+}
+
+    // Standard ajax call for buttons that retrieves JSON response
+    function buttonAjax(button,data) {
+        var alertElement = $(button.data('alert-element'));
+          $.ajax({
+            url: button.attr('href'),
+            type: button.data('method'),
+            data: {data:data},
+            dataType: 'JSON'
+          }).done(function(data){
+            receivedDataFromAJAX = data;
+                if (data.status) {
+                        if(data.message != undefined) {
+                            alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
+                        }
+                } else {
+                    if(data.message != undefined) {
+                        alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                    }
+                }
+                if (data.data != undefined) {
+                    returnedData = data.data;
+                }
+                if (data.actions != undefined && data.actions.length > 0) {
+                    performActions(data.actions);    
+                }
+          })
+    }
+
+
+
+
+    // Predefined set of actions can be called by passing an array of actions into this function. Useful for Rails to call specific follow up actions after AJAX call
+    function performActions(actionsArray) {
+        actionsArray.forEach(function(actionObject){
+            if(actionObject.action=="popup_refresh_main_on_close") {
+                var win = window.open(actionObject.url);
+            var checkConnect = setInterval(function() {
+                    if (!win || !win.closed) return;
+                    clearInterval(checkConnect);
+                    window.location.reload();
+                }, 100);                        
+            } else if (actionObject.action=="unhide") {
+                $(actionObject.element).removeClass('hidden');
+            } else if (actionObject.action == "change_css") {
+                $(actionObject.element).css(actionObject.css.attribute,actionObject.css.value);
+            } else if (actionObject.action == "transitionViews") {
+                transition($(actionObject.from),$(actionObject.to));
+            } else if (actionObject.action == "function_call") {
+                eval(actionObject.function);
+            }
+        });
+    }
+
+    var validations = {
+        checkConsecutiveLevels: function() {
+            var hashOfLevels = {};
+            var arrayOfLevels = $('#level .update-instance').map(function(){return {instanceID:$(this).data('instance-id'), level:parseInt($(this).find('input#level').val())}} ).toArray().sort(function(a,b){ return a.level - b.level });
+
+            var numberOfIssues = 0;
+            for (var i=0; i< arrayOfLevels.length; i++) {
+                if (i>0) {
+                    var difference = arrayOfLevels[i].level - arrayOfLevels[i-1].level;
+                    if (difference != 1 ) {
+                        performActions([{action:'change_css',element:'.inputs#level .update-instance[data-instance-id='+arrayOfLevels[i].instanceID+'] input[name=level]',css:{attribute:'border',value:'1px solid red'} }]);
+                        numberOfIssues++;
+                    } else {
+                            performActions([{action:'change_css',element:'.inputs#level .update-instance[data-instance-id='+arrayOfLevels[i].instanceID+'] input[name=level]',css:{attribute:'border',value:'initial'} }]);                        
+                    }
+                }
+            }
+            if (numberOfIssues > 0) {
+                alert("Some issues found! Look for the highlighted cells")
+            } else {
+                alert("No issues")
+            }
+        },
+        checkFieldCompletion: function(modelName) {
+
+        },
+        checkFieldNames: function(modelName) {
+
+        }
+    }
+
+
+    function reCheck(modelName,inputIds,updateOrDelete) {
+        inputIdsInInt = inputIds.map(function(id){ return parseInt(id) });
+        $('#'+modelName+' .update-instance').each(function(){
+            if ( inputIdsInInt.indexOf(parseInt($(this).data('instance-id'))) > -1 ) {
+                if (updateOrDelete == "update") {
+                    $(this).find('input.updateCheck').prop("checked",true);
+                    $(this).find('input.deleteCheck').prop("checked",false);
+                } else {
+                    $(this).find('input.updateCheck').prop("checked",false);
+                    $(this).find('input.deleteCheck').prop("checked",true);
+                }                
+            } else {
+                    $(this).find('input.updateCheck').prop("checked",false);
+                    $(this).find('input.deleteCheck').prop("checked",false);
+            }
+
+        });
+    }
+
+
+})
+</script>
+
+    <div id="wrapper" class="container">
+
+        <div id="top">
+            <div id="topBar">
+                <div class="wrapper20">
+                    <a class="logo" href="#" title="">
+                        SPHERE beta
+                    </a>
+                    <div class="topNav clearfix">
+                        <a href="<%= logout_path %>">Logout</a>
+                    </div> <!-- /topNav -->
+                </div>
+            </div> <!-- /topBar -->
+        </div> <!-- /top -->
+
+        <div id="sidebar" class="tab-container">
+            <ul class="mainNav etabs">
+                <li class="active tab">
+                    <a href="#dashboard"><i class="fa fa-user"></i><br>Dashboard</a>
+                </li>
+                <li class="tab">
+                    <a href="#users"><i class="fa fa-paperclip"></i><br>Users</a>
+                </li>
+                <li class="tab loadInputForm" data-input-form-model="level">
+                    <a href="#levels"><i class="fa fa-tasks"></i><br>Levels</a>
+                </li>
+                <li class="tab loadInputForm" data-input-form-model="challenge">
+                    <a href="#challenges"><i class="fa fa-comments"></i><br>Challenges</a>
+                </li>
+                <li class="tab loadInputForm" data-input-form-model="badge">
+                    <a href="#badges"><i class="fa fa-bar-chart-o"></i><br>Badges</a>
+                </li>
+            </ul>
+        </div> <!-- /sidebar -->
+
+        <div id="main" class="clearfix">
+            <div class="fluid mainPanels">
+                  <div id="dashboard">
+                    <h2>Dashboard</h2>
+                    <!-- content -->
+                  </div>
+                  <div id="users">
+                    <h2>Users</h2>
+                    <!-- content -->
+                  </div>
+                  <div id="levels">
+                    <h2>Levels</h2>
+                    <div class="inputs" id="level" >
+
+                    </div>
+                  </div>
+                  <div id="challenges">
+                    <h2>Challenges</h2>
+                    <!-- content -->
+                  </div>
+                  <div id="badges">
+                    <h2>Badges</h2>
+                    <!-- content -->
+                  </div>
+            </div>  <!-- /fluid -->
+        </div> <!-- /main -->
+
+    </div> <!-- /wrapper -->

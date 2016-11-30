@@ -1,0 +1,23 @@
+<%= number_field_tag :rows_to_add,10 %>
+<button class="addRows">Add Rows</button>
+<button class="validations" data-validations-to-run="[validations.checkConsecutiveLevels()]">Validate level numbering</button>
+<button class="updateToServer" href="<%= update_levels_path %>" data-method="put" data-alert-element=".inputs#level .alert">Update all selected changes</button>
+<div class="alert hidden default_hidden" style="margin-top:1px;line-height:15px;"></div>
+<table>
+    <thead>
+        <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
+        <th>Level</th>
+        <th>Criteria</th>
+        <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
+    </thead>
+    <tbody>
+        <% @levels.each do |level| %>
+           <tr class="update-instance" data-instance-id=<%= level.id %>>
+               <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,level.id, class:"updateInput" %></td>
+               <td><%= number_field_tag :level, level.level,class:"updateInput" %></td>
+               <td><%= text_field_tag :criteria, level.criteria,class:"updateInput" %></td>
+               <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
+           </tr> 
+        <% end %>
+    </tbody>
+</table>

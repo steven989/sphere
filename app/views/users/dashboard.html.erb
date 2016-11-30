@@ -200,7 +200,6 @@ $(function(){
             data: eval(data),
             dataType: 'JSON'
           }).done(function(data){
-            console.log(data);
                 if (data.status) {
                         if(data.message != undefined) {
                             alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
@@ -291,6 +290,9 @@ $(function(){
     <div id="accountSettings">
         Settings
     </div>
+    <div id="logout">
+        <a href="<%= logout_path %>">Logout</a>
+    </div>    
 </div>
 
 <div id="navigation-tabs-container">

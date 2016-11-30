@@ -17,6 +17,12 @@ Rails.application.routes.draw do
   get 'logout' => 'user_sessions#destroy', :as => :logout
   resources :user_sessions
 
+
+  # Admins controller
+  get 'admins/dashboard' => 'admins#dashboard', as: 'admin_dashboard'
+  get 'admins/render_model_input_form' => 'admins#render_model_input_form', as: 'render_model_input_form'
+  put  'admins/update_levels' => 'admins#update_levels', as: 'update_levels'
+
   resources :plans
   # Authorization callback routes
   get 'auth/google_oauth2/login/callback' => 'authorizations#google_login', as: 'google_login_redirect'

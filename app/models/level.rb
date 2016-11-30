@@ -1,4 +1,7 @@
 class Level < ActiveRecord::Base
+    validates :level, presence: true
+    validates :level, uniqueness: true
+    validates :criteria, uniqueness: true
 
     def self.find_level_for(current_user)
         sorted_array_of_leveling_criteria = Level.all.order(level: :asc).map {|level| {level:level.level, criteria:level.criteria}}
@@ -9,6 +12,66 @@ class Level < ActiveRecord::Base
             Level.find_level(current_user,sorted_array_of_leveling_criteria)
         end
         
+    end
+
+    def self.update_level(delete,id,level,criteria)
+        if !id.blank?
+            levelObj = Level.find(id)
+            if levelObj
+                if delete
+                    levelObj.destroy
+                    status = true
+                    message = "Level deleted"
+                    elements = nil
+                else
+
+                    # evaluate the criteria to make sure it's actually good
+                    evaluation_result = criteria == levelObj.criteria ? true : User.find_users_matching_criteria(criteria)[:status]
+                    if evaluation_result
+                        levelObj.assign_attributes(level:level,criteria:criteria)
+                        if levelObj.save
+                            status = true
+                            message = "Level successfully updated"
+                            elements = nil
+                        else
+                            status = false
+                            message = "Level could not be updated: #{levelObj.errors.full_messages.join(', ')}"
+                            elements = levelObj.errors.messages.keys
+                        end
+                    else
+                        status = false
+                        message = "Incorrect criteria syntax"
+                        elements = [:criteria]
+                    end
+                end
+
+
+            else
+                status = true
+                message = "Did not find ID. No action performed"
+                elements = nil
+            end 
+        else
+            # evaluate the criteria to make sure it's actually good
+            evaluation_result = User.find_users_matching_criteria(criteria)[:status]
+            if evaluation_result
+                levelObj = Level.new(level:level,criteria:criteria)
+                if levelObj.save
+                    status = true
+                    message = "Level successfully updated"
+                    elements = nil
+                else
+                    status = false
+                    message = "Level could not be updated: #{levelObj.errors.full_messages.join(', ')}"
+                    elements = levelObj.errors.messages.keys
+                end
+            else
+                status = false
+                message = "Incorrect criteria syntax"
+                elements = [:criteria]
+            end
+        end
+        {status:status,message:message,elements:elements}
     end
 
     private

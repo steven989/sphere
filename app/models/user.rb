@@ -93,14 +93,15 @@ class User < ActiveRecord::Base
   end
 
   def self.decode_criteria_into_sql_where_statement(criteria)
-      stat_specified = criteria.scan(/@[^@]+@/).uniq
-      operators_specified = criteria.scan(/#[^#]+#/).uniq
+      criteriaDup = criteria.dup
+      stat_specified = criteriaDup.scan(/@[^@]+@/).uniq
+      operators_specified = criteriaDup.scan(/#[^#]+#/).uniq
       operator_dictionary = {"and" => "AND", "or" => "OR"}        
       stat_with_replacement = stat_specified.map {|stat| {stat => "a.#{stat.gsub('@','')}"} }
       operator_with_replacement = operators_specified.map {|operator| {operator => "#{operator_dictionary[operator.gsub('#','').downcase]}"} }
-      stat_with_replacement.each {|replacement| criteria.gsub!(replacement.keys[0],replacement.values[0]) }
-      operator_with_replacement.each {|replacement| criteria.gsub!(replacement.keys[0],replacement.values[0]) }
-      criteria
+      stat_with_replacement.each {|replacement| criteriaDup.gsub!(replacement.keys[0],replacement.values[0]) }
+      operator_with_replacement.each {|replacement| criteriaDup.gsub!(replacement.keys[0],replacement.values[0]) }
+      criteriaDup
   end
 
 

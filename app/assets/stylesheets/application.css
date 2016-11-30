@@ -41,17 +41,23 @@ body {
     left: 20px;
 }
 
-#addConnection, #accountSettings {
+#addConnection, #accountSettings, #logout {
+    float:right;
     position: absolute;
     color: white;
 }
 
 #addConnection {
     top: 20px;
-    right: 120px;
+    right: 220px;
 }
 
 #accountSettings {
+    top: 20px;
+    right: 120px;
+}
+
+#logout {
     top: 20px;
     right: 20px;
 }

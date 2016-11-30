@@ -17,6 +17,9 @@ class UsersController < ApplicationController
     end
 
     def dashboard
+        if current_user.is? "admin"
+          redirect_to admin_dashboard_path
+        end
         @connections = current_user.connections.active
         @raw_bubbles_data = @connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name, :photo_access_url).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2],photo_url:result[5] } }.to_json
         bubbles_parameters_object = SystemSetting.search("bubbles_parameters").value_in_specified_type
