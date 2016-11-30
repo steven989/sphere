@@ -66,6 +66,16 @@ $(function(){
         });
     }
 
+    // open modal instance
+    function initializeReModal(element,modifier,resetType) {
+        modalInstance = $(element).remodal({
+        closeOnConfirm:false,
+        modifier:modifier
+        });
+        resetModal($(element),resetType);
+        modalInstance.open();        
+    }
+
     // close modal instance 
     function closeModalInstance(timer) {
         setTimeout(function(){
@@ -119,7 +129,7 @@ $(function(){
         if (resetType == 2 || resetType == 3) { 
             // Reset values
             modal.parent().find('input').each(function(){
-                if($(this).prop('type') != 'hidden') {
+                if($(this).prop('type') != 'hidden' && $(this).prop('type') != 'checkbox' ) {
                     $(this).val('');    
                 }
             })
@@ -152,6 +162,7 @@ $(function(){
           });
     }
 
+
     // Add connections
 
     $('.modalView#mainImportView .modalBottomFullButton').off('click').on('click',function(){
@@ -161,14 +172,8 @@ $(function(){
 
 
     $('#addConnection').off('click').on('click',function(){
-        modalInstance = $('[data-remodal-id=importModal]').remodal({
-        closeOnConfirm:false,
-        modifier:'standardModal'
-        });
-        resetModal($('[data-remodal-id=importModal]'),3);
-        modalInstance.open();
-
-    })
+        initializeReModal('[data-remodal-id=importModal]','standardModal',3);
+    });
 
     $('#navigation-tabs-container').easytabs({
         updateHash: false,
@@ -191,6 +196,31 @@ $(function(){
         buttonAjax($(this),$(this).data('data-to-send'));
     });
 
+    // Account settings
+    $('#accountSettings').off("click").on("click",function(){
+        buttonAjax($(this),{});
+    });
+
+    $('.modalView#settingsSelect .modalBottomLeftButton').off("click").on("click",function(){
+        closeModalInstance(0);
+    });
+
+    $('.modalView#settingsSelect .modalBottomRightButton').off("click").on("click",function(){
+        var dataObject = {}
+        $('.settingInput').each(function(){
+            if ($(this).prop('type') == "checkbox") {
+                dataObject[$(this).prop('name')] = $(this).prop('checked');
+            } else if ($(this).prop('type') == 'select-one') {
+                dataObject[$(this).prop('name')] = $(this).find('option:selected').val();
+            } else {
+                dataObject[$(this).prop('name')] = $(this).val();
+            }
+        })
+
+        var dataToSend = {data:dataObject};
+        buttonAjax($(this),dataToSend);
+    });
+
     // Standard ajax call for buttons
     function buttonAjax(button,data) {
         var alertElement = $(button.data('alert-element'));
@@ -201,11 +231,11 @@ $(function(){
             dataType: 'JSON'
           }).done(function(data){
                 if (data.status) {
-                        if(data.message != undefined) {
+                        if(data.message != undefined && alertElement.length > 0 ) {
                             alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
                         }
                 } else {
-                    if(data.message != undefined) {
+                    if(data.message != undefined && alertElement.length > 0) {
                         alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                     }
                 }
@@ -216,6 +246,22 @@ $(function(){
                     performActions(data.actions);    
                 }
           })
+    }
+
+    function populateSettingsForm () {
+
+        var form = $('.modalView#settingsSelect #settingsContainer');
+        form.find('#send_event_booking_notification_by_default_title').html(returnedData.send_event_booking_notification_by_default.title);
+        form.find('#send_event_booking_notification_by_default_value').prop('checked',returnedData.send_event_booking_notification_by_default.value);
+        form.find('#share_my_calendar_with_contacts_title').html(returnedData.share_my_calendar_with_contacts.title);
+        form.find('#share_my_calendar_with_contacts_value').prop('checked',returnedData.share_my_calendar_with_contacts.value);
+        form.find('#default_contact_interval_in_days_title').html(returnedData.default_contact_interval_in_days.title);
+        form.find('#default_contact_interval_in_days_value').val(returnedData.default_contact_interval_in_days.value);
+        form.find('#event_add_granularity_title').html(returnedData.event_add_granularity.title);
+        form.find('#event_add_granularity_detailed_value').prop("selected", (returnedData.event_add_granularity.value == 'detailed'));
+        form.find('#event_add_granularity_quick_value').prop("selected", (returnedData.event_add_granularity.value == 'quick'));
+
+        initializeReModal("[data-remodal-id=settingsModal]","standardModal",1);
     }
 
     // Predefined set of actions can be called by passing an array of actions into this function. Useful for Rails to call specific follow up actions
@@ -245,7 +291,6 @@ $(function(){
         $('.modalView#listSelect .importSelectionTable tbody').html("");
         var incrementer = 0;
         var contacts = list;
-        console.log(contacts);
         returnedData,list = null; //this is to clear up the reference to the object to make it available for garbage collection after we're done
         contacts.forEach(function(contact){
             contact.incID = incrementer;
@@ -287,7 +332,7 @@ $(function(){
     <div id="addConnection">
         Add
     </div>
-    <div id="accountSettings">
+    <div id="accountSettings" href="<%= get_user_settings_path(current_user) %>" data-method="GET">
         Settings
     </div>
     <div id="logout">
@@ -340,7 +385,7 @@ $(function(){
                 <input type="text" class="input-text" name="location" placeholder="Location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
                 <input type="text" class="input-text" name="details" placeholder="Details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
                 <input type="hidden" name="connection_id">
-                <%= check_box_tag :notify,nil,checked:true %>
+                <%= check_box_tag 'notify',1,@settings[:send_event_booking_notification_by_default] %>
                 <label for="notify">Send invite?</label>
                 <input type="text" class="input-text hidden default_hidden" name="connection_email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" >
                 <div class="alert hidden default_hidden" id="makePlanFormAlert" style="margin-top:1px;line-height:15px;"></div>
@@ -423,6 +468,42 @@ $(function(){
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton sphereRedBackground">Back</div>
             <div class="modalBottomRightButton sphereBlueBackground" href="<%= create_from_import_path %>" data-method="POST">Add to Sphere</div>
+        </div>
+    </div>
+</div>
+
+<div data-remodal-id="settingsModal" data-default-css="([{'attribute':'height','value':'400px'}])">
+  <button data-remodal-action="close" class="remodal-close"></button>
+    <div class="modalView" id="settingsSelect">
+        <div class="modalContentContainer">
+            <div id="settingsContainer">
+                <div >
+                    <div id="send_event_booking_notification_by_default_title"></div>
+                    <div><input type='checkbox' class="settingInput" name='send_event_booking_notification_by_default' id='send_event_booking_notification_by_default_value' value=''></div>
+                </div>
+                <div>
+                    <div id="share_my_calendar_with_contacts_title"></div>
+                    <div><input type='checkbox' class="settingInput" name='share_my_calendar_with_contacts' id='share_my_calendar_with_contacts_value' value=''></div>
+                </div>
+                <div>
+                    <div id="default_contact_interval_in_days_title"></div>
+                    <div><input type='number' class="settingInput" name='default_contact_interval_in_days' id='default_contact_interval_in_days_value'></div>
+                </div>
+                <div>
+                    <div id="event_add_granularity_title"></div>
+                    <div>
+                        <select class="settingInput" name='event_add_granularity'>
+                            <option value='detailed' id="event_add_granularity_detailed_value">Detailed</option>
+                            <option value='quick' id="event_add_granularity_quick_value" >Quick</option>
+                        </select>
+                    </div>
+                </div>                
+            </div>
+            <div class="alert hidden default_hidden"></div>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomLeftButton sphereRedBackground">Cancel</div>
+            <div class="modalBottomRightButton sphereBlueBackground" href="<%= update_user_settings_path(current_user) %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">Update</div>
         </div>
     </div>
 </div>

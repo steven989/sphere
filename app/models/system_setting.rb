@@ -7,7 +7,7 @@ class SystemSetting < ActiveRecord::Base
     end
 
     def update_value(value)
-        self.update_attributes(value:value)
+        self.update_attributes(value:value.to_s)
         self
     end
 

@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
   has_many :level_histories
   has_many :authorizations
   has_many :plans
+  has_one :user_setting
 
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
   validates :password_confirmation, presence: true, if: -> { new_record? || changes[:crypted_password] }

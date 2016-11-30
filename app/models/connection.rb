@@ -96,7 +96,7 @@ class Connection < ActiveRecord::Base
 
     def self.insert_contact(user,name,email=nil,other_emails=nil,phones)
           # If email matches an existing contact, merge the contacts and emails addresses (keep the current name and email in app, add any new emails to "additional emails") Otherwise create a new entry in the contacts
-          
+          interval = current_user.user_setting.get_value(:default_contact_interval_in_days)
           if email || other_emails
             unified_email_array = []
             unified_email_array.push(email) if email
@@ -177,7 +177,7 @@ class Connection < ActiveRecord::Base
               phone_to_create = primary_phone_to_update
               other_phones_to_create = updated_additional_phones_string
 
-              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true)
+              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
               if new_connection.save
                 status = true
                 message = "Connection successfully created"
@@ -198,7 +198,7 @@ class Connection < ActiveRecord::Base
               phone_to_create = primary_phone_to_update
               other_phones_to_create = updated_additional_phones_string
 
-              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true)
+              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
               if new_connection.save
                 status = true
                 message = "Connection successfully created"

@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+
+  # Users controller
   root to: 'users#dashboard'
   get 'users/new_connection' => 'users#new_connection', as: 'new_connection'
   post 'users/create_connection' => 'users#create_connection', as: 'create_connection'
@@ -7,6 +9,8 @@ Rails.application.routes.draw do
   post 'users/:connection_id/create_activity' => 'users#create_activity', as: 'create_activity'
   post 'users/create' => 'users#create', as: 'create_user'
   get 'users/new' => 'users#new', as: 'create_account'
+  get 'users/:id/settings' => 'users#get_user_settings', as: 'get_user_settings'
+  put 'users/:id/settings' => 'users#update_user_settings', as: 'update_user_settings'
 
   post 'connections/:id/create_note' => 'connections#create_note', as: 'create_connection_note'
   put  'connections/update' => 'connections#update', as: 'update_connection'
