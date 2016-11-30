@@ -3,8 +3,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     name: "google_login",
     scope: "email, profile",
     include_granted_scopes: true,
-    access_type:"offline",
-    prompt:"consent select_account",
+    prompt:"select_account",
     callback_path: "/auth/google_oauth2/login/callback"
   }
   provider :google_oauth2, ENV["GOOGLE_OAUTH_CLIENT_ID"], ENV["GOOGLE_OAUTH_CLIENT_SECRET"], {

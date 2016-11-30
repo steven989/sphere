@@ -1,6 +1,39 @@
+<script>
+$(function(){
+    $('#googleLoginButton').off("click").on("click",function(){
+            event.preventDefault();
+            event.stopPropagation()
+            var win = window.open($(this).attr('href'));
+            var checkConnect = setInterval(function() {
+                    if (!win || !win.closed) return;
+                    clearInterval(checkConnect);
+                    window.location.replace("<%= root_path %>");
+                }, 100);    
+    });
+})
+
+
+</script>
+
+<% if flash[:alert] %>
+<div class="alert alert-danger"><%= flash[:alert] %></div>
+<% end %>
+Login
 <%= form_tag user_sessions_path, method: 'POST' do %>
     <%= text_field_tag :email, nil, placeholder:"email" %>
     <%= password_field_tag :password, nil,  placeholder:"password" %>
      <%= submit_tag 'Login' %> 
 <% end %>
+<br>
+Sign up
+<%= form_tag create_user_path, method: 'POST' do %>
+    <%= text_field_tag :email, nil, placeholder:"email" %>
+    <%= text_field_tag :first_name, nil, placeholder:"first name" %>
+    <%= text_field_tag :last_name, nil, placeholder:"last name" %>
+    <%= password_field_tag :password, nil,  placeholder:"password" %>
+    <%= password_field_tag :password_confirmation, nil,  placeholder:"retype password" %>
+     <%= submit_tag 'Sign up' %> 
+<% end %>
+
 <%= link_to 'Create Account', create_account_path %>
+<%= link_to 'Login with Google', "http://localhost:3000/auth/google_login", id:'googleLoginButton' %>

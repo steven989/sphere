@@ -7,13 +7,13 @@ class UsersController < ApplicationController
     end
 
     def create
-        @user = User.new(user_params)
-        if @user.save
-          auto_login(@user)
-          redirect_to :root 
+        result = User.create_user(user_params[:email].downcase,user_params[:first_name],user_params[:last_name],user_params[:user_type],user_params[:password],user_params[:password_confirmation])
+        if result[:status]
+          auto_login(result[:user])
+          redirect_to root_path
         else
-          render action: :new
-        end        
+          redirect_to(login_path, alert: "Could not create user. #{result[:message]}")
+        end
     end
 
     def dashboard
@@ -144,7 +144,7 @@ class UsersController < ApplicationController
     end
 
     def user_params
-        params.permit(:email, :password, :password_confirmation)
+        params.permit(:email, :password, :password_confirmation,:first_name,:last_name)
     end
 
     def require_login

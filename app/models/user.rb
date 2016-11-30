@@ -14,18 +14,25 @@ class User < ActiveRecord::Base
   has_many :user_challenge_completeds
   has_many :completed_challenges, through: :user_challenge_completeds, class_name: "Challenge", foreign_key: "challenge_id", source: :challenge
   has_many :level_histories
-  has_many :authorizations
+  has_many :authorizations, dependent: :destroy
   has_many :plans
-  has_one :user_setting
-
+  has_one :user_setting, dependent: :destroy
+  
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
-  validates :password_confirmation, presence: true, if: -> { new_record? || changes[:crypted_password] }
-
   validates :email, uniqueness: true
 
+  after_create :import_default_settings
+
+  def import_default_settings
+    UserSetting.create_from_system_settings(self)
+  end
 
   def is? (user_type)
     user_type == self.user_type
+  end
+
+  def self.find_email(email)
+    User.where(email:email).take
   end
 
   def authorized_by(provider,scope)
@@ -33,6 +40,19 @@ class User < ActiveRecord::Base
       providers.length == 1 ? true : false
   end
 
+
+  def self.create_user(email,first_name,last_name,user_type="user",password=nil,password_confirmation=nil,oauth=false)
+    if oauth || !password.blank?
+      user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
+      if user.save
+        {status:true,user:user,message:nil}
+      else
+        {status:false,user:nil,message:user.errors.full_messages.join(', ')}
+      end
+    else
+      {status:false,user:nil,message:"Password is required"}
+    end
+  end
 
   def daily_connection_tasks # put all daily connection-level tasks here so that there is one loop that runs instead of multiple loops
     

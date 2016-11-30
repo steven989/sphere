@@ -2,14 +2,40 @@ class AuthorizationsController < ApplicationController
 
     # OAuth2 callback routes
     def google_login
-        puts '---------------------------------------------------'
-        puts "login"
-        puts params.inspect
-        puts request.env['omniauth.auth']
-        puts request.env['omniauth.auth']['credentials']
-        puts request.env['omniauth.auth']['credentials'].class
-        puts request.env['omniauth.auth']['credentials']['fresh_token']
-        puts '---------------------------------------------------'
+
+        begin
+            # Grab the email address
+            email = request.env['omniauth.auth']['extra']['raw_info']['email']
+            first_name = request.env['omniauth.auth']['extra']['raw_info']['given_name']
+            last_name = request.env['omniauth.auth']['extra']['raw_info']['family_name']
+
+        rescue => error
+                @action = "open"
+                @errors = "Authorization could not be completed. Please close this window and try again"
+        else
+            if email
+                # If email address matches an existing user, log that user in
+                existing_user = User.find_email(email)
+                if existing_user
+                    auto_login(existing_user)
+                    @action = "close"
+                else
+                    # add photo in here later
+                    result = User.create_user(email,first_name,last_name,"user",nil,nil,true)
+                    if result[:status]
+                        auto_login(result[:user])
+                        authorization = current_user.authorizations.create(provider:"google",scope:"['email','profile']",data:"{email:'#{request.env['omniauth.auth']['extra']['raw_info']['email']}',name:'#{request.env['omniauth.auth']['extra']['raw_info']['name']}'}",login:true)
+                        @action = "close"
+                    else
+                        @errors = "We could not create your user account for the following reasons: result[:message]. Please close this window and try again"
+                        @action = "open"
+                    end
+                end
+            else
+                @action = "open"
+                @errors = "Authorization could not be completed. Please close this window and try again"
+            end
+        end
         
     end
 
