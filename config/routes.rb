@@ -22,6 +22,8 @@ Rails.application.routes.draw do
   get 'admins/dashboard' => 'admins#dashboard', as: 'admin_dashboard'
   get 'admins/render_model_input_form' => 'admins#render_model_input_form', as: 'render_model_input_form'
   put  'admins/update_levels' => 'admins#update_levels', as: 'update_levels'
+  put  'admins/update_challenges' => 'admins#update_challenges', as: 'update_challenges'
+  put  'admins/update_badges' => 'admins#update_badges', as: 'update_badges'
 
   resources :plans
   # Authorization callback routes

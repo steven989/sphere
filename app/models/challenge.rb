@@ -3,7 +3,8 @@ class Challenge < ActiveRecord::Base
     has_many :user_challenge_completeds
     has_many :current_users, through: :user_challenges, class_name: "User", foreign_key: "user_id", source: :user
     has_many :completed_users, through: :user_challenge_completeds, class_name: "User", foreign_key: "user_id", source: :user
-
+    validates :name, presence: true
+    validates :reward, presence: true
 
     def self.identify_challenges_for(current_user)
         number_of_challenges_to_display_to_user = SystemSetting.search("number_of_challenges_to_display_to_user").value_in_specified_type
@@ -41,6 +42,68 @@ class Challenge < ActiveRecord::Base
         operator_with_replacement.each {|replacement| criteria.gsub!(replacement.keys[0],replacement.values[0]) }
         criteria
     end
+
+
+    def self.update_challenge(delete,id,name,description,instructions,repeated_allowed,criteria,reward)
+        if !id.blank?
+            challengeObj = Challenge.find(id)
+            if challengeObj
+                if delete
+                    challengeObj.destroy
+                    status = true
+                    message = "Challenge deleted"
+                    elements = nil
+                else
+
+                    # evaluate the criteria to make sure it's actually good
+                    evaluation_result = criteria == challengeObj.criteria ? true : User.find_users_matching_criteria(criteria)[:status]
+                    if evaluation_result
+                        challengeObj.assign_attributes(name:name,description:description,instructions:instructions,repeated_allowed:repeated_allowed,criteria:criteria,reward:reward)
+                        if challengeObj.save
+                            status = true
+                            message = "Challenge successfully updated"
+                            elements = nil
+                        else
+                            status = false
+                            message = "Challenge could not be updated: #{challengeObj.errors.full_messages.join(', ')}"
+                            elements = challengeObj.errors.messages.keys
+                        end
+                    else
+                        status = false
+                        message = "Incorrect criteria syntax"
+                        elements = [:criteria]
+                    end
+                end
+
+
+            else
+                status = true
+                message = "Did not find ID. No action performed"
+                elements = nil
+            end 
+        else
+            # evaluate the criteria to make sure it's actually good
+            evaluation_result = User.find_users_matching_criteria(criteria)[:status]
+            if evaluation_result
+                challengeObj = Challenge.new(name:name,description:description,instructions:instructions,repeated_allowed:repeated_allowed,criteria:criteria,reward:reward)
+                if challengeObj.save
+                    status = true
+                    message = "Challenge successfully updated"
+                    elements = nil
+                else
+                    status = false
+                    message = "Challenge could not be updated: #{challengeObj.errors.full_messages.join(', ')}"
+                    elements = challengeObj.errors.messages.keys
+                end
+            else
+                status = false
+                message = "Incorrect criteria syntax"
+                elements = [:criteria]
+            end
+        end
+        {status:status,message:message,elements:elements}
+    end
+
 
 
 end

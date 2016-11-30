@@ -1,6 +1,8 @@
 class Badge < ActiveRecord::Base
     has_many :user_badges
     has_many :users, through: :user_badges
+    validates :name, presence: true
+    
 
     def self.identify_badges_for(current_user)
         current_badges = current_user.user_badges
@@ -29,6 +31,66 @@ class Badge < ActiveRecord::Base
         criteria
     end
 
+
+    def self.update_badge(delete,id,name,description,criteria)
+        if !id.blank?
+            badgeObj = Badge.find(id)
+            if badgeObj
+                if delete
+                    badgeObj.destroy
+                    status = true
+                    message = "Badge deleted"
+                    elements = nil
+                else
+
+                    # evaluate the criteria to make sure it's actually good
+                    evaluation_result = criteria == badgeObj.criteria ? true : User.find_users_matching_criteria(criteria)[:status]
+                    if evaluation_result
+                        badgeObj.assign_attributes(name:name,description:description,criteria:criteria)
+                        if badgeObj.save
+                            status = true
+                            message = "Badge successfully updated"
+                            elements = nil
+                        else
+                            status = false
+                            message = "Badge could not be updated: #{badgeObj.errors.full_messages.join(', ')}"
+                            elements = badgeObj.errors.messages.keys
+                        end
+                    else
+                        status = false
+                        message = "Incorrect criteria syntax"
+                        elements = [:criteria]
+                    end
+                end
+
+
+            else
+                status = true
+                message = "Did not find ID. No action performed"
+                elements = nil
+            end 
+        else
+            # evaluate the criteria to make sure it's actually good
+            evaluation_result = User.find_users_matching_criteria(criteria)[:status]
+            if evaluation_result
+                badgeObj = Badge.new(name:name,description:description,criteria:criteria)
+                if badgeObj.save
+                    status = true
+                    message = "Badge successfully updated"
+                    elements = nil
+                else
+                    status = false
+                    message = "Badge could not be updated: #{badgeObj.errors.full_messages.join(', ')}"
+                    elements = badgeObj.errors.messages.keys
+                end
+            else
+                status = false
+                message = "Incorrect criteria syntax"
+                elements = [:criteria]
+            end
+        end
+        {status:status,message:message,elements:elements}
+    end
 
 
 end

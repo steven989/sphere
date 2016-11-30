@@ -1,0 +1,37 @@
+<%= number_field_tag :rows_to_add,10 %>
+<button class="addRows" data-model-name="challenge">Add Rows</button>
+<button class="updateToServer" href="<%= update_challenges_path %>" data-method="put" data-alert-element=".inputs#challenge .alert">Update all selected changes</button>
+<div class="alert hidden default_hidden" style="margin-top:1px;line-height:15px;"></div>
+<table>
+    <thead>
+        <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Instructions</th>
+        <th>Repeat Allowed?</th>
+        <th>Criteria</th>
+        <th>Reward</th>
+        <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
+    </thead>
+    <tbody>
+        <% @challenges.each do |challenge| %>
+           <tr class="update-instance" data-instance-id=<%= challenge.id %>>
+               <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,challenge.id, class:"updateInput" %></td>
+               <td><%= text_field_tag :name, challenge.name, class:"updateInput"%></td>
+               <td><%= text_field_tag :description, challenge.description, class:"updateInput"%></td>
+               <td><%= text_field_tag :instructions, challenge.instructions, class:"updateInput"%></td>
+               <td><%= check_box_tag :repeated_allowed,nil,challenge.repeated_allowed,class:"updateInput" %></td>
+               
+               <td><%= text_field_tag :criteria, challenge.criteria, class:"updateInput"%></td>
+               <td><%= text_field_tag :reward, challenge.reward, class:"updateInput"%></td>
+               <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
+           </tr> 
+        <% end %>
+    </tbody>
+</table>
+
+
+
+
+
+

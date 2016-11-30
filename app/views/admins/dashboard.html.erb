@@ -37,10 +37,22 @@ $(function(){
         });
         // add rows
         model.find('button.addRows').off("click").on("click",function(){
+
             var rowsToAdd = $(this).siblings('input#rows_to_add').val();
+            var modelName = $(this).data('model-name');
+            var standardHTML = $('#'+modelName+' .update-instance').eq(0).html();
+            
             for(var i=0;i<rowsToAdd;i++){
-                model.find('tbody').append('<tr class="update-instance" data-instance-id='+Date.now().toString()+i.toString()+'><td><%= check_box_tag :update,nil,nil,class:"updateCheck" %></td><td><%= number_field_tag :level,nil,class:"updateInput" %></td><td><%= text_field_tag :criteria, nil,class:"updateInput" %></td><td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td></tr>')
+                var instanceID = Date.now().toString()+i.toString();
+                model.find('tbody').append('<tr class="update-instance" data-instance-id='+instanceID+'>'+standardHTML+'</tr>');
+            var row = $('.update-instance[data-instance-id='+instanceID+']');
+            row.find('input#id').remove();
+            row.find('.updateCheck').each(function(){ $(this).prop('checked',false)});
+            row.find('.deleteCheck').each(function(){ $(this).prop('checked',false)});
+            row.find('.updateInput[type=checkbox]').each(function(){ $(this).prop('checked',false)});
+            row.find('.updateInput').each(function(){ $(this).val('')});
             };
+
             readyInputs(modelName);
         })
 
@@ -63,7 +75,12 @@ $(function(){
                 dataObject["delete"] = $(this).find('input.deleteCheck').prop('checked');
                 dataObject["inputId"] = $(this).data('instance-id');
                 $(this).find('.updateInput').each(function(){
-                    dataObject[$(this).prop('name')] = $(this).val();
+                    if ($(this).prop('type') == 'checkbox') {
+                        dataObject[$(this).prop('name')] = $(this).prop('checked');
+                    } else {
+                        dataObject[$(this).prop('name')] = $(this).val();    
+                    }
+                    
                 });
                 dataToSend.push(dataObject);
             });
@@ -248,11 +265,15 @@ $(function(){
                   </div>
                   <div id="challenges">
                     <h2>Challenges</h2>
-                    <!-- content -->
+                    <div class="inputs" id="challenge" >
+                        
+                    </div>
                   </div>
                   <div id="badges">
                     <h2>Badges</h2>
-                    <!-- content -->
+                    <div class="inputs" id="badge" >
+
+                    </div>
                   </div>
             </div>  <!-- /fluid -->
         </div> <!-- /main -->

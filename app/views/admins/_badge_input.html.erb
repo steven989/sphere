@@ -1,0 +1,24 @@
+<%= number_field_tag :rows_to_add,10 %>
+<button class="addRows" data-model-name="badge">Add Rows</button>
+<button class="updateToServer" href="<%= update_badges_path %>" data-method="put" data-alert-element=".inputs#badge .alert">Update all selected changes</button>
+<div class="alert hidden default_hidden" style="margin-top:1px;line-height:15px;"></div>
+<table>
+    <thead>
+        <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Criteria</th>
+        <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
+    </thead>
+    <tbody>
+        <% @badges.each do |badge| %>
+           <tr class="update-instance" data-instance-id=<%= badge.id %>>
+               <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,badge.id, class:"updateInput" %></td>
+               <td><%= text_field_tag :name, badge.name,class:"updateInput" %></td>
+               <td><%= text_field_tag :description, badge.description,class:"updateInput" %></td>
+               <td><%= text_field_tag :criteria, badge.criteria,class:"updateInput" %></td>
+               <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
+           </tr> 
+        <% end %>
+    </tbody>
+</table>
