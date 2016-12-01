@@ -19,23 +19,36 @@ class UsersController < ApplicationController
     def dashboard
         if current_user.is? "admin"
           redirect_to admin_dashboard_path
-        end
+        else
+          @settings = current_user.user_setting.value_evaled
+          @connections = current_user.connections.active          
+          @raw_bubbles_data = @connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name, :photo_access_url).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2],photo_url:result[5] } }.to_json
+          bubbles_parameters_object = SystemSetting.search("bubbles_parameters").value_in_specified_type
+          @bubbles_parameters = {
+            sizeOfGapBetweenBubbles:bubbles_parameters_object[:min_gap_between_bubbles],
+            minDistance:bubbles_parameters_object[:min_distance_from_center_of_central_bubble],
+            minBubbleSize:bubbles_parameters_object[:min_size_of_bubbles],
+            maxBubbleSize:bubbles_parameters_object[:max_size_of_bubbles],
+            numberOfRecursion:bubbles_parameters_object[:number_of_recursions],
+            radiusOfCentralBubble:bubbles_parameters_object[:radius_of_central_bubble],
+            centralBubbleDisplay:current_user.email,
+            centralBubblePhotoURL:nil
+            }.to_json
 
-        @settings = current_user.user_setting.value_evaled
-        @connections = current_user.connections.active
-        @raw_bubbles_data = @connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name, :photo_access_url).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2],photo_url:result[5] } }.to_json
-        bubbles_parameters_object = SystemSetting.search("bubbles_parameters").value_in_specified_type
-        @bubbles_parameters = {
-          sizeOfGapBetweenBubbles:bubbles_parameters_object[:min_gap_between_bubbles],
-          minDistance:bubbles_parameters_object[:min_distance_from_center_of_central_bubble],
-          minBubbleSize:bubbles_parameters_object[:min_size_of_bubbles],
-          maxBubbleSize:bubbles_parameters_object[:max_size_of_bubbles],
-          numberOfRecursion:bubbles_parameters_object[:number_of_recursions],
-          radiusOfCentralBubble:bubbles_parameters_object[:radius_of_central_bubble],
-          centralBubbleDisplay:current_user.email,
-          centralBubblePhotoURL:nil
-          }.to_json
-        @activities = current_user.activities
+          # ----- this section contains all the variables needed to display Level, Challenge and Badge
+            # --- badges
+            @badges = current_user.badges.order(id: :asc)
+            # --- challenges
+            @challenges = current_user.current_challenges.order(id: :asc)
+            # --- level
+            current_user_stats = current_user.stats
+            @level_object = current_user.level
+            @level_num = @level_object.level
+            @xp = current_user_stats[:xp]
+            level_progress_lookup = Level.return_level_xps([@level_num,@level_num+1])
+            @level_progress_percent_string = (((@xp-level_progress_lookup[@level_num]).to_f/(level_progress_lookup[@level_num+1]-level_progress_lookup[@level_num]).to_f)*100.0).round.to_s+"%"
+          # -----
+        end
     end
 
     def new_connection

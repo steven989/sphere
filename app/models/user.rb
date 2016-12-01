@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
   has_many :authorizations, dependent: :destroy
   has_many :plans
   has_one :user_setting, dependent: :destroy
-  
+
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
   validates :email, uniqueness: true
 
@@ -26,6 +26,22 @@ class User < ActiveRecord::Base
   def import_default_settings
     UserSetting.create_from_system_settings(self)
   end
+
+  def level
+    current_level = stat('level')
+    level = Level.where(level:current_level)
+    level.blank? ? nil : level.take
+  end
+
+  def stat(statistic)
+    stat = user_statistics.find_statistic(statistic)
+    stat.blank? ? nil : stat.take.value_in_type
+  end
+
+  def stats
+    user_statistics.inject({}){|result,element| result[element.name.to_sym] = element.value_in_type; result }
+  end
+
 
   def is? (user_type)
     user_type == self.user_type

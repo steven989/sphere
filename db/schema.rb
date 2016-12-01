@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161130152207) do
+ActiveRecord::Schema.define(version: 20161201175920) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 20161130152207) do
     t.string   "criteria"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.string   "graphic"
   end
 
   create_table "challenges", force: :cascade do |t|
@@ -75,6 +76,7 @@ ActiveRecord::Schema.define(version: 20161130152207) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.boolean  "repeated_allowed", default: true
+    t.string   "graphic"
   end
 
   create_table "connection_notes", force: :cascade do |t|
@@ -133,6 +135,7 @@ ActiveRecord::Schema.define(version: 20161130152207) do
     t.string   "criteria"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "graphic"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -219,9 +222,10 @@ ActiveRecord::Schema.define(version: 20161130152207) do
     t.integer  "user_id"
     t.integer  "statistic_definition_id"
     t.string   "name"
-    t.float    "value"
+    t.string   "value"
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.string   "data_type"
   end
 
   create_table "users", force: :cascade do |t|

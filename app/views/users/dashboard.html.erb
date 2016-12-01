@@ -353,11 +353,88 @@ $(function(){
         <div id="mySphere">
 
             <div id="canvas" style="position: relative; margin: auto;"></div>            
-            
+
         </div>
-        <div id="challenges"></div>
-        <div id="progress"></div>
-        <div id="achievements"></div>
+        <div id="challenges">
+            <div class="title">
+                <h1 class="textDarkGray">Your challenges for the week</h1>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <% @challenges.each  do |challenge| %>
+                        <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
+                            <div class="card challengeCard">
+                                <div class="title">
+                                    <h2 class="textDarkGray"><%= challenge.name %></h2>
+                                </div>
+                                <div class="graphic">
+                                    <%= challenge.graphic.blank? ? "" : challenge.graphic %>
+                                </div>
+                                <div class="subtitle">
+                                   <p class="textDarkGray"><%= challenge.instructions %></p>
+                                </div>
+                                <div class="buttons">
+                                    <div class="sphereGreenBackground modalBottomLeftButton">
+                                        Start
+                                    </div>
+                                    <div class="sphereBlueBackground modalBottomRightButton">
+                                        Learn
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    <% end %>                    
+                </div>
+            </div>
+        </div>
+        <div id="progress">
+            <div class="title">
+                <h1 class="textDarkGray">How you're doing so far</h1>
+            </div>
+            <div id="levelDisplay">
+                <div class="content">
+                    <div class="graphic">
+                        <%= @level_object.graphic.blank? ? "" : @level_object.graphic %>
+                    </div>
+                    <div class="details">
+                        <div class="level">
+                            <h2 class="textDarkGray">Level <%= @level_num %></h2>
+                        </div>
+                        <div class="progress progressBar">
+                            <div class="progress-bar bar-green" style="width:<%= @level_progress_percent_string %>"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="details">
+                
+            </div>
+        </div>
+        <div id="achievements">
+            <div class="title">
+                <h1 class="textDarkGray">Achievements</h1>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <% @badges.each  do |badge| %>
+                        <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
+                            <div class="card badgeCard">
+                                <div class="title">
+                                    <h2 class="textDarkGray"><%= badge.name %></h2>
+                                </div>
+                                <div class="graphic">
+                                    <%= badge.graphic.blank? ? "" : badge.graphic %>
+                                </div>
+                                <div class="subtitle">
+                                   <p class="textDarkGray"><%= badge.description %></p>
+                                </div>
+                            </div> 
+                        </div>
+                    <% end %>                    
+                </div>
+            </div>            
+        </div>
     </div>
 </div>
 

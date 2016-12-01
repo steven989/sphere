@@ -14,6 +14,15 @@ class Level < ActiveRecord::Base
         
     end
 
+    def self.return_level_xps(levels=[])
+        if levels.length != 0
+            levels_object = Level.where(level:levels)
+            levels_object.inject({}){|result,level| result[level.level] = level.criteria.match(/[0-9]+/)[0].to_i;result}
+        else
+            nil
+        end
+    end
+
     def self.update_level(delete,id,level,criteria)
         if !id.blank?
             levelObj = Level.find(id)

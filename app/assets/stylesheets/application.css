@@ -21,6 +21,10 @@ body {
     background: #F6F6F6 !important;
 }
 
+.textDarkGray {
+    color: #707070;
+}
+
 #loading > div > div {
   background: #0d9ddb !important;
 }
@@ -164,7 +168,19 @@ label[for=photoUploader] {
     left: 0px;
 }
 
-.remodal.standardModal .modalView .modalButtonContainer .modalBottomLeftButton {
+.sphereRedBackground {
+    background-color:#FE0000;
+}
+
+.sphereBlueBackground {
+    background-color: #0099E5;
+}
+
+.sphereGreenBackground {
+    background-color: #34BF49;
+}
+
+.modalBottomLeftButton {
     width: 50%;
     cursor: pointer;
     height: 100%;
@@ -175,15 +191,7 @@ label[for=photoUploader] {
     padding-top: 15px;
 }
 
-.sphereRedBackground {
-    background-color:#FE0000;
-}
-
-.sphereBlueBackground {
-    background-color: #0099E5;
-}
-
-.remodal.standardModal .modalView .modalButtonContainer .modalBottomRightButton {
+.modalBottomRightButton {
     width: 50%;
     cursor: pointer;
     height: 100%;
@@ -195,7 +203,7 @@ label[for=photoUploader] {
     padding-top: 15px;
 }
 
-.remodal.standardModal .modalView .modalButtonContainer .modalBottomFullButton {
+.modalBottomFullButton {
     width: 100%;
     cursor: pointer;
     height: 100%;
@@ -207,8 +215,120 @@ label[for=photoUploader] {
     padding-top: 15px;
 }
 
+/* Challenges, Progress, Achievements UI*/
+
+#challenges, #progress, #achievements {
+    width: 100%;
+} 
 
 
+#challenges > .title, #progress > .title, #achievements > .title {
+    margin: 40px 0px;
+    width: 100%;
+    text-align: center;
+} 
+
+#challenges > .title h1, #progress > .title h1, #achievements > .title h1 {
+    font-size: 25px;
+} 
+
+/*Progress-specific*/
+#progress #levelDisplay .content {
+    margin: auto;
+    width: 400px;
+    height: 140px;
+}
+
+#progress #levelDisplay .content .graphic {
+    width: 120px;
+    height: 100%;
+    float:left;
+}
+
+#progress #levelDisplay .content .details {
+    padding: 10px;
+    width: 280px;
+    height:100%;
+    float:left;
+}
+
+#progress #levelDisplay .content h2 {
+    font-size:20px;
+}
+
+
+
+
+/* Cards in the main dashboard */
+
+/*general*/
+.cardColumn {
+    padding: 10px;
+}
+
+.card {
+    height: 360px;
+    background-color: white;
+    width: 100%;
+    border-radius: 10px;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+
+.card .title {
+    padding: 5px 0px;
+    text-align: center;
+
+}
+
+.card .title h2 {
+    font-size: 20px;
+}
+
+
+/*Challenge-specific */
+
+.card.challengeCard .buttons {
+    position: absolute;
+    width: 100%;
+    left:0px;
+    bottom:0px;
+    height:50px;
+    text-align: center;
+
+}
+
+.card.challengeCard .graphic {
+    height: 170px;
+    width: 100%;
+    position: relative;
+}
+
+.card.challengeCard .subtitle {
+    padding: 0px 20px;
+    text-align: center;
+    line-height: 25px;
+}
+
+/*Achievement-specific*/
+
+.card.badgeCard {
+    background-color: rgba(0,0,0,0);
+    border: 3px solid white;
+}
+
+.card.badgeCard .graphic {
+    height: 220px;
+    width: 100%;
+    position: relative;
+}
+
+.card.badgeCard .subtitle {
+    padding: 0px 20px;
+    text-align: center;
+    line-height: 25px;
+}
 
 
 /*FOR RESPONSIVE DESIGN*/
