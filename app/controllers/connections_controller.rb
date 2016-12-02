@@ -74,4 +74,37 @@ class ConnectionsController < ApplicationController
     end
 
 
+    def populate_connection_modal
+
+        data = {}
+        connection = Connection.find(params[:connection_id])
+        data[:photo] = connection.photo_url
+        data[:name] = connection.name
+        last_plan = Plan.last(current_user,connection)
+
+        if last_plan
+            last_plan_time_string = last_plan.last_activity_date_difference_humanized
+            last_plan_name_string = last_plan.name_with_parentheses_removed
+            data[:lastPlanString] = "Last Hangout: #{last_plan_time_string} #{last_plan_name_string}"
+        else
+            data[:lastPlanString] = "Last Hangout: Nothing yet!"
+        end
+
+        upcoming_plan = Plan.first_upcoming(current_user,connection)
+        if upcoming_plan
+            activity = upcoming_plan.name_with_parentheses_removed
+            time = upcoming_plan.datetime_humanized
+            data[:upcomingPlanString] = "#{activity} #{time}"
+        else
+            data[:upcomingPlanString] = "No current plans :("
+        end
+        actions= [{action:"function_call",function:"populateBubblesModal()"}]
+        respond_to do |format|
+          format.json {
+            render json: {status:true, message:nil,actions:actions,data:data}
+          } 
+        end        
+    end
+
+
 end

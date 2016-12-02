@@ -22,11 +22,15 @@ $(function(){
             var coordinates = getNotificationCoordinate(315,$(this).parent('.connectBubbleContainer').width()/2,14);
             $(this).parent('.connectBubbleContainer').append('<span class="badge badge-yellow" style="width:28px; height:28px; position:absolute;left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:15px;padding-top:4px;">1d</span>');
 
-            // 3) Dialog on clicking each bubble
-            
+            // 3) Set some attributes
+            $(this).attr('href',"<%= populate_connection_modal_path %>?connection_id="+$(this).data('connection-id'))
+            $(this).data('method','get')
+
+            // 4) Dialog on clicking each bubble
             $(this).off("click").on("click",function(){
                 var formData = new FormData();                
                 var _this = $(this);
+
                 $('[data-remodal-id=bubbleModal] .modalView').each(function(){
                     if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
                         else {$(this).removeClass('hidden')};
@@ -60,8 +64,8 @@ $(function(){
                       });
                 })
                 resetModal($('[data-remodal-id=bubbleModal]'),3);
+                buttonAjax(_this,{});
                 modalInstance.open();
-
             });
         });
     }
@@ -223,6 +227,7 @@ $(function(){
 
     // Standard ajax call for buttons
     function buttonAjax(button,data) {
+        console.log(button)
         var alertElement = $(button.data('alert-element'));
           $.ajax({
             url: button.attr('href'),
@@ -246,6 +251,19 @@ $(function(){
                     performActions(data.actions);    
                 }
           })
+    }
+
+    // Specific callback functions for after modal population
+    function populateBubblesModal() {
+        // Main screen
+        var name = returnedData.name;
+        var lastHangout = returnedData.lastPlanString;
+        var nextHangout = returnedData.upcomingPlanString;
+        var photoUrl = returnedData.photo;
+        $('[data-remodal-id=bubbleModal] .modalView#plans span.name').html(name);
+        $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
+        $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').attr('src',photoUrl);
+        $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
     }
 
     function populateSettingsForm () {
@@ -439,17 +457,16 @@ $(function(){
 </div>
 
 <div data-remodal-id="bubbleModal" data-default-css="([{'attribute':'height','value':'400px'}])">
-  <button data-remodal-action="close" class="remodal-close"></button>
     <div class="modalView" id="plans">
         <div class="modalContentContainer">
-            <div style="color:#656268; font-size:20px;">Shaun Bauer</div>
-            <div style="color:#656268; margin-top: 15px; font-size:15px;font-weight:lighter">Last Hangout: Drinks 2 months ago</div>
-            <div style="height:140px;margin-top:35px;" class="transitionButton" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">Icons</div>
-            <div style="margin-top:22px;font-size:15px;color:#656268">No current plans :(</div>
+            <div style="color:#656268; font-size:20px;"><span class="name"></span></div>
+            <div style="color:#656268; margin-top: 15px; font-size:15px;font-weight:lighter"><span class="lastHangout"></span></div>
+            <div style="height:140px;margin-top:35px;"><img class="photo transitionButton" src="" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%;"> </div>
+            <div style="margin-top:22px;font-size:15px;color:#656268"><span class="nextHangout"></span></div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereBlueBackground" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">Make Plans</div>
-            <div class="modalBottomRightButton sphereRedBackground">Remind Me</div>
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
+            <div class="modalBottomRightButton sphereGreenBackground">CHECK IN</div>
         </div>
     </div>
     <div class="modalView hidden" id="makePlan">
@@ -492,7 +509,6 @@ $(function(){
 
 
 <div data-remodal-id="importModal" data-default-css="([{'attribute':'height','value':'400px'}])">
-  <button data-remodal-action="close" class="remodal-close"></button>
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
@@ -550,7 +566,6 @@ $(function(){
 </div>
 
 <div data-remodal-id="settingsModal" data-default-css="([{'attribute':'height','value':'400px'}])">
-  <button data-remodal-action="close" class="remodal-close"></button>
     <div class="modalView" id="settingsSelect">
         <div class="modalContentContainer">
             <div id="settingsContainer">

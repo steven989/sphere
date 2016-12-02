@@ -71,7 +71,6 @@ class PlansController < ApplicationController
             render json: {status:status, message:message,actions:actions}
           } 
         end
-
     end
 
 end

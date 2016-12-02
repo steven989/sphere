@@ -71,7 +71,7 @@ class Plan < ActiveRecord::Base
                         user_id:user.id,
                         connection_id:connection.id,
                         date:start_time.to_date,
-                        time:start_time.to_time,
+                        date_time:start_time,
                         timezone:calendar.time_zone,
                         name:summary,
                         location:location,
@@ -87,4 +87,94 @@ class Plan < ActiveRecord::Base
         end
         {status:status,message:message,access_token:token_object}
     end
+
+    def self.first_upcoming(user,connection)
+        plan = Plan.where("user_id = ? and connection_id = ? and date_time > ?",user.id,connection.id,Time.now).order(date_time: :asc)
+        plan.length == 0 ? nil : plan.first
+    end
+
+    def self.last(user,connection)
+        plan = Plan.where("user_id = ? and connection_id = ? and date_time < ?",user.id,connection.id,Time.now).order(date_time: :desc)
+        plan.length == 0 ? nil : plan.first
+    end
+
+    def datetime_humanized
+        Plan.to_human_datetime(date_time)
+    end
+
+    def name_with_parentheses_removed
+        part_to_remove = name.match(/\(.+\)/).to_s
+        part_removed = name.gsub(part_to_remove,"")
+        part_removed.strip
+    end
+
+    def self.to_human_datetime(datetime)
+        date = datetime.to_date
+        timezone_offset_int = datetime.strftime('%z').gsub("0","").to_i
+        timezone_object = ActiveSupport::TimeZone[timezone_offset_int]
+        current_date_in_timezone = Time.now.in_time_zone(timezone_object).to_date
+        days_diff = (date - current_date_in_timezone).to_i
+        if days_diff == 0
+            date_humanized = "today"
+        elsif days_diff == 1
+            date_humanized = "tomorrow"
+        elsif days_diff >= 7 && days_diff < 14
+            date_humanized = "next #{date.strftime('%A')} (#{date.strftime("%B %e")})"
+        elsif days_diff < 7
+            if date.strftime("%u").to_i < current_date_in_timezone.strftime("%u").to_i
+                date_humanized = "this coming #{date.strftime('%A')} (#{date.strftime("%B %e")})"
+            else
+                date_humanized = "this #{date.strftime('%A')} (#{date.strftime("%B %e")})"
+            end
+        else
+            date_humanized = "#{date.strftime("%B %e")}"
+        end
+
+        hour_in_12 = datetime.strftime('%l')
+        minute = datetime.strftime('%M')
+        am_pm = datetime.strftime('%p')
+        "#{date_humanized} at #{hour_in_12}:#{minute}#{am_pm}"
+    end
+
+    def last_activity_date_difference_humanized
+        Plan.to_human_time_difference_past(days_to_last_plan_string)
+    end
+
+    def days_to_last_plan_string
+        plan_date = date_time.to_date
+        timezone_offset_int = date_time.strftime('%z').gsub("0","").to_i
+        timezone_object = ActiveSupport::TimeZone[timezone_offset_int]
+        current_date_in_timezone = Time.now.in_time_zone(timezone_object).to_date
+        days_diff = (current_date_in_timezone - plan_date).to_i
+        days_diff
+    end
+
+    def self.to_human_time_difference_past(days)
+        if days == 0
+            date_diff_humanized = "earlier today"
+        elsif days == 1
+            date_diff_humanized = "yesterday"
+        elsif days > 1 && days < 8
+            date_diff_humanized = "#{days} days ago"
+        else
+            if (days/7) == 1
+                date_diff_humanized = "a week ago"
+            elsif (days/7) > 1 && (days/7) < 4
+                date_diff_humanized = "#{days/7} weeks ago"
+            else
+                if (days.to_f/30.4).round == 1
+                    date_diff_humanized = "a month ago"
+                elsif (days.to_f/30.4).round > 1 && (days.to_f/30.4).round < 12
+                    date_diff_humanized = "#{(days.to_f/30.4).round} months ago"
+                else
+                    if (days.to_f/365).round == 1
+                        date_diff_humanized = "a year ago"
+                    else
+                        date_diff_humanized = "#{(days.to_f/365).round} years ago"
+                    end
+                end
+            end
+        end
+    end
+
 end
