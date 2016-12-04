@@ -32,7 +32,10 @@ Rails.application.routes.draw do
   put  'admins/update_challenges' => 'admins#update_challenges', as: 'update_challenges'
   put  'admins/update_badges' => 'admins#update_badges', as: 'update_badges'
 
-  resources :plans
+  # resources :plans
+  post 'plans' => 'plans#create', as: 'plans'
+  put 'plans/cancel_plan' => 'plans#cancel', as: 'cancel_plan'
+  put 'plans/modify_plan' => 'plans#update', as: 'modify_plan'
   # Authorization callback routes
   get 'auth/google_oauth2/login/callback' => 'authorizations#google_login', as: 'google_login_redirect'
   get 'auth/google_oauth2/calendar/callback' => 'authorizations#google_calendar', as: 'google_calendar_redirect'

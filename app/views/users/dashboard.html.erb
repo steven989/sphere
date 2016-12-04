@@ -105,10 +105,13 @@ $(function(){
     });
 
     // make plans
-    $('.modalView#makePlan .modalBottomRightButton').off('click').on('click',function(){
-      var form = $('.modalView#makePlan form');
-      modalAjaxFormSubmission(form);
-    })
+    function addListenerToPlanForm() {
+        $('.modalView#makePlan .modalBottomRightButton').off('click').on('click',function(){
+          var form = $('.modalView#makePlan form');
+          modalAjaxFormSubmission(form);
+        });        
+    }
+
 
     // Modal resets
     function resetModal(modal,resetType) {
@@ -142,9 +145,10 @@ $(function(){
 
     // General modal ajax submission function
     function modalAjaxFormSubmission(form) {
+        test = form;
       $.ajax({
-        url: form.prop('action'),
-        type: form.prop('method'),
+        url: form.attr('action'),
+        type: form.attr('method'),
         data: form.serialize(),
         dataType: 'JSON'
       }).done(function(data){
@@ -153,7 +157,7 @@ $(function(){
                 form.find('.alert').html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
                     setTimeout(function(){
                         form.find('.alert').addClass('hidden');
-                        form.children().each(function(){$(this).val("")});
+                        resetModal(form.closest('.remodal'),2);
                         modalInstance.close();
                     },2000)
             } else {
@@ -227,7 +231,8 @@ $(function(){
 
     // Standard ajax call for buttons
     function buttonAjax(button,data) {
-        console.log(button)
+        event.preventDefault();
+        event.stopPropagation();
         var alertElement = $(button.data('alert-element'));
           $.ajax({
             url: button.attr('href'),
@@ -264,6 +269,30 @@ $(function(){
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').attr('src',photoUrl);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
+        if (returnedData.hasUpcomingPlan) {
+            $('.modalView#makePlan input[name=date]').val(returnedData.planData.date);
+            $('.modalView#makePlan input[name=time]').val(returnedData.planData.time);
+            $('.modalView#makePlan input[name=duration]').val(returnedData.planData.length);
+            $('.modalView#makePlan input[name=name]').val(returnedData.planData.name);
+            $('.modalView#makePlan input[name=location]').val(returnedData.planData.location);
+            $('.modalView#makePlan input[name=details]').val(returnedData.planData.details);
+            $('.modalView#makePlan input[name=plan_id]').val(returnedData.planData.id);
+            $('.modalView#makePlan div#deleteEvent').removeClass('hidden');
+            $('.modalView#makePlan div#deleteEvent').off('click').on('click',function(){
+                buttonAjax($(this),{plan_id:returnedData.planData.id,notify:$('.modalView#makePlan #notify').prop('checked')});
+            });
+            $('.modalView#makePlan form').attr('action',"<%= modify_plan_path %>").attr('method','PUT');
+            $('.modalView#makePlan .modalBottomRightButton').html("UPDATE");
+            $('.modalView#plans .modalBottomLeftButton').html("RESCHEDULE");
+            
+            addListenerToPlanForm();
+        } else {
+            $('.modalView#makePlan div#deleteEvent').removeClass('hidden').addClass('hidden');
+            $('.modalView#makePlan form').attr('action',"<%= plans_path %>").attr('method','POST');
+            addListenerToPlanForm();
+            $('.modalView#makePlan .modalBottomRightButton').html("PUT IN CALENDAR");
+            $('.modalView#plans .modalBottomLeftButton').html("MAKE PLANS");
+        }
     }
 
     function populateSettingsForm () {
@@ -478,16 +507,18 @@ $(function(){
                 <input type="text" class="input-text" name="name" placeholder="Meeting/activity name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
                 <input type="text" class="input-text" name="location" placeholder="Location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
                 <input type="text" class="input-text" name="details" placeholder="Details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <div style="display:inline-box; width:50px; height:20px; border-radius:5px; background-color:yellow" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent" data-alert-element=".modalView#makePlan #makePlanFormAlert">Cancel</div>
                 <input type="hidden" name="connection_id">
-                <%= check_box_tag 'notify',1,@settings[:send_event_booking_notification_by_default] %>
+                <input type="hidden" name="plan_id">
+                <%= check_box_tag 'notify',true,@settings[:send_event_booking_notification_by_default], style:"display:inline-box;" %>
                 <label for="notify">Send invite?</label>
                 <input type="text" class="input-text hidden default_hidden" name="connection_email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" >
                 <div class="alert hidden default_hidden" id="makePlanFormAlert" style="margin-top:1px;line-height:15px;"></div>
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">Back</div>
-            <div class="modalBottomRightButton sphereBlueBackground">Put in Calendar</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground">PUT IN CALENDAR</div>
         </div>
     </div>
     <div class="modalView hidden" id="editConnection">
@@ -559,8 +590,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereRedBackground">Back</div>
-            <div class="modalBottomRightButton sphereBlueBackground" href="<%= create_from_import_path %>" data-method="POST">Add to Sphere</div>
+            <div class="modalBottomLeftButton sphereRedBackground">BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground" href="<%= create_from_import_path %>" data-method="POST">ADD TO SPHERE</div>
         </div>
     </div>
 </div>
