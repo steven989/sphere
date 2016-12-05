@@ -376,21 +376,24 @@ $(function(){
     <div id="logo">
         <%= image_tag "logo-white", width:"125" %>
     </div>
-    <div id="addConnection">
-        <%= fa_icon 'user-plus' %>
-    </div>
-    <div id="accountSettings" href="<%= get_user_settings_path(current_user) %>" data-method="GET">
-        <%= fa_icon 'cog' %>
-    </div>
-    <div id="logout">
-        <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
-    </div>    
+    
+        <div id="addConnection">
+            <%= fa_icon 'user-plus' %>
+        </div>
+        <div id="accountSettings" href="<%= get_user_settings_path(current_user) %>" data-method="GET">
+            <%= fa_icon 'cog' %>
+        </div>
+        <div id="logout">
+            <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
+        </div>    
+    
+
 </div>
 
 <div id="navigation-tabs-container">
     <div class="topTabs-header clearfix">
         <ul class="etabs tabs" id="navigation">
-            <li class="tab"><a href="#mySphere"><%= image_tag "logo-shape-white", width:"20" %><br>MY SPHERE</a></li>
+            <li class="tab"><a href="#mySphere"><%= fa_icon 'circle-o' %><br>MY SPHERE</a></li>
             <li class="tab"><a href="#challenges"><%= fa_icon 'map' %><br>CHALLENGES</a></li>
             <li class="tab"><a href="#progress"><%= fa_icon 'bar-chart' %><br>PROGRESS</a></li>
             <li class="tab"><a href="#achievements"><%= fa_icon 'star' %><br>ACHIEVEMENTS</a></li>

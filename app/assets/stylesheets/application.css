@@ -51,22 +51,37 @@ body {
     float:right;
     position: absolute;
     color: white;
+    font-size: 25px;
+    top: 25px;
+    color: #FFF;
+    cursor: pointer;
 }
 
+#logout a {
+    color: #FFF;
+}
+
+#addConnection:hover, #accountSettings:hover, #logout:hover {
+    color: #B5ADAC;
+}
+
+#logout a:hover {
+    color: #B5ADAC;
+}
+
+
 #addConnection {
-    top: 20px;
-    right: 220px;
+    right: 150px;
 }
 
 #accountSettings {
-    top: 20px;
-    right: 120px;
+    right: 100px;
 }
 
 #logout {
-    top: 20px;
-    right: 20px;
+    right: 50px;
 }
+
 
 #navigation-tabs-container {
     width: 100%;
