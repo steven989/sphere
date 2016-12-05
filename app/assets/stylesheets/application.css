@@ -55,10 +55,12 @@ body {
     top: 25px;
     color: #FFF;
     cursor: pointer;
+    transition:color 0.2s ease;
 }
 
 #logout a {
     color: #FFF;
+    transition:color 0.2s ease;
 }
 
 #addConnection:hover, #accountSettings:hover, #logout:hover {
