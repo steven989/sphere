@@ -1,5 +1,6 @@
 class ConnectionsController < ApplicationController
 
+
     def create_note
         ConnectionNote.create(user_id:current_user.id,connection_id:params[:id],notes:params[:notes])
         redirect_to :root 
@@ -17,7 +18,7 @@ class ConnectionsController < ApplicationController
             id:params[:connection_id]
         )
         if connection.save
-            connection.update_attributes(photo_access_url:connection.photo.url) if photo_uploaded
+            connection.port_photo_url_to_access_url
             status = true
             message = "Connection successfully updated"
         else

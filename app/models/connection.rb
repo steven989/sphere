@@ -1,13 +1,19 @@
 class Connection < ActiveRecord::Base
+    # Associtions
     belongs_to :user
     has_many :activities
     has_one :connection_score
     has_many :connection_score_histories
     has_many :connection_notes
     has_many :plans
+    # Callbacks
+    after_create :callbacks_after_create
+    after_update :callbacks_after_update
+    # Other stuff
     scope :active, -> { where(active:true) } 
     mount_uploader :photo, PhotoUploader
 
+    # Methods
     def name
         first_name+" "+last_name
     end
@@ -158,9 +164,14 @@ class Connection < ActiveRecord::Base
               (matched_connection.additional_emails = updated_additional_emails_string) if updated_additional_emails_string
               (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
               (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
-              (matched_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{photo_object[:body]}") if (photo_object && !photo_object[:body].blank?)
+              
+              if photo_object && !photo_object[:body].blank?
+                encoded = Base64.strict_encode64(photo_object[:body])
+                matched_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+              end
 
               if matched_connection.save
+                Connection.port_photo_url_to_access_url(matched_connection.id)
                 status = true
                 message = "Connection successfully updated"
               else
@@ -180,20 +191,19 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
-              # image_file = open('carasphoto.jpg', 'wb')
-              # image_file.write(photo_object[:body])
-              # image_file.close()
-              (new_connection.photo_data_uri = "data:#{photo_object[:content_type]};#{photo_object[:body]}") if (photo_object && !photo_object[:body].blank?)
+              
+              if photo_object && !photo_object[:body].blank?
+                encoded = Base64.strict_encode64(photo_object[:body])
+                new_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+              end
 
               if new_connection.save
+                Connection.port_photo_url_to_access_url(new_connection.id)
                 status = true
                 message = "Connection successfully created"
               else
                 status = false
                 message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
-                puts '---------------------------------------------------'
-                puts new_connection.errors.inspect
-                puts '---------------------------------------------------'
               end
             end
           else
@@ -209,9 +219,14 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
-              (new_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{photo_object[:body]}") if (photo_object && !photo_object[:body].blank?)
-
+              
+              if photo_object && !photo_object[:body].blank?
+                encoded = Base64.strict_encode64(photo_object[:body])
+                new_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+              end
+              
               if new_connection.save
+                Connection.port_photo_url_to_access_url(new_connection.id)
                 status = true
                 message = "Connection successfully created"
                 data = nil
@@ -255,6 +270,23 @@ class Connection < ActiveRecord::Base
 
     def find_photo
       
+    end
+
+    def self.port_photo_url_to_access_url(id)
+      connection = Connection.find(id)
+      if connection.photo && connection.photo.file && connection.photo.file.exists?
+        connection.update_attributes(photo_access_url:connection.photo.url)
+      end
+    end
+
+    private
+
+    def callbacks_after_create
+      @@new_record = true
+    end
+
+    def callbacks_after_update
+      @photo_updated = photo_changed?
     end
 
 end
