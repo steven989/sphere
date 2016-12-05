@@ -30,7 +30,6 @@ class ConnectionsController < ApplicationController
             render json: {status:status, message:message}
           } 
         end
-
     end
 
     def import
@@ -43,7 +42,7 @@ class ConnectionsController < ApplicationController
         else
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil
-            result = Connection.import_from_google(current_user,access_token,expires_at)
+            result = Connection.import_from_google(current_user,access_token,expires_at,"summarized_array")
             data = result[:data]
             status = result[:status]
             message = result[:message]
@@ -62,7 +61,9 @@ class ConnectionsController < ApplicationController
     end
 
     def create_from_import
-        result = Connection.create_from_import(current_user,params[:contactsToImport].values)
+        access_token = session ? session[:access_token] : nil
+        expires_at = session ? session[:expires_at] : nil
+        result = Connection.create_from_import(current_user,params[:contactsToImport].values,access_token,expires_at)
         actions = [{action:"function_call",function:"closeModalInstance(2000)"}]
         message = result[:status] ? result[:message] : "Oops. Looks like our robots had some errors saving the contacts. Here are the details: #{result[:message]}"
 

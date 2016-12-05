@@ -32,6 +32,8 @@ gem 'hirb'
 gem 'squeel'
 # Image upload
 gem 'carrierwave', '>= 1.0.0.rc', '< 2.0'
+# Image upload from data URI (data stream)
+gem 'carrierwave-data-uri'
 # Work with Amazon S3
 gem 'fog-aws'
 # Modify images
@@ -59,6 +61,7 @@ gem 'google_contacts_api'
 # Oauth2
 gem 'oauth2'
 
+gem 'data_uri'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

@@ -9,6 +9,32 @@ module GoogleContactsApi
 
   end
 
+
+  class Contact < GoogleContactsApi::Result
+    # Returns binary data for the photo. You can probably
+    # use it in a data-uri. This is in PNG format.
+    def photo_with_header
+      return nil unless @api && photo_link
+      begin 
+        response = @api.oauth.get(photo_link)
+      rescue
+        return nil
+      else
+        case GoogleContactsApi::Api.parse_response_code(response)
+        # maybe return a placeholder instead of nil
+        when 400; return nil
+        when 401; return nil
+        when 403; return nil
+        when 404; return nil
+        when 400...500; return nil
+        when 500...600; return nil
+        else; return {content_type:response.headers["content-type"],body:response.body}
+        end
+      end
+    end
+  end
+
+
   module Contacts
     # Retrieve the contacts for this user or group
     def get_contact_by_id(id,params = {})

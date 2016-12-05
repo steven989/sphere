@@ -341,7 +341,7 @@ $(function(){
         returnedData,list = null; //this is to clear up the reference to the object to make it available for garbage collection after we're done
         contacts.forEach(function(contact){
             contact.incID = incrementer;
-            $('.modalView#listSelect #importSelectionTable tbody').append('<tr data-inc-id='+incrementer+'><td class="import" ><input type="checkbox" data-inc-id='+incrementer+' data-name="'+contact.name+'" data-email="'+contact.email+'" data-phone="'+contact.phone.join('|>-<+|%')+'" data-other-emails="'+contact.other_emails.join('|>-<+|%')+'" ></td><td class="name" >'+contact.name+'</td><td class="email">'+contact.email+'</td><td class="phone">'+contact.phone.join(', ')+'</td><td class="other_emails">'+contact.other_emails.join(', ')+'</td></tr>');
+            $('.modalView#listSelect #importSelectionTable tbody').append('<tr data-inc-id='+incrementer+'><td class="import" ><input type="checkbox" data-inc-id='+incrementer+' data-id="'+contact.id+'" data-name="'+contact.name+'" data-email="'+contact.email+'" data-phone="'+contact.phone.join('|>-<+|%')+'" data-other-emails="'+contact.other_emails.join('|>-<+|%')+'" ></td><td class="name" >'+contact.name+'</td><td class="email">'+contact.email+'</td><td class="phone">'+contact.phone.join(', ')+'</td><td class="other_emails">'+contact.other_emails.join(', ')+'</td></tr>');
             incrementer++;
         });
         
@@ -361,7 +361,7 @@ $(function(){
             var contactListToSend = [];
             $('#importContacts table tbody tr td.import input[type=checkbox]').each(function(){
                 if ($(this).prop('checked')) {
-                    contactListToSend.push({name:$(this).data('name'),email:$(this).data('email'),phone:$(this).data('phone'),other_emails:$(this).data('other-emails') })
+                    contactListToSend.push({id:$(this).data('id'),name:$(this).data('name'),email:$(this).data('email'),phone:$(this).data('phone'),other_emails:$(this).data('other-emails') })
                 }
             });
             buttonAjax($(this),{contactsToImport:contactListToSend});

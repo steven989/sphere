@@ -72,7 +72,7 @@ class Connection < ActiveRecord::Base
           value.instance_of?(Complex) ? 1 : value
     end
     
-    def self.import_from_google(user,access_token=nil,expires_at=nil)
+    def self.import_from_google(user,access_token=nil,expires_at=nil,output_type="summarized_array")
         if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
           token_object = user.authorizations.where(provider:'google').take.refresh_token!  
         else
@@ -83,7 +83,8 @@ class Connection < ActiveRecord::Base
           client = OAuth2::Client.new(ENV['GOOGLE_OAUTH_CLIENT_ID'],ENV['GOOGLE_OAUTH_CLIENT_SECRET'])
           oauth_access_token_for_user = OAuth2::AccessToken.new(client,token_object[:access_token])
           google_contacts_user = GoogleContactsApi::User.new(oauth_access_token_for_user)
-          contacts = google_contacts_user.contacts.map {|contact| {id:contact.id,name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }} 
+          imported = google_contacts_user.contacts
+          contacts = output_type == "api_contact_class" ? imported : imported.map {|contact| {id:contact.id,name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }} 
         rescue => error
             status = false
             message = error.message                  
@@ -94,9 +95,9 @@ class Connection < ActiveRecord::Base
         end
     end
 
-    def self.insert_contact(user,name,email=nil,other_emails=nil,phones)
+    def self.insert_contact(user,name,email=nil,other_emails=nil,phones=nil,photo_object=nil)
           # If email matches an existing contact, merge the contacts and emails addresses (keep the current name and email in app, add any new emails to "additional emails") Otherwise create a new entry in the contacts
-          interval = current_user.user_setting.get_value(:default_contact_interval_in_days)
+          interval = user.user_setting.get_value(:default_contact_interval_in_days)
           if email || other_emails
             unified_email_array = []
             unified_email_array.push(email) if email
@@ -157,6 +158,7 @@ class Connection < ActiveRecord::Base
               (matched_connection.additional_emails = updated_additional_emails_string) if updated_additional_emails_string
               (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
               (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
+              (matched_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{photo_object[:body]}") if (photo_object && !photo_object[:body].blank?)
 
               if matched_connection.save
                 status = true
@@ -178,12 +180,20 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
+              # image_file = open('carasphoto.jpg', 'wb')
+              # image_file.write(photo_object[:body])
+              # image_file.close()
+              (new_connection.photo_data_uri = "data:#{photo_object[:content_type]};#{photo_object[:body]}") if (photo_object && !photo_object[:body].blank?)
+
               if new_connection.save
                 status = true
                 message = "Connection successfully created"
               else
                 status = false
                 message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
+                puts '---------------------------------------------------'
+                puts new_connection.errors.inspect
+                puts '---------------------------------------------------'
               end
             end
           else
@@ -199,6 +209,8 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
+              (new_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{photo_object[:body]}") if (photo_object && !photo_object[:body].blank?)
+
               if new_connection.save
                 status = true
                 message = "Connection successfully created"
@@ -212,15 +224,20 @@ class Connection < ActiveRecord::Base
           {status:status,message:message,data:data}
     end
 
-    def self.create_from_import(user,contacts_imported)
+    def self.create_from_import(user,contacts_imported,access_token=nil,expires_at=nil)
+      imported_contacts = Connection.import_from_google(user,access_token,expires_at,"api_contact_class")      
+      selected_imports_id_for_matching_purposes = contacts_imported.map {|selectec_contact| selectec_contact["id"] }
+      selected_contacts_in_api_contact_class = imported_contacts[:data].select {|contact| selected_imports_id_for_matching_purposes.include?(contact.id)}
+
       result_array = []
         contacts_imported.each do |contact|
+          id = contact["id"]
           name = contact["name"]
           email = contact["email"]
           phone = contact["phone"]
           other_emails = contact["other_emails"]
-
-          result = Connection.insert_contact(user,name,email,other_emails,phone)
+          photo_object = selected_contacts_in_api_contact_class.select {|contact| contact.id == id}[0].photo_with_header
+          result = Connection.insert_contact(user,name,email,other_emails,phone,photo_object)
           result_array.push(result)
         end
       issues = result_array.select {|result| result[:status] == false}

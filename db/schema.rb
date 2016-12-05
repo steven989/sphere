@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161202134515) do
+ActiveRecord::Schema.define(version: 20161205000549) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -121,6 +121,8 @@ ActiveRecord::Schema.define(version: 20161202134515) do
     t.string   "photo_access_url"
     t.string   "additional_emails",               default: "[]"
     t.string   "additional_phones",               default: "[]"
+    t.string   "source_provider"
+    t.string   "contact_id_at_provider"
   end
 
   create_table "level_histories", force: :cascade do |t|
