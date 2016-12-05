@@ -13,8 +13,10 @@
  *= require_tree .
  *= require_self
  *= require jquery-ui
+*= require font-awesome
  *= require_tree ../../../vendor/assets/stylesheets/.
  */
+
 
 
 body {
@@ -41,8 +43,8 @@ body {
 #logo {
     position: absolute;
     color: white;
-    top: 20px;
-    left: 20px;
+    top: 25px;
+    left: 50px;
 }
 
 #addConnection, #accountSettings, #logout {

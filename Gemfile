@@ -60,8 +60,9 @@ gem 'fullcontact'
 gem 'google_contacts_api'
 # Oauth2
 gem 'oauth2'
+# Font awesome
+gem "font-awesome-rails"
 
-gem 'data_uri'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
