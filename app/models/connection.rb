@@ -6,6 +6,7 @@ class Connection < ActiveRecord::Base
     has_many :connection_score_histories
     has_many :connection_notes
     has_many :plans
+    has_many :tags, as: :taggable
     # Callbacks
     after_create :callbacks_after_create
     after_update :callbacks_after_update
@@ -276,6 +277,22 @@ class Connection < ActiveRecord::Base
 
     def find_photo
       
+    end
+
+    def update_tags(user,new_tags_array)
+      begin
+        tags.destroy_all
+        if !new_tags_array.blank?
+          new_tags_array.uniq.each {|tag| tags.create(user_id:user.id,tag:tag)}
+        end
+      rescue => error
+        status = false
+        message = error.message
+      else
+        status = true
+        message = "Tags successfully updated"
+      end
+      {status:status,message:message}
     end
 
     def self.port_photo_url_to_access_url(id)

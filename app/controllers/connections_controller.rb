@@ -80,6 +80,7 @@ class ConnectionsController < ApplicationController
 
         data = {}
         connection = Connection.find(params[:connection_id])
+        data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
         data[:name] = connection.name
         last_plan = Plan.last(current_user,connection)
@@ -91,6 +92,9 @@ class ConnectionsController < ApplicationController
         else
             data[:lastPlanString] = "Last Hangout: Nothing yet!"
         end
+
+        data[:connection_tags] = connection.tags.order(created_at: :asc).map {|tag| tag.tag}
+        data[:all_tags] = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq
 
         upcoming_plan = Plan.first_upcoming(current_user,connection)
         if upcoming_plan

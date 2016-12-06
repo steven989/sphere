@@ -17,6 +17,9 @@ Rails.application.routes.draw do
   get 'users/new' => 'users#new', as: 'create_account'
   get 'users/:id/settings' => 'users#get_user_settings', as: 'get_user_settings'
   put 'users/:id/settings' => 'users#update_user_settings', as: 'update_user_settings'
+  put 'users/update_tags' => 'users#update_tags', as: 'update_tags'
+
+
 
   # Connections controller
   get 'connections/populate_connection_modal' => 'connections#populate_connection_modal', as: 'populate_connection_modal'

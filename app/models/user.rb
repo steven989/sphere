@@ -17,6 +17,7 @@ class User < ActiveRecord::Base
   has_many :authorizations, dependent: :destroy
   has_many :plans
   has_one :user_setting, dependent: :destroy
+  has_many :tags
 
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
   validates :email, uniqueness: true

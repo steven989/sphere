@@ -122,7 +122,6 @@ class UsersController < ApplicationController
       end
     end
 
-
     def get_user_settings
       current_user_settings = current_user.user_setting
       current_user_settings = current_user_settings.blank? ? UserSetting.create_from_system_settings(current_user) : current_user_settings
@@ -157,6 +156,25 @@ class UsersController < ApplicationController
         actions = nil
       end
 
+      respond_to do |format|
+        format.json {
+          render json: {status:status,message:message,actions:actions}
+        } 
+      end
+    end
+
+    def update_tags
+      connection = Connection.find(params[:connection_id])
+      result = connection.update_tags(current_user,params[:tags])
+      if result[:status]
+        status = true
+        message = nil
+        actions = nil
+      else
+        status = false
+        message = "Oops. Our robots encountered some issues while updating tags. Please let us know the error: #{result[:message]}"
+        actions = nil
+      end
       respond_to do |format|
         format.json {
           render json: {status:status,message:message,actions:actions}

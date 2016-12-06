@@ -144,6 +144,51 @@ label[for=photoUploader] {
 
 
 /* Bubbles related */
+
+.modalTokenBox {
+    margin-top: 5px;
+    width: 90%;
+}
+
+.modalTokenBox ul.TokensContainer {
+    height: 38px !important;
+    border: none !important;
+    border-radius: 10px;
+}
+
+.modalTokenBox ul.TokensContainer:hover {
+    background-color: #ECECEC;
+}
+
+.modalTokenBox ul.TokensContainer li.Token {
+    background-color: #FFF !important;
+    border: 1px solid #ECECEC !important;
+    border-radius: 30px;
+    min-width: 80px;
+    height: 28px !important;
+    color: #8E8E8E;
+    line-height: 28px !important;
+
+}
+
+.modalTokenBox ul.TokensContainer li.TokenSearch input {
+    line-height: 28px;
+    height: 28px;
+    font-size: 15px;
+}
+
+.modalTokenBox ul.TokensContainer li.Token a.Close {
+    font-size:15px !important;
+    line-height: 28px !important;
+}
+
+.modalTokenBox ul.TokensContainer li.Token span {
+    font-size:15px !important;
+    margin: 0px 10px;
+    margin-right: 2px;
+}
+
+
 .connectionBubble:hover .initialsDisplayedInBubble {
     opacity:0;
 }
