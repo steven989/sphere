@@ -26,7 +26,7 @@ $(function(){
             $(this).attr('href',"<%= populate_connection_modal_path %>?connection_id="+$(this).data('connection-id'))
             $(this).data('method','get')
 
-            // 4) Dialog on clicking each bubble
+            // 4) Modal on clicking each bubble
             $(this).off("click").on("click",function(){
                 var formData = new FormData();                
                 var _this = $(this);
@@ -38,6 +38,10 @@ $(function(){
                 $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
                 $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
                 $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
+                $('.ajaxButton.createActivity').each(function(){
+
+                    $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
+                });
 
                     modalInstance = $('[data-remodal-id=bubbleModal]').remodal({
                     closeOnConfirm:false,
@@ -229,10 +233,20 @@ $(function(){
         buttonAjax($(this),dataToSend);
     });
 
+    // Generic listener for ajax-enabled buttons
+
+    $('.ajaxButton').each(function(){
+        $(this).off("click").on("click",function(){
+            buttonAjax($(this),$(this).data('data-to-send'));
+        });
+    });
+
     // Standard ajax call for buttons
     function buttonAjax(button,data) {
         event.preventDefault();
         event.stopPropagation();
+        // notification options
+        toastr.options.newestOnTop = true;
         var alertElement = $(button.data('alert-element'));
           $.ajax({
             url: button.attr('href'),
@@ -241,12 +255,16 @@ $(function(){
             dataType: 'JSON'
           }).done(function(data){
                 if (data.status) {
-                        if(data.message != undefined && alertElement.length > 0 ) {
-                            alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
+                        if(data.message != undefined /* && alertElement.length > 0 */ ) {
+                            toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
+                            // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
                         }
                 } else {
-                    if(data.message != undefined && alertElement.length > 0) {
-                        alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                    toastr.options.closeButton = true;
+
+                    if(data.message != undefined /* && alertElement.length > 0 */) {
+                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                        // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                     }
                 }
                 if (data.data != undefined) {
@@ -498,9 +516,27 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereBlueBackground" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
-            <div class="modalBottomRightButton sphereGreenBackground">CHECK IN</div>
+            <div class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity"  end  %> sphereGreenBackground" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
         </div>
     </div>
+    <% if @activity_definitions %>
+        <div class="modalView" id="detailedCheckIn">
+            <div class="modalContentContainer">
+                <ul>
+                    <% @activity_definitions.each do |activity_definition| %>
+                        <li>
+                            <div class="checkInButton ajaxButton createActivity" data-data-to-send="({activity_definition_id:<%= activity_definition.id %>})" href="<%= create_activity_path %>" data-method="POST" >
+                                <%= activity_definition.activity.capitalize %>
+                            </div>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
+            <div class="modalButtonContainer">
+                <div class="modalBottomFullButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
+            </div>            
+        </div>
+    <% end %>
     <div class="modalView hidden" id="makePlan">
         <div class="modalContentContainer">
             <form action="<%= plans_path %>" method="POST" >

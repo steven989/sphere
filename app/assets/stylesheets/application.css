@@ -234,6 +234,20 @@ label[for=photoUploader] {
     padding-top: 15px;
 }
 
+/* Check in screen */
+.modalView#detailedCheckIn ul li {
+    height: 40px;
+    line-height: 40px;
+    margin: 5px 5px;
+    cursor:pointer;
+    border-radius:5px;
+    border:1px solid gray;
+}
+
+.modalView#detailedCheckIn ul li:hover {
+    background-color: gray;
+}
+
 /* Challenges, Progress, Achievements UI*/
 
 #challenges, #progress, #achievements {
@@ -356,6 +370,10 @@ label[for=photoUploader] {
 }
 
 
+/* Customization of plugins */
 
+/* Toastr notification */
 
-
+.toast-success {
+  background-color: #34BF49 !important;
+}

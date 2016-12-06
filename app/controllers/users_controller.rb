@@ -35,6 +35,10 @@ class UsersController < ApplicationController
             centralBubblePhotoURL:nil
             }.to_json
 
+            if @setting_for_activity_entry_details = SystemSetting.search("activity_detail_level_to_be_shown")
+              @activity_definitions = ActivityDefinition.level(@setting_for_activity_entry_details.value_in_specified_type) #specify the specificity level of the activities shown 
+            end
+
           # ----- this section contains all the variables needed to display Level, Challenge and Badge
             # --- badges
             @badges = current_user.badges.order(id: :asc)
@@ -95,17 +99,27 @@ class UsersController < ApplicationController
     end
 
     def create_activity
-       @connection = Connection.find(params[:connection_id])
-       activity = current_user.activities.new(activity_params)
-       if activity.save
-          activity.update_attributes(connection_id:params[:connection_id],activity:ActivityDefinition.find(activity.activity_definition_id).activity)
-          @connection.update_score
-          @connection.update_attributes(active:true)
-          StatisticDefinition.triggers("individual","create_activity",current_user)
-          redirect_to root_path, notice: "Successfully created"
-       else 
-          render action: :new_activity
-       end
+      if params[:activity_definition_id]
+        result = Activity.create_activity(current_user,params[:connection_id],params[:activity_definition_id],Date.today,0)
+        if result[:status]
+          status = true
+          message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
+          actions = [{action:"function_call",function:"closeModalInstance(2000)"}]
+        else
+          status = false
+          message = "Oops. Our robots ran into some problems. Let us know the error: #{result[:message]}"
+          actions = nil
+        end
+      else
+        status = false
+        message = "Oops. Something is off. Please refresh and try again"
+        actions = nil
+      end
+      respond_to do |format|
+        format.json {
+          render json: {status:status,message:message,actions:actions}
+        } 
+      end
     end
 
 
