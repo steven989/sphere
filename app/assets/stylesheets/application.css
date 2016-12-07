@@ -19,9 +19,159 @@
 
 
 
-body {
-    background: #F6F6F6 !important;
+/*Some standard components*/
+
+.formElement {
+    background-color: #FAFAFA;
+    border-radius: 5px;
+    border: 1px solid #E9E9E9;
+    width: 100%;
+    transition:color 0.2s ease;  
+    transition:background 0.2s ease; 
+    min-height: 30px; 
+    line-height: 30px;
+    padding: 0px 15px;
 }
+
+.formElement.halfRow.left {
+    display:inline-block;
+    width: 48%;
+    margin-right: 1%;
+}
+
+.formElement.halfRow.right {
+    display:inline-block;
+    width: 48%;
+    margin-left: 1%;
+}
+
+.formElement.tallerInput {
+    height: 35px;
+    line-height: 35px;
+    font-size: 15px;
+}
+
+
+.formElement.button {
+    cursor: pointer;
+}
+
+.formElement:hover {
+    background-color: #F1F1F1;
+}
+
+
+.p-v-xxlg {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.p-h-xxlg {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.m-t-xs {
+    margin-top: 5px;
+}
+
+.m-b-xs {
+    margin-bottom: 5px;   
+}
+
+.m-t-sm {
+    margin-top: 10px;
+}
+
+.m-b-sm {
+    margin-bottom: 10px;   
+}
+
+.m-l-sm {
+    margin-left: 10px;
+}
+
+.m-r-sm {
+    margin-right: 10px;   
+}
+
+.m-t-md {
+    margin-top: 15px;
+}
+
+.m-b-md {
+    margin-bottom: 15px;
+}
+
+
+.m-t-lg {
+    margin-top: 20px;
+}
+
+.m-b-lg {
+    margin-bottom: 20px;
+}
+
+
+.m-l-md {
+    margin-left: 15px;
+}
+
+.m-r-md {
+    margin-right: 15px;   
+}
+
+
+.m-l-xxxxxlg {
+    margin-left: 45px;
+}
+
+.m-r-xxxxxlg {
+    margin-right: 45px;   
+}
+
+
+
+.transitionButton {
+    cursor:pointer;
+}
+
+.modalBottomLeftButton {
+    width: 50%;
+    cursor: pointer;
+    height: 100%;
+    float:left;
+    font-size: 18px;
+    color: #FFFFFF;
+    text-align: center;
+    padding-top:15px;
+    border:none;
+}
+
+.modalBottomRightButton {
+    width: 50%;
+    cursor: pointer;
+    height: 100%;
+    float:right;
+    font-size: 18px;
+    color: #FFFFFF;
+    text-align: center;
+    padding-top:15px;
+    border:none;
+}
+
+.modalBottomFullButton {
+    width: 100%;
+    cursor: pointer;
+    height: 100%;
+    float:right;
+    font-size: 18px;
+    color: #FFFFFF;
+    text-align: center;
+    padding-top:15px;
+    border:none;
+}
+
 
 .textDarkGray {
     color: #707070;
@@ -31,6 +181,47 @@ body {
     border: 1px solid #BB1414 !important;
     background-color: #FF9595 !important;
 }
+
+
+/*Specific elements*/
+
+/* Login screen */
+
+.fullViewportContainer {
+    width: 100%;
+    height: vh;
+    background: none;
+    position: relative;
+}
+
+.fullViewportContainer.loginScreen #title {
+    position:relative;
+    width: 150px;
+    margin: 20px auto;
+    margin-top: 120px;
+}
+
+.fullViewportContainer.loginScreen #displayBox {
+    position:relative;
+    width: 340px;
+    margin: 0px auto;
+    border-radius: 10px;
+    overflow:hidden;
+    min-height: 300px;
+    background-color: #FFFFFF;
+
+}
+
+.loginScreen .modalButtonContainer .modalBottomFullButton {
+    padding-top: 0px;
+}
+
+/*User dashboard*/
+
+body {
+    background: #F6F6F6 !important;
+}
+
 
 #loading > div > div {
   background: #0d9ddb !important;
@@ -99,21 +290,7 @@ body {
 #logout a:hover {
     color: #B5ADAC;
 }
-/*
 
-#addConnection {
-    right: 150px;
-}
-
-#accountSettings {
-    right: 100px;
-}
-
-#logout {
-    right: 50px;
-}
-
-*/
 #navigation-tabs-container {
     width: 100%;
     position:absolute;    
@@ -166,6 +343,12 @@ label[for=photoUploader]:hover {
     background-color: #F1F1F1;    
 }
 
+
+/* Add connection screen related  */
+
+.modalView#mainImportView .addConnectionPopupContent {
+    padding: 0px 30px;
+}
 
 
 /* Bubbles related */
@@ -249,6 +432,14 @@ label[for=photoUploader]:hover {
     overflow-y:scroll;
 }
 
+.modalButtonContainer {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    bottom: 0px;
+    left: 0px;   
+}
+
 .remodal.standardModal .modalView .modalButtonContainer {
     position: absolute;
     width: 100%;
@@ -259,50 +450,34 @@ label[for=photoUploader]:hover {
 
 .sphereRedBackground {
     background-color:#FE0000;
+    transition:background-color 0.2s ease;
 }
+
+.sphereRedBackground.hoverable:hover {
+    background-color:#CC1919;
+}
+
 
 .sphereBlueBackground {
     background-color: #0099E5;
+    transition:background-color 0.2s ease;
 }
+
+.sphereBlueBackground.hoverable:hover {
+    background-color: #0584C3;
+}
+
 
 .sphereGreenBackground {
     background-color: #34BF49;
+    transition:background-color 0.2s ease;
 }
 
-.modalBottomLeftButton {
-    width: 50%;
-    cursor: pointer;
-    height: 100%;
-    float:left;
-    font-size: 18px;
-    color: #FFFFFF;
-    text-align: center;
-    padding-top: 15px;
+.sphereGreenBackground.hoverable:hover {
+    background-color: #37AF49;
 }
 
-.modalBottomRightButton {
-    width: 50%;
-    cursor: pointer;
-    height: 100%;
-    float:right;
 
-    font-size: 18px;
-    color: #FFFFFF;
-    text-align: center;
-    padding-top: 15px;
-}
-
-.modalBottomFullButton {
-    width: 100%;
-    cursor: pointer;
-    height: 100%;
-    float:right;
-
-    font-size: 18px;
-    color: #FFFFFF;
-    text-align: center;
-    padding-top: 15px;
-}
 
 /*Edit connection screen */
 .modalView#editConnection .modalContentContainer {
@@ -322,6 +497,7 @@ label[for=photoUploader]:hover {
     border-radius: 5px;
     background-color: #FAFAFA;
 }
+
 
 .modalView#editConnection form div.btn-group .btn{
     background-color: #FAFAFA;
@@ -590,17 +766,11 @@ label[for=photoUploader]:hover {
 
 
 
-
-
 /* For Admin Dashboard*/
 
 #wrapper.container #main {
     overflow-x: scroll;
 }
-
-
-
-
 
 
 /* Customization of plugins */

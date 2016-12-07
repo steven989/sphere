@@ -11,29 +11,58 @@ $(function(){
                 }, 100);    
     });
 })
-
-
 </script>
+<div class="fullViewportContainer loginScreen">
+    <div id="title">
+        <%= image_tag "logo-white", width:"230" %>
+    </div>
+    <div id="displayBox">
+        <div class="p-h-xxlg p-v-xxlg" id="login">
+            <%= form_tag user_sessions_path, method: 'POST' do %>
+                <div>
+                    <div class="formElement button textDarkGray tallerInput" href="http://localhost:3000/auth/google_login" id='googleLoginButton'>
+                        <%= image_tag 'google-logo-small', width: 20 %>
+                        <span class="m-l-xxxxxlg">
+                            Login with Google
+                        </span>
+                    </div>
+                    <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or with email</span></h2>
+                    <%= text_field_tag :email, nil, placeholder:"email", class:"textDarkGray formElement m-b-md tallerInput" %>
+                    <%= password_field_tag :password, nil,  placeholder:"password", class:"textDarkGray formElement m-b-md tallerInput" %>
+                </div>
+                <span style="font-size:12px;text-align:center; display:block; width:100%;">
+                    <a class="transitionButton" data-current=".loginScreen #login" data-target=".loginScreen #signup" >Sign Up</a><br>
+                    <a href="#">Forgot Password?</a>
+                </span>
+                <div class="modalButtonContainer">
+                    <%= submit_tag 'LOGIN', class:"modalBottomFullButton sphereBlueBackground hoverable" %> 
+                </div>
+            <% end %>
+        </div>
+        <div class="p-h-xxlg p-v-xxlg hidden" id="signup">
+            <%= form_tag create_user_path, method: 'POST' do %>
+                <div>
+                    <div class="formElement button textDarkGray tallerInput" href="http://localhost:3000/auth/google_login" id='googleLoginButton'>
+                        <%= image_tag 'google-logo-small', width: 20 %>
+                        <span class="m-l-xxxxxlg">
+                            Signup with Google
+                        </span>
+                    </div>
+                    <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or create account</span></h2>
 
-<% if flash[:alert] %>
-<div class="alert alert-danger"><%= flash[:alert] %></div>
-<% end %>
-Login
-<%= form_tag user_sessions_path, method: 'POST' do %>
-    <%= text_field_tag :email, nil, placeholder:"email" %>
-    <%= password_field_tag :password, nil,  placeholder:"password" %>
-     <%= submit_tag 'Login' %> 
-<% end %>
-<br>
-Sign up
-<%= form_tag create_user_path, method: 'POST' do %>
-    <%= text_field_tag :email, nil, placeholder:"email" %>
-    <%= text_field_tag :first_name, nil, placeholder:"first name" %>
-    <%= text_field_tag :last_name, nil, placeholder:"last name" %>
-    <%= password_field_tag :password, nil,  placeholder:"password" %>
-    <%= password_field_tag :password_confirmation, nil,  placeholder:"retype password" %>
-     <%= submit_tag 'Sign up' %> 
-<% end %>
-
-<%= link_to 'Create Account', create_account_path %>
-<%= link_to 'Login with Google', "http://localhost:3000/auth/google_login", id:'googleLoginButton' %>
+                    <%= text_field_tag :email, nil, placeholder:"email", class:"textDarkGray formElement m-b-xs tallerInput" %>
+                    <%= text_field_tag :first_name, nil, placeholder:"first name", class:"textDarkGray formElement halfRow left m-b-xs tallerInput" %>
+                    <%= text_field_tag :last_name, nil, placeholder:"last name", class:"textDarkGray formElement halfRow right m-b-xs tallerInput" %>
+                    <%= password_field_tag :password, nil,  placeholder:"password", class:"textDarkGray formElement m-b-xs tallerInput" %>
+                    <%= password_field_tag :password_confirmation, nil,  placeholder:"retype password", class:"textDarkGray formElement m-b-xs tallerInput" %>
+                </div>
+                <span style="margin-bottom: 30px; font-size:12px;text-align:center; display:block; width:100%;">
+                    <a class="transitionButton" data-current=".loginScreen #signup" data-target=".loginScreen #login" >Login</a>
+                </span>
+                <div class="modalButtonContainer">
+                    <%= submit_tag 'SIGN UP', class:"modalBottomFullButton sphereBlueBackground hoverable" %> 
+                </div>                 
+            <% end %>            
+        </div>
+    </div>
+</div>

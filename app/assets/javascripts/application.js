@@ -18,6 +18,18 @@
 //= require_tree ../../../vendor/assets/javascripts/priority/.
 //= require_tree ../../../vendor/assets/javascripts/.
 
+// Shared utilities
+
 $(function(){
-    vex.defaultOptions.className = 'vex-theme-default';
+// Transitioning mechanism of different views within the bubble popup modal
+$('.transitionButton').off('click').on('click',function(){
+    transition($($(this).data('current')),$($(this).data('target')));
+});
+  
 })
+
+// This function implements the transition so that it can be used by other things
+function transition(from,to) {
+    from.addClass('hidden');
+    to.removeClass('hidden');        
+}  

@@ -113,18 +113,6 @@ $(function(){
         },timer);        
     }
 
-
-    // Transitioning mechanism of different views within the bubble popup modal
-    $('[data-remodal-id=bubbleModal] .transitionButton').off('click').on('click',function(){
-        transition($($(this).data('current')),$($(this).data('target')));
-    });
-
-    // This function implements the transition so that it can be used by other things
-    function transition(from,to) {
-        from.addClass('hidden');
-        to.removeClass('hidden');        
-    }
-
     // Photo upload label within bubble modal to change display when a file is selected
     $(".modalView#editConnection #photoUploader").on("change",function(){
             $(".modalView#editConnection label[for=photoUploader]").html($(".modalView#editConnection #photoUploader").prop("files")[0].name);
@@ -586,10 +574,10 @@ $(function(){
                                    <p class="textDarkGray"><%= challenge.instructions %></p>
                                 </div>
                                 <div class="buttons">
-                                    <div class="sphereGreenBackground modalBottomLeftButton">
+                                    <div class="sphereGreenBackground hoverable modalBottomLeftButton">
                                         Start
                                     </div>
-                                    <div class="sphereBlueBackground modalBottomRightButton">
+                                    <div class="sphereBlueBackground hoverable modalBottomRightButton">
                                         Learn
                                     </div>
                                 </div>
@@ -661,8 +649,8 @@ $(function(){
             </select>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereBlueBackground" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
-            <div class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity"  end  %> sphereGreenBackground" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
+            <div class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>
@@ -679,31 +667,32 @@ $(function(){
                 </ul>
             </div>
             <div class="modalButtonContainer">
-                <div class="modalBottomFullButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
+                <div class="modalBottomFullButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
             </div>            
         </div>
     <% end %>
     <div class="modalView hidden" id="makePlan">
-        <div class="modalContentContainer">
+        <div class="modalContentContainer p-h-xxlg">
+            <span class="textDarkGray">Event info</span>
             <form action="<%= plans_path %>" method="POST" >
-                <input type="date" class="input-text" name="date" placeholder="Which day" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
-                <input type="text" class="input-text" name="time" placeholder="What time (e.g. 12:30pm)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="number" class="input-text" name="duration" placeholder="For how many hours (e.g. 0.5)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="text" class="input-text" name="name" placeholder="Meeting/activity name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="text" class="input-text" name="location" placeholder="Location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
-                <input type="text" class="input-text" name="details" placeholder="Details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="date" class="formElement button m-b-sm m-t-sm" name="date" placeholder="Which day" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="text" class="formElement m-b-sm" name="time" placeholder="what time (e.g. 12:30pm)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="number" class="formElement m-b-sm" name="duration" placeholder="for how many hours (e.g. 0.5)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="text" class="formElement m-b-sm" name="name" placeholder="meeting/activity name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="text" class="formElement m-b-sm" name="location" placeholder="location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="text" class="formElement m-b-sm" name="details" placeholder="details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
                 <div style="display:inline-box; width:50px; height:20px; border-radius:5px; background-color:yellow" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent" data-alert-element=".modalView#makePlan #makePlanFormAlert">Cancel</div>
                 <input type="hidden" name="connection_id">
                 <input type="hidden" name="plan_id">
                 <%= check_box_tag 'notify',true,@settings[:send_event_booking_notification_by_default], style:"display:inline-box;" %>
-                <label for="notify">Send invite?</label>
+                <label for="notify" class="textDarkGray">Send invite?</label>
                 <input type="text" class="input-text hidden default_hidden" name="connection_email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" >
                 <div class="alert hidden default_hidden" id="makePlanFormAlert" style="margin-top:1px;line-height:15px;"></div>
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground">PUT IN CALENDAR</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable">PUT IN CALENDAR</div>
         </div>
     </div>
     <div class="modalView hidden" id="editConnection">
@@ -729,8 +718,8 @@ $(function(){
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">Back</div>
-            <div class="modalBottomRightButton sphereBlueBackground">Update</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">Back</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable">Update</div>
         </div>
     </div>
 </div>
@@ -740,31 +729,23 @@ $(function(){
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
-                <button class="btn" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" data-alert-element="[data-remodal-id=importModal] .alert" id="importContactsGoogle" style="width:100%; margin-bottom:5px; background-color:#3b5998; color:white;">Import from Google</button>
+                <div class="formElement button textDarkGray" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" data-alert-element="[data-remodal-id=importModal] .alert" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
                 <br>
-                <button class="btn btn-blue" style="width:100%; margin-bottom:10px; background-color:#0077b5; color:white;">Import from Outlook</button>
-                <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:13px;color:#787878;background-color:#f0f0f0;padding:0 19px;font-weight:bold;">Or enter manually</span></h2>
+                <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
-                        <div class="vex-custom-input-wrapper">
-                            <input name="name" type="text" placeholder="Name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required>
-                        </div>
-                        <div class="vex-custom-input-wrapper">
-                            <input name="email" type="text" placeholder="Email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])">
-                        </div>
-                        <div class="vex-custom-input-wrapper">
-                            <input name="phone" type="text" placeholder="Phone" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])">
-                        </div>
-                        <div class="vex-custom-input-wrapper">
-                            <input name="target_contact_interval_in_days" type="number" placeholder="How often to reach out? (days)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required>
-                        </div>
+                        <input class="formElement m-b-md" name="name" type="text" placeholder="name" required>
+                        <input class="formElement m-b-md" name="email" type="text" placeholder="email" >
+                        <textarea class="formElement" name="notes" placeholder="notes" rows="2" required></textarea>
                     </div>
                     <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
                 </form>
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomFullButton sphereBlueBackground">Add to Sphere</div>
+            <div class="modalBottomFullButton sphereBlueBackground hoverable">
+                <span>Add to Sphere</span>
+            </div>
         </div>
     </div>
     <div class="modalView" id="listSelect">
@@ -787,8 +768,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereRedBackground">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground" href="<%= create_from_import_path %>" data-method="POST">ADD TO SPHERE</div>
+            <div class="modalBottomLeftButton sphereRedBackground hoverable">BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable" href="<%= create_from_import_path %>" data-method="POST">ADD TO SPHERE</div>
         </div>
     </div>
 </div>
@@ -822,8 +803,8 @@ $(function(){
             <div class="alert hidden default_hidden"></div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereRedBackground">Cancel</div>
-            <div class="modalBottomRightButton sphereBlueBackground" href="<%= update_user_settings_path(current_user) %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">Update</div>
+            <div class="modalBottomLeftButton sphereRedBackground hoverable">Cancel</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable" href="<%= update_user_settings_path(current_user) %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">Update</div>
         </div>
     </div>
 </div>
