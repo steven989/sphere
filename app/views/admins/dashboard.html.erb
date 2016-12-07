@@ -68,22 +68,17 @@ $(function(){
             var rowsToSend = model.find('.update-instance').filter(function(){
                 return ($(this).find('input.updateCheck').prop("checked") == true || $(this).find('input.deleteCheck').prop("checked") == true);
             })
-            var dataToSend = [];
             var formData = new FormData();
             var inc = 0;
 
             rowsToSend.each(function(){
                 var dataObject = {};
                 var idForKey = $(this).data('instance-id');
-                // dataObject["delete"] = $(this).find('input.deleteCheck').prop('checked');
                 formData.append("ID$"+idForKey+"$ATTR$"+"delete",$(this).find('input.deleteCheck').prop('checked'));
-
-                // dataObject["inputId"] = $(this).data('instance-id');
                 formData.append("ID$"+idForKey+"$ATTR$"+"inputId",$(this).data('instance-id'));
 
                 $(this).find('.updateInput').each(function(){
                     if ($(this).prop('type') == 'checkbox') {
-                        // dataObject[$(this).prop('name')] = $(this).prop('checked');
                         formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).prop('checked'));
                     } else if ($(this).prop('type') == 'file') {
                         formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).prop("files")[0]);
@@ -92,26 +87,8 @@ $(function(){
                         formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).val());
                     }
                 });
-                // dataToSend.push(dataObject);
                 inc++;
             });
-
-
-
-            // rowsToSend.each(function(){
-            //     var dataObject = {};
-
-            //     dataObject["delete"] = $(this).find('input.deleteCheck').prop('checked');
-            //     dataObject["inputId"] = $(this).data('instance-id');
-            //     $(this).find('.updateInput').each(function(){
-            //         if ($(this).prop('type') == 'checkbox') {
-            //             dataObject[$(this).prop('name')] = $(this).prop('checked');
-            //         } else {
-            //             dataObject[$(this).prop('name')] = $(this).val();    
-            //         }
-            //     });
-            //     dataToSend.push(dataObject);
-            // });
 
             if (inc > 0) {
                 buttonAjax($(this),formData);
