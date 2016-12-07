@@ -445,10 +445,18 @@ label[for=photoUploader]:hover {
 }
 
 .card.challengeCard .graphic {
-    height: 170px;
+    height: 150px;
     width: 100%;
     position: relative;
+    margin: 15px 0px;
 }
+
+.card.challengeCard img {
+    display:block;
+    margin: auto;
+    height: 100%;
+}
+
 
 .card.challengeCard .subtitle {
     padding: 0px 20px;
@@ -464,10 +472,18 @@ label[for=photoUploader]:hover {
 }
 
 .card.badgeCard .graphic {
-    height: 220px;
+    height: 150px;
+    margin: 30px 0px;
     width: 100%;
     position: relative;
 }
+
+.card.badgeCard .graphic img {
+    display:block;
+    margin: auto;
+    height: 100%;
+}
+
 
 .card.badgeCard .subtitle {
     padding: 0px 20px;
@@ -482,6 +498,17 @@ label[for=photoUploader]:hover {
 }
 
 
+/* For Admin Dashboard*/
+
+#wrapper.container #main {
+    overflow-x: scroll;
+}
+
+
+
+
+
+
 /* Customization of plugins */
 
 /* Toastr notification */
@@ -489,3 +516,7 @@ label[for=photoUploader]:hover {
 .toast-success {
   background-color: #34BF49 !important;
 }
+
+
+
+

@@ -11,6 +11,8 @@
         <th>Repeat Allowed?</th>
         <th>Criteria</th>
         <th>Reward</th>
+        <th>Graphic</th>
+        <th>Upload New Graphic</th>
         <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
     </thead>
     <tbody>
@@ -24,6 +26,8 @@
                
                <td><%= text_field_tag :criteria, challenge.criteria, class:"updateInput"%></td>
                <td><%= text_field_tag :reward, challenge.reward, class:"updateInput"%></td>
+               <td><%= image_tag challenge.graphic_url, height:"25", alt:"No Graphic Yet" %></td>
+               <td><%= file_field_tag :graphic, accept: "image/*", class:"updateInput" %></td>
                <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
            </tr> 
         <% end %>

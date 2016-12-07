@@ -54,15 +54,25 @@ class AdminsController < ApplicationController
     end
 
     def update_levels
+        parsed_params = {}
+        params.each do |key,value|
+            if key.match /ID\$(\d+)\$ATTR\$(\w+)/ #The keys are all in the shape of ID$123$ATTR$some_attribute
+                object_id = $1
+                attribute = $2
+                parsed_params[object_id] = {} unless parsed_params[object_id]
+                parsed_params[object_id][attribute.to_sym] = value
+            end
+        end
+
         error_array = []
-        params[:data].values.each do |value| 
+        parsed_params.values.each do |value| 
             delete = value[:delete] == "true" ? true : false
             id = value[:id].blank? ? nil : value[:id].to_i
             inputID = value[:inputId]
             level = value[:level]
             criteria = value[:criteria]
-
-            result = Level.update_level(delete,id,level,criteria)
+            graphic = value[:graphic]
+            result = Level.update_level(delete,id,level,criteria,graphic)
 
             if !result[:status] 
                 error_array.push({inputId:inputID,message:result[:message],elements:result[:elements]})
@@ -87,13 +97,23 @@ class AdminsController < ApplicationController
             render json: {status:status, message:message,actions:actions,data:data}
           } 
         end                
-
     end
 
 
     def update_challenges
+        parsed_params = {}
+        params.each do |key,value|
+            if key.match /ID\$(\d+)\$ATTR\$(\w+)/ #The keys are all in the shape of ID$123$ATTR$some_attribute
+                object_id = $1
+                attribute = $2
+                parsed_params[object_id] = {} unless parsed_params[object_id]
+                parsed_params[object_id][attribute.to_sym] = value
+            end
+        end
+
+
         error_array = []
-        params[:data].values.each do |value| 
+        parsed_params.values.each do |value| 
             delete = value[:delete] == "true" ? true : false
             id = value[:id].blank? ? nil : value[:id].to_i
             inputID = value[:inputId]
@@ -103,8 +123,9 @@ class AdminsController < ApplicationController
             repeated_allowed = value[:repeated_allowed] == "true" ? true : false
             criteria = value[:criteria]
             reward = value[:reward]
+            graphic = value[:graphic]
 
-            result = Challenge.update_challenge(delete,id,name,description,instructions,repeated_allowed,criteria,reward)
+            result = Challenge.update_challenge(delete,id,name,description,instructions,repeated_allowed,criteria,reward,graphic)
 
             if !result[:status] 
                 error_array.push({inputId:inputID,message:result[:message],elements:result[:elements]})
@@ -135,16 +156,27 @@ class AdminsController < ApplicationController
 
 
     def update_badges
+        parsed_params = {}
+        params.each do |key,value|
+            if key.match /ID\$(\d+)\$ATTR\$(\w+)/ #The keys are all in the shape of ID$123$ATTR$some_attribute
+                object_id = $1
+                attribute = $2
+                parsed_params[object_id] = {} unless parsed_params[object_id]
+                parsed_params[object_id][attribute.to_sym] = value
+            end
+        end
+
         error_array = []
-        params[:data].values.each do |value| 
+        parsed_params.values.each do |value| 
             delete = value[:delete] == "true" ? true : false
             id = value[:id].blank? ? nil : value[:id].to_i
             inputID = value[:inputId]
             name = value[:name]
             description = value[:description]
             criteria = value[:criteria]
+            graphic = value[:graphic]
 
-            result = Badge.update_badge(delete,id,name,description,criteria)
+            result = Badge.update_badge(delete,id,name,description,criteria,graphic)
 
             if !result[:status] 
                 error_array.push({inputId:inputID,message:result[:message],elements:result[:elements]})

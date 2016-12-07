@@ -24,7 +24,7 @@ class Level < ActiveRecord::Base
         end
     end
 
-    def self.update_level(delete,id,level,criteria)
+    def self.update_level(delete,id,level,criteria,graphic)
         if !id.blank?
             levelObj = Level.find(id)
             if levelObj
@@ -34,19 +34,31 @@ class Level < ActiveRecord::Base
                     message = "Level deleted"
                     elements = nil
                 else
-
                     # evaluate the criteria to make sure it's actually good
                     evaluation_result = criteria == levelObj.criteria ? true : User.find_users_matching_criteria(criteria)[:status]
                     if evaluation_result
+                        if !((graphic == "undefined") || (graphic == "null") || graphic.blank?)
+                            levelObj.remove_graphic!
+                            levelObj.save
+                            levelObj.graphic = graphic
+                        end 
                         levelObj.assign_attributes(level:level,criteria:criteria)
-                        if levelObj.save
-                            status = true
-                            message = "Level successfully updated"
+                        begin
+                            savedObj = levelObj.save
+                        rescue => error
+                            status = false
+                            message = "Level could not be updated: #{error.message}"
                             elements = nil
                         else
-                            status = false
-                            message = "Level could not be updated: #{levelObj.errors.full_messages.join(', ')}"
-                            elements = levelObj.errors.messages.keys
+                            if savedObj
+                                status = true
+                                message = "Level successfully updated"
+                                elements = nil
+                            else
+                                status = false
+                                message = "Level could not be updated: #{levelObj.errors.full_messages.join(', ')}"
+                                elements = levelObj.errors.messages.keys
+                            end
                         end
                     else
                         status = false

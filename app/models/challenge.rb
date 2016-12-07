@@ -5,6 +5,7 @@ class Challenge < ActiveRecord::Base
     has_many :completed_users, through: :user_challenge_completeds, class_name: "User", foreign_key: "user_id", source: :user
     validates :name, presence: true
     validates :reward, presence: true
+    mount_uploader :graphic, GraphicUploader
 
     def self.identify_challenges_for(current_user)
         number_of_challenges_to_display_to_user = SystemSetting.search("number_of_challenges_to_display_to_user").value_in_specified_type
@@ -44,7 +45,7 @@ class Challenge < ActiveRecord::Base
     end
 
 
-    def self.update_challenge(delete,id,name,description,instructions,repeated_allowed,criteria,reward)
+    def self.update_challenge(delete,id,name,description,instructions,repeated_allowed,criteria,reward,graphic)
         if !id.blank?
             challengeObj = Challenge.find(id)
             if challengeObj
@@ -54,19 +55,31 @@ class Challenge < ActiveRecord::Base
                     message = "Challenge deleted"
                     elements = nil
                 else
-
                     # evaluate the criteria to make sure it's actually good
                     evaluation_result = criteria == challengeObj.criteria ? true : User.find_users_matching_criteria(criteria)[:status]
                     if evaluation_result
+                        if !((graphic == "undefined") || (graphic == "null") || graphic.blank?)
+                            challengeObj.remove_graphic!
+                            challengeObj.save
+                            challengeObj.graphic = graphic
+                        end 
                         challengeObj.assign_attributes(name:name,description:description,instructions:instructions,repeated_allowed:repeated_allowed,criteria:criteria,reward:reward)
-                        if challengeObj.save
-                            status = true
-                            message = "Challenge successfully updated"
+                        begin
+                            savedObj = challengeObj.save
+                        rescue => error
+                            status = false
+                            message = "Challenge could not be updated: #{error.message}"
                             elements = nil
                         else
-                            status = false
-                            message = "Challenge could not be updated: #{challengeObj.errors.full_messages.join(', ')}"
-                            elements = challengeObj.errors.messages.keys
+                            if savedObj
+                                status = true
+                                message = "Challenge successfully updated"
+                                elements = nil
+                            else
+                                status = false
+                                message = "Challenge could not be updated: #{challengeObj.errors.full_messages.join(', ')}"
+                                elements = challengeObj.errors.messages.keys
+                            end
                         end
                     else
                         status = false

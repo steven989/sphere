@@ -69,24 +69,54 @@ $(function(){
                 return ($(this).find('input.updateCheck').prop("checked") == true || $(this).find('input.deleteCheck').prop("checked") == true);
             })
             var dataToSend = [];
+            var formData = new FormData();
+            var inc = 0;
+
             rowsToSend.each(function(){
                 var dataObject = {};
+                var idForKey = $(this).data('instance-id');
+                // dataObject["delete"] = $(this).find('input.deleteCheck').prop('checked');
+                formData.append("ID$"+idForKey+"$ATTR$"+"delete",$(this).find('input.deleteCheck').prop('checked'));
 
-                dataObject["delete"] = $(this).find('input.deleteCheck').prop('checked');
-                dataObject["inputId"] = $(this).data('instance-id');
+                // dataObject["inputId"] = $(this).data('instance-id');
+                formData.append("ID$"+idForKey+"$ATTR$"+"inputId",$(this).data('instance-id'));
+
                 $(this).find('.updateInput').each(function(){
                     if ($(this).prop('type') == 'checkbox') {
-                        dataObject[$(this).prop('name')] = $(this).prop('checked');
+                        // dataObject[$(this).prop('name')] = $(this).prop('checked');
+                        formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).prop('checked'));
+                    } else if ($(this).prop('type') == 'file') {
+                        formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).prop("files")[0]);
                     } else {
                         dataObject[$(this).prop('name')] = $(this).val();    
+                        formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).val());
                     }
                 });
-                dataToSend.push(dataObject);
+                // dataToSend.push(dataObject);
+                inc++;
             });
-            if (dataToSend.length > 0) {
-                buttonAjax($(this),dataToSend);
+
+
+
+            // rowsToSend.each(function(){
+            //     var dataObject = {};
+
+            //     dataObject["delete"] = $(this).find('input.deleteCheck').prop('checked');
+            //     dataObject["inputId"] = $(this).data('instance-id');
+            //     $(this).find('.updateInput').each(function(){
+            //         if ($(this).prop('type') == 'checkbox') {
+            //             dataObject[$(this).prop('name')] = $(this).prop('checked');
+            //         } else {
+            //             dataObject[$(this).prop('name')] = $(this).val();    
+            //         }
+            //     });
+            //     dataToSend.push(dataObject);
+            // });
+
+            if (inc > 0) {
+                buttonAjax($(this),formData);
             } else {
-                alert("You must select at least 1 row to update")
+                toastr.warning("You must select at least 1 row to update", {timeOut: 3000,closeButton:true});
             }
         });
     }
@@ -105,21 +135,26 @@ $(function(){
 
     // Standard ajax call for buttons that retrieves JSON response
     function buttonAjax(button,data) {
+        toastr.options.newestOnTop = true;
         var alertElement = $(button.data('alert-element'));
           $.ajax({
             url: button.attr('href'),
             type: button.data('method'),
-            data: {data:data},
+            data: data,
+            processData: false,
+            contentType: false,
             dataType: 'JSON'
           }).done(function(data){
             receivedDataFromAJAX = data;
                 if (data.status) {
                         if(data.message != undefined) {
-                            alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
+                            // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
+                            toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
                         }
                 } else {
                     if(data.message != undefined) {
-                        alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                        // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                     }
                 }
                 if (data.data != undefined) {
@@ -172,9 +207,9 @@ $(function(){
                 }
             }
             if (numberOfIssues > 0) {
-                alert("Some issues found! Look for the highlighted cells")
+                toastr.error("Some issues found! Look for the highlighted cells", {timeOut: 5000,closeButton:true});
             } else {
-                alert("No issues")
+                toastr.success("No issues!", {timeOut: 3000,closeButton:true});
             }
         },
         checkFieldCompletion: function(modelName) {
