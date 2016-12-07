@@ -5,6 +5,13 @@ $(function(){
     var returnedData;
     var token;
 
+
+    // Navigation bar related
+    $('#settingLogoutToggle').off("click").on("click",function(){
+        $('.profileButtonsContainer.hideOnMobile').toggle();
+    });
+
+    // Paint the bubbles
     $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
 
     function prettifyBubbles(canvas){
@@ -524,26 +531,34 @@ $(function(){
         <%= image_tag "logo-white", width:"125" %>
     </div>
     
-        <div id="addConnection">
-            <%= fa_icon 'user-plus' %>
+        <div class="profileButtonsContainer showOnMobile">
+            <div class="profileButton" id="addConnection" >
+                <%= fa_icon 'user-plus' %>
+            </div>
+            <div class="profileButton showOnMobile" id="settingLogoutToggle" style="display:none">
+                <%= fa_icon 'bars' %>
+            </div>
         </div>
-        <div id="accountSettings" href="<%= get_user_settings_path(current_user) %>" data-method="GET">
-            <%= fa_icon 'cog' %>
-        </div>
-        <div id="logout">
-            <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
+        <div class="profileButtonsContainer hideOnMobile showOnDesktop" >
+            <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path(current_user) %>" data-method="GET">
+                <p class="showOnMobile" style="display:none;">Settings</p>
+                <%= fa_icon 'cog' %>
+            </div>
+            <div class="divider showOnMobile" style="display:none;"></div>
+            <div class="profileButton" id="logout">
+                <p class="showOnMobile" style="display:none;">Log out</p>
+                <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
+            </div>
         </div>    
-    
-
 </div>
 
 <div id="navigation-tabs-container">
     <div class="topTabs-header clearfix">
         <ul class="etabs tabs" id="navigation">
-            <li class="tab"><a href="#mySphere"><%= fa_icon 'circle-o' %><br>MY SPHERE</a></li>
-            <li class="tab"><a href="#challenges"><%= fa_icon 'map' %><br>CHALLENGES</a></li>
-            <li class="tab"><a href="#progress"><%= fa_icon 'bar-chart' %><br>PROGRESS</a></li>
-            <li class="tab"><a href="#achievements"><%= fa_icon 'star' %><br>ACHIEVEMENTS</a></li>
+            <li class="tab"><a href="#mySphere"><%= fa_icon 'circle-o' %><br><span class="hideOnMobile">MY SPHERE</span></a></li>
+            <li class="tab"><a href="#challenges"><%= fa_icon 'map' %><br><span class="hideOnMobile">CHALLENGES</span></a></li>
+            <li class="tab"><a href="#progress"><%= fa_icon 'bar-chart' %><br><span class="hideOnMobile">PROGRESS</span></a></li>
+            <li class="tab"><a href="#achievements"><%= fa_icon 'star' %><br><span class="hideOnMobile">ACHIEVEMENTS</span></a></li>
         </ul>        
     </div> 
     <div class="topTabsContent">
