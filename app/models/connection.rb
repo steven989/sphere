@@ -288,11 +288,13 @@ class Connection < ActiveRecord::Base
       rescue => error
         status = false
         message = error.message
+        data = []
       else
         status = true
         message = "Tags successfully updated"
+        data = new_tags_array.blank? ? [] : new_tags_array.uniq
       end
-      {status:status,message:message}
+      {status:status,message:message,data:data}
     end
 
     def self.port_photo_url_to_access_url(id)

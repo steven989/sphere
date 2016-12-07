@@ -168,16 +168,18 @@ class UsersController < ApplicationController
       result = connection.update_tags(current_user,params[:tags])
       if result[:status]
         status = true
-        message = nil
+        message = "Tag updated!"
         actions = nil
+        data = {connection_tags:result[:data],connection_id:params[:connection_id]}
       else
         status = false
         message = "Oops. Our robots encountered some issues while updating tags. Please let us know the error: #{result[:message]}"
         actions = nil
+        data = {connection_tags:result[:data],connection_id:params[:connection_id]}
       end
       respond_to do |format|
         format.json {
-          render json: {status:status,message:message,actions:actions}
+          render json: {status:status,message:message,actions:actions,data:data}
         } 
       end
     end

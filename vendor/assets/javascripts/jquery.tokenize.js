@@ -417,7 +417,7 @@
                     if(this.searchInput.val().length == 0){
                         e.preventDefault();
                         if($('li.Token.PendingDelete', this.tokensContainer).length){
-                            this.tokenRemove($('li.Token.PendingDelete').attr('data-value'));
+                            this.tokenRemove($('li.Token.PendingDelete').attr('data-value'),true); // Edited by Steve to add a flag whether to trigger callback or not
                         } else {
                             $('li.Token:last', this.tokensContainer).addClass('PendingDelete');
                         }
@@ -624,7 +624,7 @@
                 .html("&#215;")
                 .on('click', function(e){
                     e.stopImmediatePropagation();
-                    $this.tokenRemove(value);
+                    $this.tokenRemove(value,true); // Edited by Steve to add a flag whether to trigger callback or not
                 });
 
             if($('option[value="' + value + '"]', this.select).length){
@@ -675,7 +675,7 @@
          * @param {string} value The value of the token who has to be removed
          * @returns {$.tokenize}
          */
-        tokenRemove: function(value){
+        tokenRemove: function(value,callback){ // Edited by Steve to add a flag whether to trigger callback or not
 
             var option = $('option[value="' + value + '"]', this.select);
 
@@ -687,7 +687,10 @@
 
             $('li.Token[data-value="' + value + '"]', this.tokensContainer).remove();
 
-            this.options.onRemoveToken(value, this);
+            if (callback) {
+                this.options.onRemoveToken(value, this);    // Edited by Steve to add a flag whether to trigger callback or not
+            }
+            
             this.resizeSearchInput();
             this.dropdownHide();
             this.updateOrder();
@@ -706,7 +709,7 @@
             var $this = this;
 
             $('li.Token', this.tokensContainer).each(function(){
-                $this.tokenRemove($(this).attr('data-value'));
+                $this.tokenRemove($(this).attr('data-value'),false); // Edited by Steve to add a flag whether to trigger callback or not
             });
 
             this.options.onClear(this);

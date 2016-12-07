@@ -286,7 +286,6 @@ $(function(){
         var photoUrl = returnedData.photo;
         var allTags = returnedData.all_tags;
         var connectionTags = returnedData.connection_tags;
-        var connectionId = {id:returnedData.connection_id};
 
         $('[data-remodal-id=bubbleModal] .modalView#plans span.name').html(name);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
@@ -323,12 +322,18 @@ $(function(){
                 autosize:true,
                 onAddToken:function(){
                     var idReference = returnedData;
-                    buttonAjax($('.modalView#plans #tokenize'),{connection_id:idReference.connection_id,tags:token.toArray().filter(function(el){return el != "$add$tag$"})});
+                    if (!isSubset(token.toArray(),idReference.connection_tags,["$add$tag$"],[])) { // if the new array is NOT a subset of the old array, then update the backend
+                        buttonAjax($('.modalView#plans #tokenize'),{connection_id:idReference.connection_id,tags:token.toArray().filter(function(el){return el != "$add$tag$"})});
+                    }
                 },
                 onRemoveToken:function() {
                     var idReference = returnedData;
-                    buttonAjax($('.modalView#plans #tokenize'),{connection_id:idReference.connection_id,tags:token.toArray().filter(function(el){return el != "$add$tag$"})});
+                    if (!isSubset(idReference.connection_tags,token.toArray(),[],["$add$tag$"])) { 
+                        buttonAjax($('.modalView#plans #tokenize'),{connection_id:idReference.connection_id,tags:token.toArray().filter(function(el){return el != "$add$tag$"})});
+                    }
+                    
                 }
+
             });            
          }
          token.clear();
@@ -341,6 +346,7 @@ $(function(){
             token.tokenRemove("$add$tag$");
         });
         $('.modalView#plans .modalTokenBox li.TokenSearch input').off('focusout').on('focusout',function(){
+
             if (token.toArray().length == 0) {
                 token.tokenAdd("$add$tag$","+ Add Tags");
                 $('.modalView#plans .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('span').css("margin-right","10px");
@@ -434,7 +440,26 @@ $(function(){
         
     }
 
+
+// utility functions
+
+    // check if an array is a subset of another array
+    function isSubset(x,y,xValuesToIgnore,yValuesToIgnore) {
+        x_removed = xValuesToIgnore.length > 0 ? x.filter(function(xEl){ return xValuesToIgnore.indexOf(xEl) == -1 }) : x;
+        y_removed = yValuesToIgnore.length > 0 ? y.filter(function(yEl){ return yValuesToIgnore.indexOf(yEl) == -1 }) : y;
+        var result = true;
+        if (x_removed.length > 0) {
+            x_removed.forEach(function(el){
+                if(y_removed.indexOf(el) == -1) {result = false;}
+            });        
+        }
+        return result;
+    }
+
+
+
 })
+
 </script>
 <div id="profile">
     <div id="logo">
