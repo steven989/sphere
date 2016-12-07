@@ -9,26 +9,39 @@ class ConnectionsController < ApplicationController
     def update
         connection = Connection.find(params[:connection_id])
         photo_uploaded = !((params[:photo] == "undefined") || (params[:photo] == "null") || params[:photo].blank?)
-        if photo_uploaded
-            connection.remove_photo!
-            connection.save
-            connection.photo = params[:photo]
-        end
-        connection.assign_attributes(
-            id:params[:connection_id]
-        )
-        if connection.save
-            connection.port_photo_url_to_access_url
-            status = true
-            message = "Connection successfully updated"
-        else
-            status = false
-            message = "Connection could not be updated #{connection.errors.full_messages.join(', ')}"
-        end
 
+        if params[:contact_frequency] == "other" && (params[:custom_frequency].blank? || params[:custom_frequency].to_i < 1 )
+            status = false
+            message = "Please enter a valid number of days"
+            actions = [{action:"add_class",element:".modalView#editConnection input[name=other_days]",class:"errorFormInput"}]
+        else
+            if photo_uploaded
+                connection.remove_photo!
+                connection.save
+                connection.photo = params[:photo]
+            end
+            target_contact_interval_in_days = (params[:contact_frequency] == "monthly" ? 30 : ( params[:contact_frequency] == "weekly" ? 7 : params[:custom_frequency].to_i ) )
+            connection.assign_attributes(
+                id:params[:connection_id],
+                frequency_word:params[:contact_frequency],
+                target_contact_interval_in_days:target_contact_interval_in_days,
+                notes:params[:notes]
+            )
+            if connection.save
+                Connection.port_photo_url_to_access_url(connection.id)
+                status = true
+                message = "Awesome. We updated #{connection.first_name}'s info for you!"
+                actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(2000)"}]
+                
+            else
+                status = false
+                message = "Oops. Our robots ran into some issues: #{connection.errors.full_messages.join(', ')}"
+                actions = []
+            end
+        end
         respond_to do |format|
           format.json {
-            render json: {status:status, message:message}
+            render json: {status:status,message:message,actions:actions}
           } 
         end
     end
@@ -83,6 +96,10 @@ class ConnectionsController < ApplicationController
         data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
         data[:name] = connection.name
+        data[:notes] = connection.notes
+        data[:contact_frequency] = connection.frequency_word
+        data[:target_contact_interval_in_days] = connection.target_contact_interval_in_days
+
         last_plan = Plan.last(current_user,connection)
 
         if last_plan

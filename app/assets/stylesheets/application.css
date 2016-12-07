@@ -27,6 +27,11 @@ body {
     color: #707070;
 }
 
+.errorFormInput {
+    border: 1px solid #BB1414 !important;
+    background-color: #FF9595 !important;
+}
+
 #loading > div > div {
   background: #0d9ddb !important;
 }
@@ -117,30 +122,26 @@ body {
 
 #photoUploader { display: none; }
 label[for=photoUploader] {
+    border: 1px solid #E9E9E9;
     font-family: 'eausans_book';
-    margin-top: 10px;
+    margin-top: 20px;
     width: 100%; 
-    padding: 5px;
-    background: #fff;
-    padding-left: 10px;
-    border-radius: 3px;
-    border:1px solid rgba(0,0,0,0.1);
+    padding-left: 12%;
+    background-color: #FAFAFA;
+    border-radius: 5px;
     font-size: 12px;
     color: #656268;
     position: relative;
+    text-align: left;
+    cursor: pointer;
+    height: 35px;
+    line-height: 35px;
 }
-    label[for=uploader]:after {
-        content: "+";
-        text-align: center;
-        font-size: 18px;
-        color: #fff;
-        position: absolute;
-        right: 5px;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        background: #fd8a78;
-    }
+
+label[for=photoUploader]:hover {
+    background-color: #F1F1F1;    
+}
+
 
 
 /* Bubbles related */
@@ -278,6 +279,72 @@ label[for=photoUploader] {
     text-align: center;
     padding-top: 15px;
 }
+
+/*Edit connection screen */
+.modalView#editConnection .modalContentContainer {
+    padding: 0px 30px;
+}
+
+.modalView#editConnection form span{
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.modalView#editConnection form div.btn-group{
+    margin-top:10px;
+    width: 100%;
+    border: 1px solid #E9E9E9;
+    border-radius: 5px;
+    background-color: #FAFAFA;
+}
+
+.modalView#editConnection form div.btn-group .btn{
+    background-color: #FAFAFA;
+}
+
+.modalView#editConnection form div.btn-group .btn:hover{
+    background-color: #F1F1F1;
+}
+
+
+.modalView#editConnection form div.btn-group .btn.active {
+    background-color: #34BF49;
+    color: #FFFFFF;
+}
+
+.modalView#editConnection form div.btn-group .btn.active:hover{
+    background-color: #2CAF40;
+}
+
+.modalView#editConnection form textarea {
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 15px;
+    background-color: #FAFAFA;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #E9E9E9;
+}
+
+.modalView#editConnection form .details {
+    margin-top: 10px;
+    margin-bottom: -10px;
+    height: 30px;
+    text-align: center;
+}
+
+.modalView#editConnection form .details input {
+    padding: 0px 10px;
+    background-color: #FAFAFA;
+    border-radius: 5px;
+    font-size: 15px;
+    border: 1px solid #E9E9E9;
+    line-height: 30px;
+    height:30px;  
+    width: 60px;  
+}
+
 
 /* Check in screen */
 .modalView#detailedCheckIn ul li {

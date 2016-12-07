@@ -49,7 +49,14 @@ $(function(){
                     modifier:'standardModal'
                     });
                 $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
+                    var form = $('.modalView#editConnection form');
+                    var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
+                    var custom_frequency;
                     formData.append("connection_id",_this.data('connection-id'));
+                    if (frequency=="other") { custom_frequency = form.find('.details input').val();}
+                    formData.append("contact_frequency",frequency);
+                    formData.append("custom_frequency",custom_frequency);
+                    formData.append("notes",form.find('[name=notes]').val());
                     formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
                   $.ajax({
                     url: '<%= update_connection_path %>',
@@ -60,11 +67,17 @@ $(function(){
                     dataType: 'JSON'
                   }).done(function(data){
                         if (data.status) {
-                            $(".modalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
-                            closeModalInstance(2000);
+                                if(data.message != undefined /* && alertElement.length > 0 */ ) {
+                                    toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
+                                }
                         } else {
-                            $(".modalView#editConnection #connectionFormAlert").html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
-                            
+                            toastr.options.closeButton = true;
+                            if(data.message != undefined /* && alertElement.length > 0 */) {
+                                toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                            }
+                        }
+                        if (data.actions != undefined && data.actions.length > 0) {
+                            performActions(data.actions);    
                         }
                       });
                 })
@@ -122,6 +135,10 @@ $(function(){
     function resetModal(modal,resetType) {
 
         if (resetType == 1 || resetType == 3) {
+            // reset class
+            modal.parent().filter(function(){ return $(this).data('default-class') != undefined }).each(function(){
+                $(this).prop("class",$(this).data('default-class'));
+            })
             // Reset css
             modal.parent().find('*').filter(function(){
                 return $(this).data('default-css') != undefined;
@@ -141,8 +158,8 @@ $(function(){
         if (resetType == 2 || resetType == 3) { 
             // Reset values
             modal.parent().find('input').each(function(){
-                if($(this).prop('type') != 'hidden' && $(this).prop('type') != 'checkbox' ) {
-                    $(this).val('');    
+                if($(this).prop('type') != 'hidden' && $(this).prop('type') != 'checkbox' && $(this).data('skip-clear') == undefined ) {
+                    $(this).val('');
                 }
             })
         }
@@ -286,6 +303,9 @@ $(function(){
         var photoUrl = returnedData.photo;
         var allTags = returnedData.all_tags;
         var connectionTags = returnedData.connection_tags;
+        var notes = returnedData.notes;
+        var contact_frequency = returnedData.contact_frequency;
+        var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
 
         $('[data-remodal-id=bubbleModal] .modalView#plans span.name').html(name);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
@@ -316,7 +336,7 @@ $(function(){
             $('.modalView#plans .modalBottomLeftButton').html("MAKE PLANS");
         }
 
-        // Related to the tagging field in the modal
+        // Related to the tagging field in the modal. Used jQuery Tokenize plugin, but made slight modifications to the plugin so that upon clearing all tokens it doesn't trigger the callbacks that is triggered for one-by-one removing token
          if ((typeof token == "undefined")) {
              token = $('.modalView#plans #tokenize').tokenize({
                 autosize:true,
@@ -328,12 +348,10 @@ $(function(){
                 },
                 onRemoveToken:function() {
                     var idReference = returnedData;
-                    if (!isSubset(idReference.connection_tags,token.toArray(),[],["$add$tag$"])) { 
+                    if (!isSubset(idReference.connection_tags,token.toArray(),[],["$add$tag$"])) { // if the old array is NOT a subset of the new array, then update the backend
                         buttonAjax($('.modalView#plans #tokenize'),{connection_id:idReference.connection_id,tags:token.toArray().filter(function(el){return el != "$add$tag$"})});
                     }
-                    
                 }
-
             });            
          }
          token.clear();
@@ -363,6 +381,41 @@ $(function(){
                 token.tokenAdd(tag,tag);
             });
         }
+
+        // Related to the preferences view
+
+        if (["monthly","weekly","other"].indexOf(contact_frequency) == -1) {
+            contact_frequency = "monthly"; // Default to monthly
+        } 
+
+        $('.modalView#editConnection form [name=notes]').val(notes);
+        if (target_contact_interval_in_days != undefined && target_contact_interval_in_days != "undefined" && target_contact_interval_in_days > 0) {$('.modalView#editConnection form .details input').val(target_contact_interval_in_days);}
+        if (contact_frequency == "other") {
+            $('.modalView#editConnection form .details').slideDown();
+        } else {
+            $('.modalView#editConnection form .details').css("display","none");
+        }
+
+        $('.modalView#editConnection .contactFrequency button').each(function(){
+            if ($(this).data('value') == contact_frequency) {
+                $(this).removeClass('active').addClass('active');
+            } else {
+                $(this).removeClass('active');
+            }
+            $(this).off("click").on("click",function(){
+                event.preventDefault();
+                event.stopPropagation();
+                $(this).siblings().each(function(){
+                    $(this).removeClass('active');
+                })
+                if($(this).data('value') == "other") {
+                    $('.modalView#editConnection form .details').slideDown();
+                } else {
+                    $('.modalView#editConnection form .details').slideUp();
+                }
+                $(this).removeClass('active').addClass('active');
+            })
+        })
     }
 
     function populateSettingsForm () {
@@ -399,6 +452,10 @@ $(function(){
                 transition($(actionObject.from),$(actionObject.to));
             } else if (actionObject.action == "function_call") {
                 eval(actionObject.function);
+            } else if (actionObject.action == "add_class") {
+                $(actionObject.element).removeClass(actionObject.class).addClass(actionObject.class);
+            } else if (actionObject.action == "remove_class") {
+                $(actionObject.element).removeClass(actionObject.class);
             }
         });
     }
@@ -636,10 +693,22 @@ $(function(){
     <div class="modalView hidden" id="editConnection">
         <div class="modalContentContainer">
             <form id="connectionInfo">
+                <span class="textDarkGray">How often do you want to stay in touch?</span>
+                <div class="btn-group contactFrequency" role="group">
+                    <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="weekly">WEEKLY</button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:34%" data-value="monthly">MONTHLY</button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="other">OTHER</button>
+                </div>
+                <div class="details" style="display:none;" >
+                    Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
+                </div>
+
                 <input name="photoUploader" id="photoUploader" type="file" accept="image/*">
-                <label for="photoUploader">
-                    Choose a display picture
+                <label for="photoUploader" class="textDarkGray">
+                    <%= fa_icon 'id-badge' %>
+                    Upload Photo
                 </label>
+                <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
                 <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
             </form>
         </div>
