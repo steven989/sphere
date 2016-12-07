@@ -80,7 +80,6 @@ $(function(){
                     } else {
                         dataObject[$(this).prop('name')] = $(this).val();    
                     }
-                    
                 });
                 dataToSend.push(dataObject);
             });
@@ -131,8 +130,6 @@ $(function(){
                 }
           })
     }
-
-
 
 
     // Predefined set of actions can be called by passing an array of actions into this function. Useful for Rails to call specific follow up actions after AJAX call
@@ -188,7 +185,7 @@ $(function(){
         }
     }
 
-
+    // This callback function is used for Rails to only check those rows with errors
     function reCheck(modelName,inputIds,updateOrDelete) {
         inputIdsInInt = inputIds.map(function(id){ return parseInt(id) });
         $('#'+modelName+' .update-instance').each(function(){
@@ -218,10 +215,10 @@ $(function(){
             <div id="topBar">
                 <div class="wrapper20">
                     <a class="logo" href="#" title="">
-                        SPHERE beta
+                        <%= image_tag "logo-white", width:"125" %>
                     </a>
                     <div class="topNav clearfix">
-                        <a href="<%= logout_path %>">Logout</a>
+                        <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
                     </div> <!-- /topNav -->
                 </div>
             </div> <!-- /topBar -->

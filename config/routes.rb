@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   put  'admins/update_levels' => 'admins#update_levels', as: 'update_levels'
   put  'admins/update_challenges' => 'admins#update_challenges', as: 'update_challenges'
   put  'admins/update_badges' => 'admins#update_badges', as: 'update_badges'
+  put  'admins/upload_graphics' => 'admins#upload_graphics', as: 'upload_graphics'
 
   # resources :plans
   post 'plans' => 'plans#create', as: 'plans'

@@ -8,6 +8,8 @@
         <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
         <th>Level</th>
         <th>Criteria</th>
+        <th>Graphic</th>
+        <th>Upload New Graphic</th>
         <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
     </thead>
     <tbody>
@@ -16,6 +18,8 @@
                <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,level.id, class:"updateInput" %></td>
                <td><%= number_field_tag :level, level.level,class:"updateInput" %></td>
                <td><%= text_field_tag :criteria, level.criteria,class:"updateInput" %></td>
+               <td><%= image_tag level.graphic_url, height:"25", alt:"No Graphic Yet" %></td>
+               <td><%= file_field_tag :graphic, accept: "image/*", class:"updateInput" %></td>
                <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
            </tr> 
         <% end %>

@@ -2,6 +2,7 @@ class Level < ActiveRecord::Base
     validates :level, presence: true
     validates :level, uniqueness: true
     validates :criteria, uniqueness: true
+    mount_uploader :graphic, GraphicUploader
 
     def self.find_level_for(current_user)
         sorted_array_of_leveling_criteria = Level.all.order(level: :asc).map {|level| {level:level.level, criteria:level.criteria}}

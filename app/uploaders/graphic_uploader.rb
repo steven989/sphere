@@ -1,4 +1,4 @@
-class PhotoUploader < CarrierWave::Uploader::Base
+class GraphicUploader < CarrierWave::Uploader::Base
 
   # Include RMagick or MiniMagick support:
   include CarrierWave::RMagick
@@ -23,7 +23,7 @@ class PhotoUploader < CarrierWave::Uploader::Base
   # end
 
   # Process files as they are uploaded:
-  process resize_to_fit: [200, 200]
+  process scale: [150,150]
   #
   # def scale(width, height)
   #   # do something
@@ -36,10 +36,6 @@ class PhotoUploader < CarrierWave::Uploader::Base
 
   # Add a white list of extensions which are allowed to be uploaded.
   # For images you might use something like this:
-  # def extension_whitelist
-  #   %w(jpg jpeg gif png tiff bmp)
-  # end
-
   def content_type_whitelist
     /image\//
   end
@@ -47,7 +43,7 @@ class PhotoUploader < CarrierWave::Uploader::Base
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
   def filename
-    "#{model.class.to_s.underscore}_id#{model.id}_display_photo.#{file.extension}" if original_filename
+    "#{model.class.to_s.underscore}_id#{model.id}_graphic.#{file.extension}" if original_filename
   end
 
 end

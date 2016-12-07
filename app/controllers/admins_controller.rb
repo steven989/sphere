@@ -24,6 +24,35 @@ class AdminsController < ApplicationController
         end
     end
 
+    def upload_graphics
+        model = params[:model]
+        id = params[:id]
+        graphic_uploaded = !((params[:graphic] == "undefined") || (params[:graphic] == "null") || params[:graphic].blank?)
+
+        if model == "level" || model == "badge" || model == "challenge"
+            object = model == "level" ? Level.find(id) : ( model == "badge" ? Badge.find(id) : Challenge.find(id) )
+            if object
+                object.remove_graphic!
+                object.save
+                object.graphic = params[:graphic]
+                if object.save
+                    status = true
+                    message = nil
+                else
+                    status = false
+                    message = "Ran into some issues: #{object.errors.full_messages.join(', ')}"
+                end
+            else
+                status = false
+                message = "Couldn't find a #{model} record with ID #{id}"
+            end
+        else
+            status = false
+            message = "'#{model}' is not valid"
+        end
+        
+    end
+
     def update_levels
         error_array = []
         params[:data].values.each do |value| 
