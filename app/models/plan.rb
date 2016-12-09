@@ -131,6 +131,7 @@ class Plan < ActiveRecord::Base
                     event.start.date_time = new_start_time.strftime("%Y-%m-%dT%H:%M:%S%z")
                     self.date = new_start_time.to_date
                     self.date_time = new_start_time
+                    update_notification = true
                 end
                 if new_start_time+new_duration.hours != old_date_time+length.hours
 
@@ -161,6 +162,14 @@ class Plan < ActiveRecord::Base
                     self.save
                     status = true
                     message = "Event successfully updated"
+                    if update_notification 
+                        user.notifications.where(notification_type:"upcoming_plan").each { |notification|
+                            if notification.value_in_specified_type[:plan_id] == self.id
+                                notification.assign_attributes(expiry_date:self.date_time)
+                                notification.save
+                            end
+                        }
+                    end
                 end
             end
         end
@@ -186,6 +195,11 @@ class Plan < ActiveRecord::Base
             message = error.message
         else
             self.update_attributes(status:"Cancelled")
+            self.user.notifications.where(notification_type:"upcoming_plan").each { |notification|
+                if notification.value_in_specified_type[:plan_id] == self.id
+                    notification.destroy
+                end
+            }
             status = true
             message = "Event cancelled"
         end 

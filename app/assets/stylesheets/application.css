@@ -453,7 +453,7 @@ label[for=photoUploader]:hover {
     transition:background-color 0.2s ease;
 }
 
-.sphereRedBackground.hoverable:hover {
+.sphereRedBackground.hoverable:not(.disabled):hover {
     background-color:#CC1919;
 }
 
@@ -463,7 +463,7 @@ label[for=photoUploader]:hover {
     transition:background-color 0.2s ease;
 }
 
-.sphereBlueBackground.hoverable:hover {
+.sphereBlueBackground.hoverable:not(.disabled):hover {
     background-color: #0584C3;
 }
 

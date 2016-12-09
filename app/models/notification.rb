@@ -1,20 +1,106 @@
 class Notification < ActiveRecord::Base
     validate :validate_data_type 
     belongs_to :user
+    belongs_to :connection
 
 
-    def self.create_expiry_notification(user_id,connection_id,expiry_date,remaining_days_until_expiry)
-        # 1) Destroy any existing expiry notifications
-        Notification.where(user_id:user_id,connection_id:connection_id,notification_type:"connection_expiration").each {|notification| notification.destroy }
+    # Auto task
+    def destroy_notification 
+        self.destroy if notification.expiry_date < Date.today    # this will delete the notification the night immediately AFTER the expiry date specified
+    end
+
+    # This is a user-level notification
+    def self.create_new_level_notification(old_level,new_level,expiry_days=1,date=Date.today)
+        # 1) Destroy any existing notifications
+        Notification.where(user_id:user.id,notification_type:"level_up").destroy_all
         # 2) Create a notification
         Notification.create(
-          user_id: user_id,
-          connection_id: connection_id,
+          user_id: user.id,
+          notification_type:"level_up",
+          notification_date:date,
+          expiry_date:date+expiry_days.day,
+          data_type:"hash",
+          value:"{old_level:#{old_level.level},new_level:#{new_level.level}}"
+          )        
+    end
+
+    # This is a user-level notification
+    def self.create_new_badge_notification(badge,expiry_days=1,date=Date.today)
+        # 1) Destroy any existing notifications
+        Notification.where(user_id:user.id,notification_type:"new_badge").destroy_all
+        # 2) Create a notification
+        Notification.create(
+          user_id: user.id,
+          notification_type:"new_badge",
+          notification_date:date,
+          expiry_date:date+expiry_days.day,
+          data_type:"hash",
+          value:"{badge_id:#{badge.id}}"
+          )        
+    end
+
+    # This is a user-level notification
+    def self.create_new_challenge_notification(challenge,expiry_days=1,date=Date.today)
+        # 1) Destroy any existing notifications
+        Notification.where(user_id:user.id,notification_type:"new_challenge").destroy_all
+        # 2) Create a notification
+        Notification.create(
+          user_id: user.id,
+          notification_type:"new_challenge",
+          notification_date:date,
+          expiry_date:date+expiry_days.day,
+          data_type:"hash",
+          value:"{challenge_id:#{challenge.id}}"
+          )        
+    end
+
+
+    # This is a connection-level notification
+    def self.create_expiry_notification(user,connection,expiry_date,remaining_days_until_expiry)
+        # 1) Destroy any existing expiry notifications
+        Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"connection_expiration").destroy_all
+        # 2) Create a notification
+        Notification.create(
+          user_id: user.id,
+          connection_id: connection.id,
           notification_type:"connection_expiration",
           notification_date:Date.today,
           expiry_date:expiry_date,
           data_type:"hash",
-          value:"{remaining_days_until_expiry:#{remaining_days_until_expiry}}"
+          value:"{remaining_days_until_expiry:#{remaining_days_until_expiry}}",
+          priority: 3
+          )
+    end
+
+    # This is a connection-level notification
+    def self.create_checked_in_notification(user,connection_id,expiry_days=3,date=Date.today)
+        # 1) Destroy any existing notifications
+        Notification.where(user_id:user.id,connection_id:connection_id,notification_type:"checked_in").destroy_all
+        # 2) Create a notification
+        Notification.create(
+          user_id: user.id,
+          connection_id: connection_id,
+          notification_type:"checked_in",
+          notification_date:date,
+          expiry_date:date+expiry_days.days,
+          priority: 1
+          )
+    end
+
+    # This is a connection-level notification
+    def self.create_upcoming_plan_notification(user,connection,plan,date=Date.today)
+        # 1) Destroy any existing notifications
+        Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"upcoming_plan").destroy_all
+        # 2) Create a notification
+        Notification.create(
+          user_id: user.id,
+          connection_id: connection.id,
+          notification_type:"upcoming_plan",
+          notification_date:date,
+          expiry_date:plan.date,
+          data_type:"hash",
+          value:"{plan_id:#{plan.id}}",
+          priority: 2
           )
     end
 

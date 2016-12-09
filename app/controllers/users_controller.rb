@@ -99,12 +99,11 @@ class UsersController < ApplicationController
     end
 
     def create_activity
-      puts '---------------------------------------------------'
-      puts params[:connection_id]
-      puts '---------------------------------------------------'
       if params[:activity_definition_id]
         result = Activity.create_activity(current_user,params[:connection_id],params[:activity_definition_id],Date.today,0)
         if result[:status]
+          Notification.create_checked_in_notification(current_user,params[:connection_id])
+          current_user.notifications.where(notification_type:"connection_expiration",connection_id:params[:connection_id]).destroy_all
           status = true
           message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
           actions = [{action:"function_call",function:"closeModalInstance(2000)"}]

@@ -24,6 +24,16 @@ class User < ActiveRecord::Base
 
   after_create :import_default_settings
 
+
+  def find_challenges
+        
+  end
+
+  def find_challenges
+    
+  end
+
+
   def import_default_settings
     UserSetting.create_from_system_settings(self)
   end
@@ -71,6 +81,7 @@ class User < ActiveRecord::Base
     end
   end
 
+
   def daily_connection_tasks # put all daily connection-level tasks here so that there is one loop that runs instead of multiple loops
     
     expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
@@ -82,17 +93,23 @@ class User < ActiveRecord::Base
       number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
       remaining_days_until_expiry = [target_contact_interval_in_days - number_of_days_since_last_activity,0].max
       if remaining_days_until_expiry <= expiring_connection_notification_period_in_days
-        Notification.create_expiry_notification(self.id,connection.id,date_of_last_activity+target_contact_interval_in_days.days,remaining_days_until_expiry)
+        Notification.create_expiry_notification(self,connection,date_of_last_activity+target_contact_interval_in_days.days,remaining_days_until_expiry)
       end
 
-      # 2) update status of expired notifications
+      # 2) create upcoming plans notifications
+      if plans = self.plans.where(connection_id:connection.id).length > 0
+        plan = plans.order(date: :desc).limit(1).take
+        Notification.create_upcoming_plan_notification(self,connection,plan)
+      end
+
+      # 3) update status of expired notifications
       if number_of_days_since_last_activity > target_contact_interval_in_days
-        connection.update_attributes(active:false)
+        if connection.plans.where(date>=Date.today).length == 0
+          connection.update_attributes(active:false)
+        end
       end
-
-      # 3) Update time score
-
-
+      # 4) Update time score
+      connection.update_score
     end
   end
 
