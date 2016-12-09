@@ -99,6 +99,9 @@ class UsersController < ApplicationController
     end
 
     def create_activity
+      puts '---------------------------------------------------'
+      puts params[:connection_id]
+      puts '---------------------------------------------------'
       if params[:activity_definition_id]
         result = Activity.create_activity(current_user,params[:connection_id],params[:activity_definition_id],Date.today,0)
         if result[:status]

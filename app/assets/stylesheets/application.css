@@ -472,8 +472,14 @@ label[for=photoUploader]:hover {
     background-color: #34BF49;
     transition:background-color 0.2s ease;
 }
+.sphereGreenBackground.disabled {
+    background-color: #659C6D;
+    color:#E2E2E2;
+    cursor:auto;
+    transition:background-color 0.2s ease;
+}
 
-.sphereGreenBackground.hoverable:hover {
+.sphereGreenBackground.hoverable:not(.disabled):hover {
     background-color: #37AF49;
 }
 

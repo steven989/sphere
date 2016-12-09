@@ -93,6 +93,8 @@ class ConnectionsController < ApplicationController
 
         data = {}
         connection = Connection.find(params[:connection_id])
+        date_of_last_activity_with_this_connection = connection.activities.last && connection.activities.last.date
+        check_in_button_state = date_of_last_activity_with_this_connection && Date.today > date_of_last_activity_with_this_connection
         data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
         data[:name] = connection.name
@@ -124,7 +126,7 @@ class ConnectionsController < ApplicationController
             data[:upcomingPlanString] = "No current plans :("
             data[:hasUpcomingPlan] = false
         end
-        actions= [{action:"function_call",function:"populateBubblesModal()"}]
+        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons(#{check_in_button_state})"}]
         respond_to do |format|
           format.json {
             render json: {status:true, message:nil,actions:actions,data:data}

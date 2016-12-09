@@ -46,11 +46,9 @@ $(function(){
                 $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
                 $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
                 $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
-                $('.ajaxButton.createActivity').each(function(){
-
+                $('.createActivity').each(function(){
                     $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
                 });
-
                     modalInstance = $('[data-remodal-id=bubbleModal]').remodal({
                     closeOnConfirm:false,
                     modifier:'standardModal'
@@ -456,6 +454,42 @@ $(function(){
         });
     }
 
+    // Toggle check in button status
+
+    function checkInButtons(state=true,options={}) {
+        _this = $('#checkinButton');
+        if (state) {
+            _this.html("CHECK IN");
+            _this.removeClass('disabled');
+            if (_this.data('transition-button') != undefined ) {
+                _this.addClass('transitionButton');
+                _this.removeData('transition-button');
+                _this.off("click").on("click",function(){
+                    transition($($(this).data('current')),$($(this).data('target')));
+                });
+            }
+            if( _this.data('ajax-button') != undefined ) {
+                _this.addClass('ajaxButton');
+                _this.removeData('ajax-button');
+                _this.off("click").on("click",function(){
+                    buttonAjax($(this),$(this).data('data-to-send'));                    
+                });
+            }
+        } else {
+            _this.off("click");
+            _this.html("CHECKED IN TODAY!");
+            _this.removeClass('disabled').addClass('disabled');
+            if (_this.hasClass('transitionButton')) {
+                _this.data("transition-button",true);
+                _this.removeClass('transitionButton');
+            }
+            if (_this.hasClass('ajaxButton')) {
+                _this.data("ajax-button",true);
+                _this.removeClass('ajaxButton');
+            }
+        }
+    }
+
     // This function takes the JSON list of contacts and populate it onto the popup
     function populateImportSelectionList(list) {
         $('.modalView#listSelect .importSelectionTable tbody').html("");
@@ -650,7 +684,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
-            <div class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
+            <div id="checkinButton" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>
@@ -718,7 +752,7 @@ $(function(){
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">Back</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
             <div class="modalBottomRightButton sphereBlueBackground hoverable">Update</div>
         </div>
     </div>
