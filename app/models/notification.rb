@@ -139,6 +139,7 @@ class Notification < ActiveRecord::Base
 
     def validate_data_type
         begin
+          if self.data_type
             if self.data_type.downcase == 'hash'
                 value_class = eval(self.value).class 
                 result = value_class == Hash
@@ -151,6 +152,9 @@ class Notification < ActiveRecord::Base
             else
                 result = true
             end
+          else
+            result = true
+          end
         rescue => error
             errors.add(:value,error.message)
         else 
@@ -161,6 +165,7 @@ class Notification < ActiveRecord::Base
     end
 
     def value_in_specified_type
+      if self.data_type
         if self.data_type.downcase == 'hash'
             result = eval(self.value)
         elsif self.data_type.downcase == 'array'
@@ -170,6 +175,9 @@ class Notification < ActiveRecord::Base
         else
             result = self.value
         end
+      else
+        result = self.value
+      end
         result
     end
 

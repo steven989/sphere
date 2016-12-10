@@ -12,29 +12,57 @@ $(function(){
     });
 
     // Paint the bubbles
-    $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
+    $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
 
-    function prettifyBubbles(canvas){
+    function prettifyBubbles(canvas,notifications){
         canvas.find('.connectionBubble').each(function(){
 
-            // 1) expiration progress bar
-            $(this).parent('.connectBubbleContainer').circleProgress({
-                value: 0.75,
-                thickness:5,
-                lineCap:'round',
-                size: $(this).parent('.connectBubbleContainer').width(),
-                fill: {color: '#ed1c24'},
-                emptyFill: 'rgba(0,0,0,0)'
-            });
-            // 2) Notification icons
-            var coordinates = getNotificationCoordinate(315,$(this).parent('.connectBubbleContainer').width()/2,14);
-            $(this).parent('.connectBubbleContainer').append('<span class="badge badge-yellow" style="width:28px; height:28px; position:absolute;left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:15px;padding-top:4px;">1d</span>');
+            // 1) Notifications
+                if (connectionNotification = notifications["connection_level"][$(this).data('connection-id')]) {
 
-            // 3) Set some attributes
+                    // 1.1)Progress bar
+                    if (connectionNotification["notification_type"] == "connection_expiration") {
+                        var remaining_days_until_expiry = connectionNotification["value"]["remaining_days_until_expiry"];
+                        console.log(remaining_days_until_expiry);
+
+                        var percentageValueOfRemainingDays = Math.max(Math.min(remaining_days_until_expiry*1.0/7.0,1),0.2);
+                        console.log(percentageValueOfRemainingDays);
+                        $(this).parent('.connectBubbleContainer').circleProgress({
+                            // value: percentageValueOfRemainingDays,
+                            value: 0.8,
+                            thickness:5,
+                            lineCap:'round',
+                            size: $(this).parent('.connectBubbleContainer').width(),
+                            fill: {color: '#ED1C24'},
+                            emptyFill: 'rgba(0,0,0,0)',
+                            startAngle:(0.5*Math.PI),
+                            reverse:true,
+                            animationStartValue: 1
+                        });
+                    }
+                    // 1.2) Notification icons
+                    var backgroundColor;
+                    var content;
+                    console.log(connectionNotification["notification_type"])
+                    if (connectionNotification["notification_type"] == "connection_expiration") {
+                        backgroundColor = "#ED1C24";
+                        content = connectionNotification["value"]["remaining_days_until_expiry"]+"d";
+                    } else if (connectionNotification["notification_type"] == "checked_in") {
+                        backgroundColor = "#34BF49";
+                        content = '<%= fa_icon 'check' %>';
+                    } else if (connectionNotification["notification_type"] == "upcoming_plan") {
+                        backgroundColor = "#FFB900";
+                        content = '<%= fa_icon 'calendar' %>';
+                    }
+                    var coordinates = getNotificationCoordinate(315,$(this).parent('.connectBubbleContainer').width()/2,14);
+                    $(this).parent('.connectBubbleContainer').append('<span class="badge" style="width:28px; height:28px; position:absolute;background-color:'+backgroundColor+';left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:15px;padding-top:4px;">'+content+'</span>');
+                }
+
+            // 2) Set some attributes
             $(this).attr('href',"<%= populate_connection_modal_path %>?connection_id="+$(this).data('connection-id'))
             $(this).data('method','get')
 
-            // 4) Modal on clicking each bubble
+            // 3) Modal on clicking each bubble
             $(this).off("click").on("click",function(){
                 var formData = new FormData();
                 var _this = $(this);

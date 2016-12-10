@@ -7,6 +7,7 @@ class Connection < ActiveRecord::Base
     has_many :connection_notes
     has_many :plans
     has_many :tags, as: :taggable
+    has_many :notifications
     # Callbacks
     after_create :callbacks_after_create
     after_update :callbacks_after_update

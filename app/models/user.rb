@@ -25,6 +25,59 @@ class User < ActiveRecord::Base
   after_create :import_default_settings
 
 
+  def get_raw_bubbles_data(connections_override=nil,json_or_not_json=false)
+    connections = connections_override ? connections_override : self.connections.active
+    result = connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name, :photo_access_url).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2],photo_url:result[5] } }
+    if json_or_not_json
+      result.to_json
+    else
+      result
+    end
+  end
+
+  def get_notifications(json_or_not_json=false)
+      result = self.notifications.inject({}) do |accumulator,notification|
+                  accumulator[:connection_level] = {} unless accumulator[:connection_level]
+                  accumulator[:user_level] = [] unless accumulator[:user_level]
+                  if Date.today >= notification.notification_date && Date.today < notification.expiry_date
+                    if !notification.connection_id.blank?
+                      if accumulator[:connection_level][notification.connection_id]
+                        accumulator[:connection_level][notification.connection_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority} if (notification.priority < accumulator[:connection_level][notification.connection_id][:priority])
+                      else
+                        accumulator[:connection_level][notification.connection_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority}
+                      end
+                    else
+                      accumulator[:user_level].push({notification_type:notification.notification_type,value:notification.value_in_specified_type})
+                    end
+                  end
+                  accumulator
+                end
+      if json_or_not_json
+        result.to_json
+      else
+        result
+      end
+  end
+
+  def get_bubbles_display_system_settings(json_or_not_json=false)
+        bubbles_parameters_object = SystemSetting.search("bubbles_parameters").value_in_specified_type
+        bubbles_parameters = {
+          sizeOfGapBetweenBubbles:bubbles_parameters_object[:min_gap_between_bubbles],
+          minDistance:bubbles_parameters_object[:min_distance_from_center_of_central_bubble],
+          minBubbleSize:bubbles_parameters_object[:min_size_of_bubbles],
+          maxBubbleSize:bubbles_parameters_object[:max_size_of_bubbles],
+          numberOfRecursion:bubbles_parameters_object[:number_of_recursions],
+          radiusOfCentralBubble:bubbles_parameters_object[:radius_of_central_bubble],
+          centralBubbleDisplay:self.email,
+          centralBubblePhotoURL:nil
+          }
+          if json_or_not_json
+            bubbles_parameters.to_json
+          else
+            bubbles_parameters
+          end
+  end
+
   def find_challenges
     additional_challenges = Challenge.identify_challenges_for(self)
     if additional_challenges.length > 0 

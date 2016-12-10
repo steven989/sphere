@@ -21,24 +21,12 @@ class UsersController < ApplicationController
           redirect_to admin_dashboard_path
         else
           @settings = current_user.user_setting.value_evaled
-          @connections = current_user.connections.active          
-          @raw_bubbles_data = @connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name, :photo_access_url).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2],photo_url:result[5] } }.to_json
-          bubbles_parameters_object = SystemSetting.search("bubbles_parameters").value_in_specified_type
-          @bubbles_parameters = {
-            sizeOfGapBetweenBubbles:bubbles_parameters_object[:min_gap_between_bubbles],
-            minDistance:bubbles_parameters_object[:min_distance_from_center_of_central_bubble],
-            minBubbleSize:bubbles_parameters_object[:min_size_of_bubbles],
-            maxBubbleSize:bubbles_parameters_object[:max_size_of_bubbles],
-            numberOfRecursion:bubbles_parameters_object[:number_of_recursions],
-            radiusOfCentralBubble:bubbles_parameters_object[:radius_of_central_bubble],
-            centralBubbleDisplay:current_user.email,
-            centralBubblePhotoURL:nil
-            }.to_json
-
-            if @setting_for_activity_entry_details = SystemSetting.search("activity_detail_level_to_be_shown")
-              @activity_definitions = ActivityDefinition.level(@setting_for_activity_entry_details.value_in_specified_type) #specify the specificity level of the activities shown 
-            end
-
+          @raw_bubbles_data = current_user.get_raw_bubbles_data(nil,true)
+          @bubbles_parameters = current_user.get_bubbles_display_system_settings(true)
+          @notifications = current_user.get_notifications(true)
+          if @setting_for_activity_entry_details = SystemSetting.search("activity_detail_level_to_be_shown")
+            @activity_definitions = ActivityDefinition.level(@setting_for_activity_entry_details.value_in_specified_type) #specify the specificity level of the activities shown 
+          end
           # ----- this section contains all the variables needed to display Level, Challenge and Badge
             # --- badges
             @badges = current_user.badges.order(id: :asc)

@@ -15,7 +15,7 @@ class Activity < ActiveRecord::Base
             new_level = user.user_statistics.find_statistic('level')
             Notification.create_checked_in_notification(user,connection_id)
             user.notifications.where(notification_type:"connection_expiration",connection_id:connection_id).destroy_all
-            if new_level.level > current_level.level
+            if new_level.take.value > current_level.take.value
                 Notification.create_new_level_notification(current_level,new_level)
             end
             status = true
