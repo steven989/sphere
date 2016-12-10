@@ -90,22 +90,28 @@ class UsersController < ApplicationController
       if params[:activity_definition_id]
         result = Activity.create_activity(current_user,params[:connection_id],params[:activity_definition_id],Date.today,0)
         if result[:status]
+          raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+          notifications = current_user.get_notifications(false)
+          bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           status = true
           message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
-          actions = [{action:"function_call",function:"closeModalInstance(2000)"}]
+          actions = [{action:"function_call",function:"closeModalInstance(2000)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           status = false
           message = "Oops. Our robots ran into some problems. Let us know the error: #{result[:message]}"
           actions = nil
+          data = nil
         end
       else
         status = false
         message = "Oops. Something is off. Please refresh and try again"
         actions = nil
+        data = nil
       end
       respond_to do |format|
         format.json {
-          render json: {status:status,message:message,actions:actions}
+          render json: {status:status,message:message,actions:actions,data:data}
         } 
       end
     end

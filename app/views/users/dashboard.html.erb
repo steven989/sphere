@@ -1,8 +1,9 @@
 <script>
 var test;
+var returnedData;
 $(function(){
     var modalInstance;
-    var returnedData;
+    
     var token;
 
 
@@ -12,8 +13,13 @@ $(function(){
     });
 
     // Paint the bubbles
-    $('#canvas').bubblify(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
 
+    paintBubbles(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
+
+    function paintBubbles(raw_bubbles_data,notifications,bubbles_parameters,callback) {
+        $('#canvas').bubblify(raw_bubbles_data,notifications,bubbles_parameters,callback);
+    }
+    
     function prettifyBubbles(canvas,notifications){
         canvas.find('.connectionBubble').each(function(){
 
