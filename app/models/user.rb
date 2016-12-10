@@ -26,11 +26,23 @@ class User < ActiveRecord::Base
 
 
   def find_challenges
-        
+    additional_challenges = Challenge.identify_challenges_for(self)
+    if additional_challenges.length > 0 
+      additional_challenges.each do |challenge|
+        self.user_challenges.create(challenge_id:challenge.id)
+        Notification.create_new_challenge_notification(challenge)
+      end
+    end
   end
 
-  def find_challenges
-    
+  def find_badges
+    additional_badges = Badge.identify_badges_for(self)
+    if additional_badges.length > 0 
+      additional_badges.each do |badge|
+        self.user_badges.create(badge_id:badge.id)
+        Notification.create_new_badge_notification(badge)
+      end
+    end    
   end
 
 
