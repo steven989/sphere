@@ -1,6 +1,7 @@
 class Plan < ActiveRecord::Base
     belongs_to :user
     belongs_to :connection
+    scope :upcoming, -> { where(status:"Planned") } 
 
     def self.create_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,calendar_id="primary")
         date = event_parameters[:date]
@@ -67,27 +68,27 @@ class Plan < ActiveRecord::Base
                     status = false
                     message = error.message
                 else
-                    Plan.create(
-                        user_id:user.id,
-                        connection_id:connection.id,
-                        date:start_time.to_date,
-                        date_time:start_time,
-                        timezone:calendar.time_zone,
-                        name:summary,
-                        location:location,
-                        status:"Planned",
-                        calendar_id:calendar.id,
-                        calendar_event_id:result.id,
-                        invite_sent:notify,
-                        length:duration,
-                        details:details
-                        )
+                    plan = Plan.create(
+                            user_id:user.id,
+                            connection_id:connection.id,
+                            date:start_time.to_date,
+                            date_time:start_time,
+                            timezone:calendar.time_zone,
+                            name:summary,
+                            location:location,
+                            status:"Planned",
+                            calendar_id:calendar.id,
+                            calendar_event_id:result.id,
+                            invite_sent:notify,
+                            length:duration,
+                            details:details
+                            )
                     status = true
                     message = "Event successfully created"
                 end
             end
         end
-        {status:status,message:message,access_token:token_object}
+        {status:status,message:message,access_token:token_object,plan:plan}
     end
 
     def update_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil)

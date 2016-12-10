@@ -1,9 +1,8 @@
 <script>
 var test;
-var returnedData;
 $(function(){
     var modalInstance;
-    
+    var returnedData;    
     var token;
 
 
@@ -25,14 +24,10 @@ $(function(){
 
             // 1) Notifications
                 if (connectionNotification = notifications["connection_level"][$(this).data('connection-id')]) {
-
                     // 1.1)Progress bar
                     if (connectionNotification["notification_type"] == "connection_expiration") {
                         var remaining_days_until_expiry = connectionNotification["value"]["remaining_days_until_expiry"];
-                        console.log(remaining_days_until_expiry);
-
                         var percentageValueOfRemainingDays = Math.max(Math.min(remaining_days_until_expiry*1.0/7.0,1),0.2);
-                        console.log(percentageValueOfRemainingDays);
                         $(this).parent('.connectBubbleContainer').circleProgress({
                             // value: percentageValueOfRemainingDays,
                             value: 0.8,
@@ -49,7 +44,6 @@ $(function(){
                     // 1.2) Notification icons
                     var backgroundColor;
                     var content;
-                    console.log(connectionNotification["notification_type"])
                     if (connectionNotification["notification_type"] == "connection_expiration") {
                         backgroundColor = "#ED1C24";
                         content = connectionNotification["value"]["remaining_days_until_expiry"]+"d";
@@ -62,6 +56,8 @@ $(function(){
                     }
                     var coordinates = getNotificationCoordinate(315,$(this).parent('.connectBubbleContainer').width()/2,14);
                     $(this).parent('.connectBubbleContainer').append('<span class="badge" style="width:28px; height:28px; position:absolute;background-color:'+backgroundColor+';left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:15px;padding-top:4px;">'+content+'</span>');
+                } else {
+                    $(this).parent('.connectBubbleContainer').find('.badge').remove();
                 }
 
             // 2) Set some attributes
@@ -204,16 +200,23 @@ $(function(){
       }).done(function(data){
             resetModal(form.closest('.remodal'),1);
             if (data.status) {
-                form.find('.alert').html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
+                    if(data.message != undefined /* && alertElement.length > 0 */ ) {
+                        toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
+                    }
                     setTimeout(function(){
                         form.find('.alert').addClass('hidden');
                         resetModal(form.closest('.remodal'),2);
                         modalInstance.close();
                     },2000)
             } else {
-                form.find('.alert').html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
+                    toastr.options.closeButton = true;
+                    if(data.message != undefined /* && alertElement.length > 0 */) {
+                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                    }
             }
-
+            if (data.data != undefined) {
+                returnedData = data.data;
+            }
             if (data.actions != undefined && data.actions.length > 0) {
                 performActions(data.actions);
             }
@@ -303,14 +306,12 @@ $(function(){
                 if (data.status) {
                         if(data.message != undefined /* && alertElement.length > 0 */ ) {
                             toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
-                            // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");                            
                         }
                 } else {
                     toastr.options.closeButton = true;
 
                     if(data.message != undefined /* && alertElement.length > 0 */) {
                         toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
-                        // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                     }
                 }
                 if (data.data != undefined) {

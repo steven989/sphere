@@ -88,20 +88,24 @@ class Notification < ActiveRecord::Base
     end
 
     # This is a connection-level notification
-    def self.create_upcoming_plan_notification(user,connection,plan,date=Date.today)
+    def self.create_upcoming_plan_notification(user,connection,date=Date.today)
         # 1) Destroy any existing notifications
         Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"upcoming_plan").destroy_all
-        # 2) Create a notification
-        Notification.create(
-          user_id: user.id,
-          connection_id: connection.id,
-          notification_type:"upcoming_plan",
-          notification_date:date,
-          expiry_date:plan.date,
-          data_type:"hash",
-          value:"{plan_id:#{plan.id}}",
-          priority: 2
-          )
+        # 2) See if there are upcoming plans, if there are, then create. Otherwise do nothing
+        plans = connection.plans.upcoming.where("date >= ?",Date.today).order(date: :asc)
+        if plans.length > 0 
+          plan = plans.limit(1).take
+          Notification.create(
+            user_id: user.id,
+            connection_id: connection.id,
+            notification_type:"upcoming_plan",
+            notification_date:date,
+            expiry_date:plan.date,
+            data_type:"hash",
+            value:"{plan_id:#{plan.id}}",
+            priority: 2
+            )
+        end
     end
 
     def self.delete_all_expired_notifications

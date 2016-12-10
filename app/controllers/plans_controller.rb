@@ -25,18 +25,22 @@ class PlansController < ApplicationController
             actions = [{action:"popup_refresh_main_on_close",url:"http://localhost:3000/auth/google_calendar"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Please connect Sphere with your Google Calendar in the popup"
+            data = nil
         elsif connection.email.blank? && notify
             actions = [{action:"unhide",element:".modalView#makePlan input[name=connection_email]"},{action:"change_css",element:".modalView#makePlan input[name=connection_email]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"480"}}]
             status = false
             message ="Please enter an email for #{connection.first_name} as we don't seem to have it"
+            data = nil
         elsif Chronic.parse(date).nil?
             actions = [{action:"change_css",element:".modalView#makePlan input[name=date]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Oops. Our robot can't seem to understand your date input of '#{date}'. Try something esle"
+            data = nil
         elsif Chronic.parse(time).nil?
             actions = [{action:"change_css",element:".modalView#makePlan input[name=time]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Oops. Our robot can't seem to understand your time input of '#{time}'. Try something esle"
+            data = nil
         else
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil            
@@ -60,14 +64,17 @@ class PlansController < ApplicationController
                 session[:access_token] = result[:access_token][:access_token]
                 session[:expires_at] = result[:access_token][:expires_at]
             end
+            Notification.create_upcoming_plan_notification(current_user,connection)
             status = result[:status]
+            notifications = current_user.get_notifications(false)
+            data = {notifications:notifications}
             message= result[:message]
-            actions = [{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
         end
 
         respond_to do |format|
           format.json {
-            render json: {status:status, message:message,actions:actions}
+            render json: {status:status, message:message,actions:actions,data:data}
           } 
         end
     end
@@ -97,18 +104,22 @@ class PlansController < ApplicationController
             actions = [{action:"popup_refresh_main_on_close",url:"http://localhost:3000/auth/google_calendar"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Please connect Sphere with your Google Calendar in the popup"
+            data = nil
         elsif connection.email.blank? && notify
             actions = [{action:"unhide",element:".modalView#makePlan input[name=connection_email]"},{action:"change_css",element:".modalView#makePlan input[name=connection_email]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"480"}}]
             status = false
             message ="Please enter an email for #{connection.first_name} as we don't seem to have it"
+            data = nil
         elsif Chronic.parse(date).nil?
             actions = [{action:"change_css",element:".modalView#makePlan input[name=date]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Oops. Our robot can't seem to understand your date input of '#{date}'. Try something esle"
+            data = nil
         elsif Chronic.parse(time).nil?
             actions = [{action:"change_css",element:".modalView#makePlan input[name=time]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Oops. Our robot can't seem to understand your time input of '#{time}'. Try something esle"
+            data = nil
         else
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil 
@@ -131,14 +142,17 @@ class PlansController < ApplicationController
                 session[:access_token] = result[:access_token][:access_token]
                 session[:expires_at] = result[:access_token][:expires_at]
             end
+            Notification.create_upcoming_plan_notification(current_user,connection)
+            notifications = current_user.get_notifications(false)
             status = result[:status]
             message= result[:message]
-            actions = [{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+            data = {notifications:notifications}
+            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
         end
 
         respond_to do |format|
           format.json {
-            render json: {status:status, message:message,actions:actions}
+            render json: {status:status, message:message,actions:actions,data:data}
           } 
         end
     end
@@ -152,13 +166,18 @@ class PlansController < ApplicationController
             session[:access_token] = result[:access_token][:access_token]
             session[:expires_at] = result[:access_token][:expires_at]
         end
+        if plan.connection
+            Notification.create_upcoming_plan_notification(current_user,plan.connection) 
+        end
+        notifications = current_user.get_notifications(false)
         status = result[:status]
         message= result[:message]
-        actions = [{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}},{action:"function_call",function:"closeModalInstance(2000)"}]
+        data = {notifications:notifications}
+        actions = [{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}},{action:"function_call",function:"closeModalInstance(2000)"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
 
         respond_to do |format|
           format.json {
-            render json: {status:status, message:message,actions:actions}
+            render json: {status:status, message:message,actions:actions,data:data}
           } 
         end
 
