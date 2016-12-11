@@ -32,7 +32,11 @@ class Connection < ActiveRecord::Base
 
     def update_score
         current_quality_score = ConnectionScore.where(connection_id:self.id).take.blank? ? 0 :  ConnectionScore.where(connection_id:self.id).take.score_quality
+        puts '---------------------------------------------------'
+        puts "current score #{current_quality_score}"
         new_quality_score = self.calculate_quality_score
+        puts "new score #{new_quality_score}"
+        puts '---------------------------------------------------'        
         new_time_score = self.calculate_time_score
         self.log_score(new_quality_score, new_time_score)
         quality_score_gained = new_quality_score - current_quality_score
