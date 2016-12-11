@@ -4,6 +4,7 @@ $(function(){
     var modalInstance;
     var returnedData;    
     var token;
+    var allTags = <%= raw @all_tags %>;
 
 
     // Navigation bar related
@@ -145,6 +146,40 @@ $(function(){
     $(".modalView#editConnection #photoUploader").on("change",function(){
             $(".modalView#editConnection label[for=photoUploader]").html($(".modalView#editConnection #photoUploader").prop("files")[0].name);
     });
+
+    // tokenize the taggin in create contact modal
+    createTagginInCreate();
+    function createTagginInCreate() {
+         var tokenInCreate = $('.modalView#mainImportView #tokenizeInCreate').tokenize({
+            autosize:true,
+        }); 
+
+        tokenInCreate.tokenAdd("$add$tag$","+ Add Tags");
+        $('.modalTokenBox ul.TokensContainer li.Token span').css("margin-right","10px");
+        $('.modalView#mainImportView .modalTokenBox li.Token a').remove();
+
+        $('.modalView#mainImportView .modalTokenBox li.TokenSearch input').off('focusin').on('focusin',function(){
+            tokenInCreate.tokenRemove("$add$tag$");
+        });
+
+        $('.modalView#mainImportView .modalTokenBox li.TokenSearch input').off('focusout').on('focusout',function(){
+
+            if (tokenInCreate.toArray().length == 0) {
+                tokenInCreate.tokenAdd("$add$tag$","+ Add Tags");
+                $('.modalView#mainImportView .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('span').css("margin-right","10px");
+                $('.modalView#mainImportView .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('a').remove();                
+            }
+        });
+        tokenizeTagInCreateContactSelectionField();
+    }
+    
+    function tokenizeTagInCreateContactSelectionField() {
+        $('.modalView#mainImportView #tokenizeInCreate').html("");
+        allTags.forEach(function(tag){
+            $('.modalView#mainImportView #tokenizeInCreate').append("<option value="+tag+">"+tag+"</option>")
+        }); 
+    }
+    
 
     // make plans
     function addListenerToPlanForm() {
@@ -330,7 +365,7 @@ $(function(){
         var lastHangout = returnedData.lastPlanString;
         var nextHangout = returnedData.upcomingPlanString;
         var photoUrl = returnedData.photo;
-        var allTags = returnedData.all_tags;
+        allTags = returnedData.all_tags;
         var connectionTags = returnedData.connection_tags;
         var notes = returnedData.notes;
         var contact_frequency = returnedData.contact_frequency;
@@ -338,7 +373,15 @@ $(function(){
 
         $('[data-remodal-id=bubbleModal] .modalView#plans span.name').html(name);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
-        $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').attr('src',photoUrl);
+        if (photoUrl) {
+            $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').removeClass('hidden');
+            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden').addClass('hidden');
+            $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').attr('src',photoUrl);
+        } else {
+            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden');
+            $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').removeClass('hidden').addClass('hidden');
+        }
+        
         $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
         if (returnedData.hasUpcomingPlan) {
             $('.modalView#makePlan input[name=date]').val(returnedData.planData.date);
@@ -388,6 +431,7 @@ $(function(){
         allTags.forEach(function(tag){
             $('.modalView#plans #tokenize').append("<option value="+tag+">"+tag+"</option>")
         });
+        tokenizeTagInCreateContactSelectionField();
 
         $('.modalView#plans .modalTokenBox li.TokenSearch input').off('focusin').on('focusin',function(){
             token.tokenRemove("$add$tag$");
@@ -410,7 +454,6 @@ $(function(){
                 token.tokenAdd(tag,tag);
             });
         }
-
         // Related to the preferences view
 
         if (["monthly","weekly","other"].indexOf(contact_frequency) == -1) {
@@ -712,7 +755,12 @@ $(function(){
         <div class="modalContentContainer">
             <div style="color:#656268; font-size:20px;"><span class="name"></span></div>
             <div style="color:#656268; margin-top: 15px; font-size:15px;font-weight:lighter"><span class="lastHangout"></span></div>
-            <div style="height:140px;margin-top:35px;"><img class="photo transitionButton" src="" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%;"> </div>
+            <div style="height:140px;margin-top:35px;">
+                <img class="photo transitionButton" src="" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;">
+                <div class="photo transitionButton" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
+                    <%= fa_icon 'user-circle' %>
+                </div> 
+            </div>
             <div style="font-size:15px;color:#656268"><span class="nextHangout"></span></div>
             <select name="tags" id="tokenize" multiple="multiple" class="modalTokenBox" href="<%= update_tags_path %>" data-method="PUT">
             </select>
@@ -778,7 +826,7 @@ $(function(){
                 </div>
 
                 <input name="photoUploader" id="photoUploader" type="file" accept="image/*">
-                <label for="photoUploader" class="textDarkGray">
+                <label for="photoUploader" class="textDarkGray" style="margin-top: 20px;">
                     <%= fa_icon 'id-badge' %>
                     Upload Photo
                 </label>
@@ -800,12 +848,19 @@ $(function(){
             <div class="addConnectionPopupContent" >
                 <div class="formElement button textDarkGray" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" data-alert-element="[data-remodal-id=importModal] .alert" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
                 <br>
-                <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
+                <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
-                        <input class="formElement m-b-md" name="name" type="text" placeholder="name" required>
-                        <input class="formElement m-b-md" name="email" type="text" placeholder="email" >
+                        <input class="formElement halfRow left m-b-md" name="name" type="text" placeholder="name" required>
+                        <input class="formElement halfRow right m-b-md" name="email" type="text" placeholder="email" >
+                        <input name="photoUploaderInCreate" id="photoUploaderInCreate" type="file" accept="image/*">
+                        <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button">
+                            <%= fa_icon 'id-badge' %>
+                            Upload Photo
+                        </label>                        
                         <textarea class="formElement" name="notes" placeholder="notes" rows="2" required></textarea>
+                        <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox">
+                        </select>
                     </div>
                     <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
                 </form>
@@ -818,13 +873,12 @@ $(function(){
         </div>
     </div>
     <div class="modalView" id="listSelect">
-        <div class="modalContentContainer">
+        <div class="modalContentContainer p-h-xxlg">
             <div id="importContacts">
                 <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;position:absolute;top:0px;left:0px;"></div>
-                <input type="text" class="search" placeholder="Search">
-                <button class="btn sort" data-sort="name">Sort by Name</button>
-                <table id="importSelectionTable">
-                    <thead>
+                <input type="text" class="search formElement" placeholder="Search">
+                <table id="importSelectionTable" class="table table-sm m-t-md table-hover">
+                    <thead class="thead-default">
                         <th>Import?</th>
                         <th>Name</th>
                         <th>Email</th>

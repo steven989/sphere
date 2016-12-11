@@ -321,11 +321,10 @@ body {
     height: 100%;
 }
 
-#photoUploader { display: none; }
+#photoUploader, #photoUploaderInCreate { display: none; }
 label[for=photoUploader] {
     border: 1px solid #E9E9E9;
     font-family: 'eausans_book';
-    margin-top: 20px;
     width: 100%; 
     padding-left: 12%;
     background-color: #FAFAFA;
@@ -337,6 +336,7 @@ label[for=photoUploader] {
     cursor: pointer;
     height: 35px;
     line-height: 35px;
+    transition:background-color 0.2s ease;
 }
 
 label[for=photoUploader]:hover {
@@ -350,18 +350,50 @@ label[for=photoUploader]:hover {
     padding: 0px 30px;
 }
 
+/* Import contacts modal view */
+
+.modalView#listSelect .modalContentContainer {
+    height:300px;
+}
+
+.modalView#listSelect .modalContentContainer #importContacts {
+    overflow-x: scroll;
+}
+
+.modalView#listSelect .modalContentContainer #importContacts #importSelectionTable {
+    table-layout: fixed;
+    width:100%;
+    text-align: left;
+}
+
 
 /* Bubbles related */
 
+.modalView#plans .photo {
+    transition: box-shadow 0.2s ease;
+}
+
+.modalView#plans .photo:hover {
+    box-shadow: 0px 0px 10px #636363;
+}
+
+
 .modalTokenBox {
+    margin-top: 5px;
+    width: 100%;
+}
+
+.modalView#plans .modalTokenBox {
     margin-top: 5px;
     width: 90%;
 }
+
 
 .modalTokenBox ul.TokensContainer {
     height: 38px !important;
     border: none !important;
     border-radius: 10px;
+    transition: background-color 0.2s ease;
 }
 
 .modalTokenBox ul.TokensContainer:hover {
