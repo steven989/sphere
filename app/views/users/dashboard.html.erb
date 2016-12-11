@@ -4,7 +4,19 @@ $(function(){
     var modalInstance;
     var returnedData;    
     var token;
+    var userLevelNotifications = ;
 
+    // User-level notifications
+    function showUserLevelNotifications() {
+        if (userLevelNotifications != undefined && userLevelNotifications instanceOf Array && userLevelNotifications.length > 0) {
+            userLevelNotifications.forEach(function(notification){
+                notification.elements.forEach(function(element){
+                    var coordinates = getNotificationCoordinate(315,$(element).closest('.notificationContainer').width()/2,14);
+                    $(element).closest('.notificationContainer').append('<span class="badge" style="width:28px; height:28px; position:absolute;background-color:'+backgroundColor+';left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:15px;padding-top:4px;">'+content+'</span>')
+                })
+            });
+        }
+    }
 
     // Navigation bar related
     $('#settingLogoutToggle').off("click").on("click",function(){
@@ -12,7 +24,6 @@ $(function(){
     });
 
     // Paint the bubbles
-
     paintBubbles(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
 
     function paintBubbles(raw_bubbles_data,notifications,bubbles_parameters,callback) {
