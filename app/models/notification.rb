@@ -83,7 +83,7 @@ class Notification < ActiveRecord::Base
           notification_type:"checked_in",
           notification_date:date,
           expiry_date:date+expiry_days.days,
-          priority: 1
+          priority: 2
           )
     end
 
@@ -103,7 +103,7 @@ class Notification < ActiveRecord::Base
             expiry_date:plan.date,
             data_type:"hash",
             value:"{plan_id:#{plan.id}}",
-            priority: 2
+            priority: 1
             )
         end
     end
