@@ -33,6 +33,11 @@
     padding: 0px 15px;
 }
 
+.formElement.disabled {
+    background-color:#E9E9E9;
+    color:#D8D8D8;
+}
+
 .formElement.halfRow.left {
     display:inline-block;
     width: 48%;
@@ -181,6 +186,10 @@
 
 .textDarkGray {
     color: #707070;
+}
+
+.textLightGray {
+    color: #D6D6D6;
 }
 
 .errorFormInput {
@@ -491,6 +500,13 @@ label[for=photoUploader]:hover {
     transition:background-color 0.2s ease;
 }
 
+.sphereRedBackground.disabled {
+    background-color: #C56666;
+    color:#E2E2E2;
+    cursor:auto;
+    transition:background-color 0.2s ease;
+}
+
 .sphereRedBackground.hoverable:not(.disabled):hover {
     background-color:#CC1919;
 }
@@ -504,6 +520,14 @@ label[for=photoUploader]:hover {
 .sphereBlueBackground.hoverable:not(.disabled):hover {
     background-color: #0584C3;
 }
+
+.sphereBlueBackground.disabled {
+    background-color: #5896B5;
+    color:#E2E2E2;
+    cursor:auto;
+    transition:background-color 0.2s ease;
+}
+
 
 
 .sphereGreenBackground {

@@ -1,10 +1,10 @@
 <script>
 var test;
-
+var returnedData;
 $(function(){
     var modalInstance;
     var closeModalTimer;    
-    var returnedData;    
+    
     var token;
     var allTags = <%= raw @all_tags %>;
     toastr.options.newestOnTop = true;
@@ -70,7 +70,6 @@ $(function(){
 
             // 3) Modal on clicking each bubble
             $(this).off("click").on("click",function(){
-                var formData = new FormData();
                 var _this = $(this);
                 $('[data-remodal-id=bubbleModal] .modalView').each(function(){
                     if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
@@ -82,46 +81,47 @@ $(function(){
                 $('.createActivity').each(function(){
                     $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
                 });
-                    // modalInstance = $('[data-remodal-id=bubbleModal]').remodal({
-                    // closeOnConfirm:false,
-                    // modifier:'standardModal'
-                    // });
                 $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
-                    var form = $('.modalView#editConnection form');
-                    var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
-                    var custom_frequency;
-                    formData.append("connection_id",_this.data('connection-id'));
-                    if (frequency=="other") { custom_frequency = form.find('.details input').val();}
-                    formData.append("contact_frequency",frequency);
-                    formData.append("custom_frequency",custom_frequency);
-                    formData.append("notes",form.find('[name=notes]').val());
-                    formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
-                  $.ajax({
-                    url: '<%= update_connection_path %>',
-                    type: 'PUT',
-                    processData: false,
-                    contentType: false,
-                    data: formData,
-                    dataType: 'JSON'
-                  }).done(function(data){
-                        if (data.status) {
-                                if(data.message != undefined /* && alertElement.length > 0 */ ) {
-                                    toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
+                    var button = $(this);
+                    if (!button.hasClass('disabled')) {
+                        var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
+                        var formData = new FormData();
+                        var form = $('.modalView#editConnection form');
+                        var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
+                        var custom_frequency;
+                        formData.append("connection_id",_this.data('connection-id'));
+                        if (frequency=="other") { custom_frequency = form.find('.details input').val();}
+                        formData.append("contact_frequency",frequency);
+                        formData.append("custom_frequency",custom_frequency);
+                        formData.append("notes",form.find('[name=notes]').val());
+                        formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
+                      $.ajax({
+                        url: '<%= update_connection_path %>',
+                        type: 'PUT',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        dataType: 'JSON'
+                      }).done(function(data){
+                            if (data.status) {
+                                    if(data.message != undefined /* && alertElement.length > 0 */ ) {
+                                        toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
+                                    }
+                            } else {
+                                toastr.options.closeButton = true;
+                                if(data.message != undefined /* && alertElement.length > 0 */) {
+                                    toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                                 }
-                        } else {
-                            toastr.options.closeButton = true;
-                            if(data.message != undefined /* && alertElement.length > 0 */) {
-                                toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                             }
-                        }
-                        if (data.actions != undefined && data.actions.length > 0) {
-                            performActions(data.actions);    
-                        }
-                      });
+                            if (data.actions != undefined && data.actions.length > 0) {
+                                performActions(data.actions);    
+                            }
+                            reEnableButton(disabledButtonObject);
+                          });
+                    }
                 })
-                // resetModal($('[data-remodal-id=bubbleModal]'),3);
+                resetModal($('[data-remodal-id=bubbleModal]'),3);
                 buttonAjax(_this,{});
-                // modalInstance.open();
             });
         });
     }
@@ -143,6 +143,7 @@ $(function(){
         if (modalInstance.state=="opened") {
             closeModalTimer = setTimeout(function(){
                                 modalInstance.close();
+
                               },timer);                    
         }
     }
@@ -190,14 +191,13 @@ $(function(){
     function addListenerToPlanForm() {
         $('.modalView#makePlan .modalBottomRightButton').off('click').on('click',function(){
           var form = $('.modalView#makePlan form');
-          modalAjaxFormSubmission(form);
+          modalAjaxFormSubmission(form,$(this));
         });        
     }
 
 
     // Modal resets
     function resetModal(modal,resetType) {
-
         if (resetType == 1 || resetType == 3) {
             // reset class
             modal.parent().filter(function(){ return $(this).data('default-class') != undefined }).each(function(){
@@ -227,40 +227,68 @@ $(function(){
                 }
             })
         }
+
+    }
+
+    function disableButtonIfSpecifiedInClassName(button){
+        var current_html = button.html();
+        var current_value = button.val();
+        var status = true;
+        if (button.hasClass('disableWhileProcessed')) {
+            button.removeClass('disabled').addClass('disabled');
+            button.html("Wait...");
+            button.val("Wait...");
+            status = false;
+        }
+        return {button:button,status:status,current_html:current_html,current_value:current_value};
+    }
+
+    function reEnableButton(disabledButtonObject){
+        var button = disabledButtonObject.button;
+        if (button.hasClass('disableWhileProcessed') && button.hasClass('disabled') && !button.hasClass('doNotReenable') ) {
+            button.removeClass('disabled');
+            button.html(disabledButtonObject.current_html);
+            button.val(disabledButtonObject.current_value);
+        }
+        return button;
     }
 
     // General modal ajax submission function
-    function modalAjaxFormSubmission(form) {
-        test = form;
-      $.ajax({
-        url: form.attr('action'),
-        type: form.attr('method'),
-        data: form.serialize(),
-        dataType: 'JSON'
-      }).done(function(data){
-            resetModal(form.closest('.remodal'),1);
-            if (data.status) {
-                    if(data.message != undefined /* && alertElement.length > 0 */ ) {
-                        toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
-                    }
-                    setTimeout(function(){
-                        form.find('.alert').addClass('hidden');
-                        resetModal(form.closest('.remodal'),2);
-                        modalInstance.close();
-                    },2000)
-            } else {
-                    toastr.options.closeButton = true;
-                    if(data.message != undefined /* && alertElement.length > 0 */) {
-                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
-                    }
-            }
-            if (data.data != undefined) {
-                returnedData = data.data;
-            }
-            if (data.actions != undefined && data.actions.length > 0) {
-                performActions(data.actions);
-            }
-          });
+    function modalAjaxFormSubmission(form,submissionButton) {
+        var button = submissionButton;
+        if (!button.hasClass('disabled')) {
+            var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);
+          $.ajax({
+            url: form.attr('action'),
+            type: form.attr('method'),
+            data: form.serialize(),
+            dataType: 'JSON'
+          }).done(function(data){
+                resetModal(form.closest('.remodal'),1);
+                if (data.status) {
+                        if(data.message != undefined /* && alertElement.length > 0 */ ) {
+                            toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
+                        }
+                        setTimeout(function(){
+                            form.find('.alert').addClass('hidden');
+                            resetModal(form.closest('.remodal'),2);
+                            modalInstance.close();
+                        },2000)
+                } else {
+                        toastr.options.closeButton = true;
+                        if(data.message != undefined /* && alertElement.length > 0 */) {
+                            toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                        }
+                }
+                if (data.data != undefined) {
+                    returnedData = data.data;
+                }
+                if (data.actions != undefined && data.actions.length > 0) {
+                    performActions(data.actions);
+                }
+                reEnableButton(disabledButtonObject);
+              });
+        }   
     }
 
 
@@ -334,14 +362,14 @@ $(function(){
     function buttonAjax(button,data) {
         event.preventDefault();
         event.stopPropagation();
-        var alertElement = $(button.data('alert-element'));
+        if (!button.hasClass('disabled')) {
+          var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);
           $.ajax({
             url: button.attr('href'),
             type: button.data('method'),
             data: eval(data),
             dataType: 'JSON'
           }).done(function(data){
-                console.log(data)
                 if (data.status) {
                         if(data.message != undefined /* && alertElement.length > 0 */ ) {
                             toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
@@ -359,7 +387,9 @@ $(function(){
                 if (data.actions != undefined && data.actions.length > 0) {
                     performActions(data.actions);    
                 }
-          })
+                reEnableButton(disabledButtonObject);
+          })            
+        }
     }
 
     // Specific callback functions for after modal population
@@ -761,7 +791,7 @@ $(function(){
             <div style="color:#656268; margin-top: 15px; font-size:15px;font-weight:lighter"><span class="lastHangout"></span></div>
             <div style="height:140px;margin-top:35px;">
                 <img class="photo transitionButton" src="" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;">
-                <div class="photo transitionButton textDarkGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
+                <div class="photo transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
                     <%= fa_icon 'user-circle' %>
                 </div> 
             </div>
@@ -771,7 +801,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
-            <div id="checkinButton" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
+            <div id="checkinButton" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>
@@ -813,7 +843,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable">PUT IN CALENDAR</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed submitButton">PUT IN CALENDAR</div>
         </div>
     </div>
     <div class="modalView hidden" id="editConnection">
@@ -840,7 +870,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable">Update</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed">UPDATE</div>
         </div>
     </div>
 </div>
@@ -850,7 +880,7 @@ $(function(){
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
-                <div class="formElement button textDarkGray" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" data-alert-element="[data-remodal-id=importModal] .alert" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
+                <div class="formElement button textDarkGray disableWhileProcessed" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" data-alert-element="[data-remodal-id=importModal] .alert" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
@@ -871,7 +901,7 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomFullButton sphereBlueBackground hoverable">
+            <div class="modalBottomFullButton sphereBlueBackground hoverable  disableWhileProcessed">
                 <span>ADD TO SPHERE</span>
             </div>
         </div>
@@ -895,8 +925,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereRedBackground hoverable transitionButton" data-current="[data-remodal-id=bubbleModal] .modalView#listSelect" data-target="[data-remodal-id=bubbleModal] .modalView#mainImportView">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable" href="<%= create_from_import_path %>" data-method="POST">ADD TO SPHERE</div>
+            <div class="modalBottomLeftButton sphereRedBackground hoverable transitionButton" data-current="[data-remodal-id=importModal] .modalView#listSelect" data-target="[data-remodal-id=importModal] .modalView#mainImportView">BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable  disableWhileProcessed" href="<%= create_from_import_path %>" data-method="POST">ADD TO SPHERE</div>
         </div>
     </div>
 </div>
@@ -931,7 +961,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton sphereRedBackground hoverable">CANCEL</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable" href="<%= update_user_settings_path(current_user) %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">UPDATE</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed" href="<%= update_user_settings_path(current_user) %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">UPDATE</div>
         </div>
     </div>
 </div>
