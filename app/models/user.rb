@@ -39,15 +39,21 @@ class User < ActiveRecord::Base
       result = self.notifications.inject({}) do |accumulator,notification|
                   accumulator[:connection_level] = {} unless accumulator[:connection_level]
                   accumulator[:user_level] = [] unless accumulator[:user_level]
-                  if Date.today >= notification.notification_date && Date.today < notification.expiry_date
-                    if !notification.connection_id.blank?
-                      if accumulator[:connection_level][notification.connection_id]
-                        accumulator[:connection_level][notification.connection_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority} if (notification.priority < accumulator[:connection_level][notification.connection_id][:priority])
+                  if notification.notification_date && notification.expiry_date && Date.today >= notification.notification_date && Date.today < notification.expiry_date
+                    if notification.notifiable_type == "Connection"
+                      if accumulator[:connection_level][notification.notifiable_id]
+                        accumulator[:connection_level][notification.notifiable_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority} if (notification.priority < accumulator[:connection_level][notification.notifiable_id][:priority])
                       else
-                        accumulator[:connection_level][notification.connection_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority}
+                        accumulator[:connection_level][notification.notifiable_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority}
                       end
                     else
-                      accumulator[:user_level].push({notification_type:notification.notification_type,value:notification.value_in_specified_type})
+                      existing_notification = accumulator[:user_level].select {|notification_in_array| notification_in_array[:notification_type] == notification.notification_type}[0]
+                      if existing_notification
+                        existing_notification[:count] = existing_notification[:count]+1
+                        existing_notification[:values].push(notification.value_in_specified_type)
+                      else
+                        accumulator[:user_level].push({notification_type:notification.notification_type,values:[notification.value_in_specified_type],count:1})
+                      end
                     end
                   end
                   accumulator

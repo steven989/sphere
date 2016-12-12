@@ -3,6 +3,7 @@ class Badge < ActiveRecord::Base
     has_many :users, through: :user_badges
     validates :name, presence: true
     mount_uploader :graphic, GraphicUploader
+    has_many :notifications, as: :notifiable
 
     def self.identify_badges_for(current_user)
         current_badges = current_user.user_badges

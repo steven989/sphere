@@ -6,6 +6,7 @@ class Challenge < ActiveRecord::Base
     validates :name, presence: true
     validates :reward, presence: true
     mount_uploader :graphic, GraphicUploader
+    has_many :notifications, as: :notifiable
 
     def self.identify_challenges_for(current_user)
         number_of_challenges_to_display_to_user = SystemSetting.search("number_of_challenges_to_display_to_user").value_in_specified_type

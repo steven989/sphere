@@ -2,7 +2,7 @@ class Notification < ActiveRecord::Base
     validate :validate_data_type 
     belongs_to :user
     belongs_to :connection
-
+    belongs_to :notifiable, polymorphic: true
 
     # Auto task
     def destroy_notification 
@@ -21,15 +21,15 @@ class Notification < ActiveRecord::Base
           expiry_date:date+expiry_days.day,
           data_type:"hash",
           value:"{old_level:#{old_level.level},new_level:#{new_level.level}}"
-          )        
+          )
     end
 
     # This is a user-level notification
     def self.create_new_badge_notification(badge,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
-        Notification.where(user_id:user.id,notification_type:"new_badge").destroy_all
+        badge.notifications.where(user_id:user.id,notification_type:"new_badge").destroy_all
         # 2) Create a notification
-        Notification.create(
+        badge.notifications.create(
           user_id: user.id,
           notification_type:"new_badge",
           notification_date:date,
@@ -42,9 +42,9 @@ class Notification < ActiveRecord::Base
     # This is a user-level notification
     def self.create_new_challenge_notification(challenge,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
-        Notification.where(user_id:user.id,notification_type:"new_challenge").destroy_all
+        challenge.notifications.where(user_id:user.id,notification_type:"new_challenge").destroy_all
         # 2) Create a notification
-        Notification.create(
+        challenge.notifications.create(
           user_id: user.id,
           notification_type:"new_challenge",
           notification_date:date,
@@ -58,11 +58,11 @@ class Notification < ActiveRecord::Base
     # This is a connection-level notification
     def self.create_expiry_notification(user,connection,expiry_date,remaining_days_until_expiry)
         # 1) Destroy any existing expiry notifications
-        Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"connection_expiration").destroy_all
+        connection.notifications.where(user_id:user.id,notification_type:"connection_expiration").destroy_all
+        # Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"connection_expiration").destroy_all
         # 2) Create a notification
-        Notification.create(
+        connection.notifications.create(
           user_id: user.id,
-          connection_id: connection.id,
           notification_type:"connection_expiration",
           notification_date:Date.today,
           expiry_date:expiry_date,
@@ -73,13 +73,13 @@ class Notification < ActiveRecord::Base
     end
 
     # This is a connection-level notification
-    def self.create_checked_in_notification(user,connection_id,expiry_days=3,date=Date.today)
+    def self.create_checked_in_notification(user,connection,expiry_days=3,date=Date.today)
         # 1) Destroy any existing notifications
-        Notification.where(user_id:user.id,connection_id:connection_id,notification_type:"checked_in").destroy_all
+        connection.notifications.where(user_id:user.id,notification_type:"checked_in").destroy_all
+        # Notification.where(user_id:user.id,connection_id:connection_id,notification_type:"checked_in").destroy_all
         # 2) Create a notification
-        Notification.create(
+        connection.notifications.create(
           user_id: user.id,
-          connection_id: connection_id,
           notification_type:"checked_in",
           notification_date:date,
           expiry_date:date+expiry_days.days,
@@ -90,14 +90,14 @@ class Notification < ActiveRecord::Base
     # This is a connection-level notification
     def self.create_upcoming_plan_notification(user,connection,date=Date.today)
         # 1) Destroy any existing notifications
-        Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"upcoming_plan").destroy_all
+        connection.notifications.where(user_id:user.id,notification_type:"upcoming_plan").destroy_all
+        # Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"upcoming_plan").destroy_all
         # 2) See if there are upcoming plans, if there are, then create. Otherwise do nothing
         plans = connection.plans.upcoming.where("date >= ?",Date.today).order(date: :asc)
         if plans.length > 0 
           plan = plans.limit(1).take
-          Notification.create(
+          connection.notifications.create(
             user_id: user.id,
-            connection_id: connection.id,
             notification_type:"upcoming_plan",
             notification_date:date,
             expiry_date:plan.date,

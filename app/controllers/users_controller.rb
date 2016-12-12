@@ -30,9 +30,9 @@ class UsersController < ApplicationController
           end
           # ----- this section contains all the variables needed to display Level, Challenge and Badge
             # --- badges
-            @badges = current_user.badges.order(id: :asc)
+            @badges = current_user.badges.includes(:notifications).order(id: :asc)
             # --- challenges
-            @challenges = current_user.current_challenges.order(id: :asc)
+            @challenges = current_user.current_challenges.includes(:notifications).order(id: :asc)
             # --- level
             current_user_stats = current_user.stats
             @level_object = current_user.level
