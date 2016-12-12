@@ -33,6 +33,11 @@
     padding: 0px 15px;
 }
 
+.formElement.disabled {
+    background-color:#E9E9E9;
+    color:#D8D8D8;
+}
+
 .formElement.halfRow.left {
     display:inline-block;
     width: 48%;
@@ -48,6 +53,12 @@
 .formElement.tallerInput {
     height: 35px;
     line-height: 35px;
+    font-size: 15px;
+}
+
+.formElement.standardHeight {
+    height: 28px;
+    line-height: 28px;
     font-size: 15px;
 }
 
@@ -175,6 +186,10 @@
 
 .textDarkGray {
     color: #707070;
+}
+
+.textLightGray {
+    color: #D6D6D6;
 }
 
 .errorFormInput {
@@ -321,11 +336,10 @@ body {
     height: 100%;
 }
 
-#photoUploader { display: none; }
+#photoUploader, #photoUploaderInCreate { display: none; }
 label[for=photoUploader] {
     border: 1px solid #E9E9E9;
     font-family: 'eausans_book';
-    margin-top: 20px;
     width: 100%; 
     padding-left: 12%;
     background-color: #FAFAFA;
@@ -337,6 +351,7 @@ label[for=photoUploader] {
     cursor: pointer;
     height: 35px;
     line-height: 35px;
+    transition:background-color 0.2s ease;
 }
 
 label[for=photoUploader]:hover {
@@ -350,18 +365,50 @@ label[for=photoUploader]:hover {
     padding: 0px 30px;
 }
 
+/* Import contacts modal view */
+
+.modalView#listSelect .modalContentContainer {
+    height:300px;
+}
+
+.modalView#listSelect .modalContentContainer #importContacts {
+    overflow-x: scroll;
+}
+
+.modalView#listSelect .modalContentContainer #importContacts #importSelectionTable {
+    table-layout: fixed;
+    width:100%;
+    text-align: left;
+}
+
 
 /* Bubbles related */
 
+.modalView#plans .photo {
+    transition: box-shadow 0.2s ease;
+}
+
+.modalView#plans .photo:hover {
+    box-shadow: 0px 0px 10px #636363;
+}
+
+
 .modalTokenBox {
+    margin-top: 5px;
+    width: 100%;
+}
+
+.modalView#plans .modalTokenBox {
     margin-top: 5px;
     width: 90%;
 }
+
 
 .modalTokenBox ul.TokensContainer {
     height: 38px !important;
     border: none !important;
     border-radius: 10px;
+    transition: background-color 0.2s ease;
 }
 
 .modalTokenBox ul.TokensContainer:hover {
@@ -453,6 +500,13 @@ label[for=photoUploader]:hover {
     transition:background-color 0.2s ease;
 }
 
+.sphereRedBackground.disabled {
+    background-color: #C56666;
+    color:#E2E2E2;
+    cursor:auto;
+    transition:background-color 0.2s ease;
+}
+
 .sphereRedBackground.hoverable:not(.disabled):hover {
     background-color:#CC1919;
 }
@@ -466,6 +520,14 @@ label[for=photoUploader]:hover {
 .sphereBlueBackground.hoverable:not(.disabled):hover {
     background-color: #0584C3;
 }
+
+.sphereBlueBackground.disabled {
+    background-color: #5896B5;
+    color:#E2E2E2;
+    cursor:auto;
+    transition:background-color 0.2s ease;
+}
+
 
 
 .sphereGreenBackground {
