@@ -183,6 +183,8 @@ GEM
     polyamorous (1.1.0)
       activerecord (>= 3.0)
     public_suffix (2.0.4)
+    puma (2.11.3)
+      rack (>= 1.1, < 2.0)
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -292,6 +294,7 @@ DEPENDENCIES
   omniauth-facebook
   omniauth-google-oauth2
   pg
+  puma
   rails (= 4.2.4)
   rmagick
   sass-rails (~> 5.0)
