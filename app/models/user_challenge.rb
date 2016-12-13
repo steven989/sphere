@@ -1,6 +1,7 @@
 class UserChallenge < ActiveRecord::Base
     belongs_to :user
     belongs_to :challenge
+    has_many :notifications, as: :notifiable
 
     def start_challenge
         days_to_complete = challenge.days_to_complete.blank? ? nil : challenge.days_to_complete
@@ -25,6 +26,7 @@ class UserChallenge < ActiveRecord::Base
             reward:reward
         );
             self.destroy
+            self.notifications.destroy_all
             StatisticDefinition.triggers("individual","complete_challenge",user) if reward
             status = true
             message = "Challenge completed"

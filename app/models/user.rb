@@ -88,11 +88,11 @@ class User < ActiveRecord::Base
     additional_challenges = Challenge.identify_challenges_for(self)
     if additional_challenges.length > 0 
       additional_challenges.each do |challenge|
-        self.user_challenges.create(
-          challenge_id:challenge.id,
-          date_shown_to_user:Date.today
-          )
-        Notification.create_new_challenge_notification(self,challenge)
+        user_challenge = self.user_challenges.create(
+                        challenge_id:challenge.id,
+                        date_shown_to_user:Date.today
+                        )
+        Notification.create_new_challenge_notification(user_challenge)
       end
     end
   end
@@ -101,8 +101,8 @@ class User < ActiveRecord::Base
     additional_badges = Badge.identify_badges_for(self)
     if additional_badges.length > 0 
       additional_badges.each do |badge|
-        self.user_badges.create(badge_id:badge.id)
-        Notification.create_new_badge_notification(self,badge)
+        user_badge = self.user_badges.create(badge_id:badge.id)
+        Notification.create_new_badge_notification(user_badge)
       end
     end    
   end

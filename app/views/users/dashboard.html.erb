@@ -823,29 +823,29 @@ $(function(){
             </div>
             <div class="container">
                 <div class="row">
-                    <% @challenges.each  do |challenge| %>
+                    <% @challenges.each  do |user_challenge| %>
                         <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
-                            <div class="card challengeCard" data-id="<%= challenge.id %>" data-status="<%= challenge.status %>" data-total-days="<%= challenge.days_to_complete %>" data-days-remaining="<%= (challenge.date_to_be_completed - Date.today) if challenge.date_to_be_completed %>" >
-                                <div class="corner-ribbon top-right sticky yellow <%= "hidden" if challenge.notifications.length == 0 %>">New!</div>
+                            <div class="card challengeCard" data-id="<%= user_challenge.challenge.id %>" data-status="<%= user_challenge.status %>" data-total-days="<%= user_challenge.challenge.days_to_complete %>" data-days-remaining="<%= (user_challenge.date_to_be_completed - Date.today) if user_challenge.date_to_be_completed %>" >
+                                <div class="corner-ribbon top-right sticky yellow <%= "hidden" if user_challenge.notifications.length == 0 %>">New!</div>
                                 <div class="title">
-                                    <h2 class="textDarkGray"><%= challenge.name %></h2>
+                                    <h2 class="textDarkGray"><%= user_challenge.challenge.name %></h2>
                                 </div>
                                 <div class="graphic">
                                     <div class="graphicWrapper">
-                                        <%= challenge.graphic.blank? ? "" : (image_tag challenge.graphic, alt:"Challenge Graphics") %>
+                                        <%= user_challenge.challenge.graphic.blank? ? "" : (image_tag user_challenge.challenge.graphic, alt:"Challenge Graphics") %>
                                     </div>
                                 </div>
                                 <div class="subtitle">
-                                   <p class="textDarkGray"><%= challenge.instructions %></p>
+                                   <p class="textDarkGray"><%= user_challenge.challenge.instructions %></p>
                                 </div>
                                 <div class="buttons">
-                                    <div class="sphereGreenBackground hoverable modalBottomLeftButton ajaxButton start <%= 'hidden' if challenge.status == 'progressing' %>" data-method="PUT" href="<%= start_challenge_path %>" data-data-to-send="({challenge_id:<%= challenge.id %>})">
+                                    <div class="sphereGreenBackground hoverable modalBottomLeftButton ajaxButton start <%= 'hidden' if user_challenge.status == 'progressing' %>" data-method="PUT" href="<%= start_challenge_path %>" data-data-to-send="({challenge_id:<%= user_challenge.challenge.id %>})">
                                         START
                                     </div>
-                                    <div class="sphereRedBackground hoverable modalBottomLeftButton ajaxButton complete <%= 'hidden' unless challenge.status == 'progressing' %>" data-method="PUT" href="<%= complete_challenge_path %>" data-data-to-send="({challenge_id:<%= challenge.id %>})">
+                                    <div class="sphereRedBackground hoverable modalBottomLeftButton ajaxButton complete <%= 'hidden' unless user_challenge.status == 'progressing' %>" data-method="PUT" href="<%= complete_challenge_path %>" data-data-to-send="({challenge_id:<%= user_challenge.challenge.id %>})">
                                         COMPLETE
                                     </div>
-                                    <div class="sphereBlueBackground hoverable modalBottomRightButton" data-details="<%= h challenge.description %>">
+                                    <div class="sphereBlueBackground hoverable modalBottomRightButton" data-details="<%= h user_challenge.challenge.description %>">
                                         LEARN
                                     </div>
                                 </div>
@@ -885,18 +885,18 @@ $(function(){
             </div>
             <div class="container">
                 <div class="row">
-                    <% @badges.each  do |badge| %>
+                    <% @badges.each  do |user_badge| %>
                         <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
-                            <div class="card badgeCard" data-id="<%= badge.id %>">
-                                <div class="corner-ribbon top-right sticky yellow <%= "hidden" if badge.notifications.length == 0 %>">New!</div>
+                            <div class="card badgeCard" data-id="<%= user_badge.badge.id %>">
+                                <div class="corner-ribbon top-right sticky yellow <%= "hidden" if user_badge.notifications.length == 0 %>">New!</div>
                                 <div class="title">
-                                    <h2 class="textDarkGray"><%= badge.name %></h2>
+                                    <h2 class="textDarkGray"><%= user_badge.badge.name %></h2>
                                 </div>
                                 <div class="graphic">
-                                    <%= badge.graphic.blank? ? "" :  (image_tag badge.graphic, alt:"Badge Graphics")  %>
+                                    <%= user_badge.badge.graphic.blank? ? "" :  (image_tag user_badge.badge.graphic, alt:"Badge Graphics")  %>
                                 </div>
                                 <div class="subtitle">
-                                   <p class="textDarkGray"><%= badge.description %></p>
+                                   <p class="textDarkGray"><%= user_badge.badge.description %></p>
                                 </div>
                             </div> 
                         </div>

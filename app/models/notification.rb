@@ -25,32 +25,32 @@ class Notification < ActiveRecord::Base
     end
 
     # This is a user-level notification
-    def self.create_new_badge_notification(user,badge,expiry_days=1,date=Date.today)
+    def self.create_new_badge_notification(user_badge,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
-        badge.notifications.where(user_id:user.id,notification_type:"new_badge").destroy_all
+        user_badge.notifications.where(notification_type:"new_badge").destroy_all
         # 2) Create a notification
-        badge.notifications.create(
-          user_id: user.id,
+        user_badge.notifications.create(
+          user_id: user_badge.user.id,
           notification_type:"new_badge",
           notification_date:date,
           expiry_date:date+expiry_days.day,
           data_type:"hash",
-          value:"{badge_id:#{badge.id}}"
-          )        
+          value:"{badge_id:#{user_badge.badge.id}}"
+          )
     end
 
     # This is a user-level notification
-    def self.create_new_challenge_notification(user,challenge,expiry_days=1,date=Date.today)
+    def self.create_new_challenge_notification(user_challenge,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
-        challenge.notifications.where(user_id:user.id,notification_type:"new_challenge").destroy_all
+        user_challenge.notifications.where(notification_type:"new_challenge").destroy_all
         # 2) Create a notification
-        challenge.notifications.create(
-          user_id: user.id,
+        user_challenge.notifications.create(
+          user_id: user_challenge.user.id,
           notification_type:"new_challenge",
           notification_date:date,
           expiry_date:date+expiry_days.day,
           data_type:"hash",
-          value:"{challenge_id:#{challenge.id}}"
+          value:"{challenge_id:#{user_challenge.challenge.id}}"
           )        
     end
 
