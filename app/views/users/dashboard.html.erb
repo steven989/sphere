@@ -1,7 +1,7 @@
 <script>
 var test;
-var returnedData;
 $(function(){
+    var returnedData;
     var modalInstance;
     var closeModalTimer;    
     var token;
@@ -56,18 +56,22 @@ $(function(){
                     if (connectionNotification["notification_type"] == "connection_expiration") {
                         var remaining_days_until_expiry = connectionNotification["value"]["remaining_days_until_expiry"];
                         var percentageValueOfRemainingDays = Math.max(Math.min(remaining_days_until_expiry*1.0/7.0,1),0.2);
-                        $(this).parent('.connectBubbleContainer').circleProgress({
-                            // value: percentageValueOfRemainingDays,
-                            value: 0.8,
-                            thickness:5,
-                            lineCap:'round',
-                            size: $(this).parent('.connectBubbleContainer').width(),
-                            fill: {color: '#ED1C24'},
-                            emptyFill: 'rgba(0,0,0,0)',
-                            startAngle:(0.5*Math.PI),
-                            reverse:true,
-                            animationStartValue: 1
-                        });
+                        
+                        paintProgressBar($(this).parent('.connectBubbleContainer'),1,"#ED1C24",percentageValueOfRemainingDays);
+
+                        // $(this).parent('.connectBubbleContainer').circleProgress({
+                        //     // value: percentageValueOfRemainingDays,
+                        //     value: 0.8,
+                        //     thickness:5,
+                        //     lineCap:'round',
+                        //     size: $(this).parent('.connectBubbleContainer').width(),
+                        //     fill: {color: '#ED1C24'},
+                        //     emptyFill: 'rgba(0,0,0,0)',
+                        //     startAngle:(0.5*Math.PI),
+                        //     reverse:true,
+                        //     animationStartValue: 1
+                        // });
+
                     }
                     // 1.2) Notification icons
                     var backgroundColor;
@@ -366,6 +370,69 @@ $(function(){
         return {x:x,y:y};
     }
 
+    // learn button on the challenge cards
+    $('#challenges .challengeCard .buttons .modalBottomRightButton').off("click").on("click",function(){
+        $('[data-remodal-id=challengeDetailsModal] .modalView#challengeDetails .modalContentContainer').html($.parseHTML($(this).data('details')));
+            initializeReModal('[data-remodal-id=challengeDetailsModal]','standardModal',3);
+    });
+
+    // Related to the challenge cards
+
+    function afterStart(card) {
+        // update the data attributes
+        var daysRemaining = returnedData.days_remaining;
+        var status = returnedData.status;
+        card.data('days-remaining',daysRemaining).data('status',status);
+        // change the buttons
+        transition(card.find('.buttons .start'),card.find('.buttons .complete'));
+        // paint the progress bar
+        displayProgressBarOnChallengeCard (card.find('.graphicWrapper'));
+    }
+
+    function afterComplete(card) {
+        // fade out and then delete the card element from DOM
+        card.fadeOut(600,function(){
+            $(this).parent().remove();
+        })
+    }
+
+    displayProgressBarsOnChallenges();
+
+    function displayProgressBarsOnChallenges() {
+        $('.challengeCard .graphicWrapper').each(function(){
+            displayProgressBarOnChallengeCard ($(this));
+        })  
+    }
+
+    function displayProgressBarOnChallengeCard (graphicWrapper) {
+        var card = graphicWrapper.closest('.challengeCard')
+        if (card.data('status')=="progressing") {
+            var totalDays = parseInt(card.data('total-days'));
+            var remainingDays = parseInt(card.data('days-remaining'));
+            var remainingPercent = remainingDays/totalDays;
+            var color = remainingPercent > 0.75 ? '#34BF49' : (remainingPercent > 0.3 ?  '#FFB224' : '#ED1C24');
+            var animationStartValue = remainingPercent > 0.95 ? 0 : 1;
+            paintProgressBar(graphicWrapper,animationStartValue,color,remainingPercent);
+        }
+    }
+
+
+    // General function to paint progress bars
+
+    function paintProgressBar(displayElement,animationStartValue,color,value) {
+        displayElement.circleProgress({
+            value: value,
+            thickness:5,
+            lineCap:'round',
+            size: displayElement.width(),
+            fill: {color: color},
+            emptyFill: 'rgba(0,0,0,0)',
+            startAngle:(0.5*Math.PI),
+            reverse:true,
+            animationStartValue: animationStartValue
+        });
+    }
+
     // Importing contacts
     $('#importContactsGoogle').off("click").on("click",function(){
         buttonAjax($(this),$(this).data('data-to-send'));
@@ -596,6 +663,8 @@ $(function(){
                     clearInterval(checkConnect);
                     window.location.reload();
                 }, 100);                        
+            } else if (actionObject.action=="hide") {
+                $(actionObject.element).removeClass('hidden').addClass('hidden');
             } else if (actionObject.action=="unhide") {
                 $(actionObject.element).removeClass('hidden');
             } else if (actionObject.action == "change_css") {
@@ -756,23 +825,28 @@ $(function(){
                 <div class="row">
                     <% @challenges.each  do |challenge| %>
                         <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
-                            <div class="card challengeCard" data-id="<%= challenge.id %>">
+                            <div class="card challengeCard" data-id="<%= challenge.id %>" data-status="<%= challenge.status %>" data-total-days="<%= challenge.days_to_complete %>" data-days-remaining="<%= (challenge.date_to_be_completed - Date.today) if challenge.date_to_be_completed %>" >
                                 <div class="corner-ribbon top-right sticky yellow <%= "hidden" if challenge.notifications.length == 0 %>">New!</div>
                                 <div class="title">
                                     <h2 class="textDarkGray"><%= challenge.name %></h2>
                                 </div>
                                 <div class="graphic">
-                                    <%= challenge.graphic.blank? ? "" : (image_tag challenge.graphic, alt:"Challenge Graphics") %>
+                                    <div class="graphicWrapper">
+                                        <%= challenge.graphic.blank? ? "" : (image_tag challenge.graphic, alt:"Challenge Graphics") %>
+                                    </div>
                                 </div>
                                 <div class="subtitle">
                                    <p class="textDarkGray"><%= challenge.instructions %></p>
                                 </div>
                                 <div class="buttons">
-                                    <div class="sphereGreenBackground hoverable modalBottomLeftButton">
-                                        Start
+                                    <div class="sphereGreenBackground hoverable modalBottomLeftButton ajaxButton start <%= 'hidden' if challenge.status == 'progressing' %>" data-method="PUT" href="<%= start_challenge_path %>" data-data-to-send="({challenge_id:<%= challenge.id %>})">
+                                        START
                                     </div>
-                                    <div class="sphereBlueBackground hoverable modalBottomRightButton">
-                                        Learn
+                                    <div class="sphereRedBackground hoverable modalBottomLeftButton ajaxButton complete <%= 'hidden' unless challenge.status == 'progressing' %>" data-method="PUT" href="<%= complete_challenge_path %>" data-data-to-send="({challenge_id:<%= challenge.id %>})">
+                                        COMPLETE
+                                    </div>
+                                    <div class="sphereBlueBackground hoverable modalBottomRightButton" data-details="<%= h challenge.description %>">
+                                        LEARN
                                     </div>
                                 </div>
                             </div> 
@@ -1014,6 +1088,14 @@ $(function(){
         </div>
     </div>
 </div>
-
-
-<%= link_to 'Logout', logout_path %>
+ 
+<div data-remodal-id="challengeDetailsModal" data-default-css="([{'attribute':'height','value':'400px'}])">
+    <div class="modalView" id="challengeDetails">
+        <div class="modalContentContainer p-h-xxlg">
+            
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereGreenBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
+        </div>
+    </div>
+</div>

@@ -10,7 +10,7 @@ class Notification < ActiveRecord::Base
     end
 
     # This is a user-level notification
-    def self.create_new_level_notification(old_level,new_level,expiry_days=1,date=Date.today)
+    def self.create_new_level_notification(user,old_level,new_level,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
         Notification.where(user_id:user.id,notification_type:"level_up").destroy_all
         # 2) Create a notification
@@ -25,7 +25,7 @@ class Notification < ActiveRecord::Base
     end
 
     # This is a user-level notification
-    def self.create_new_badge_notification(badge,expiry_days=1,date=Date.today)
+    def self.create_new_badge_notification(user,badge,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
         badge.notifications.where(user_id:user.id,notification_type:"new_badge").destroy_all
         # 2) Create a notification
@@ -40,7 +40,7 @@ class Notification < ActiveRecord::Base
     end
 
     # This is a user-level notification
-    def self.create_new_challenge_notification(challenge,expiry_days=1,date=Date.today)
+    def self.create_new_challenge_notification(user,challenge,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
         challenge.notifications.where(user_id:user.id,notification_type:"new_challenge").destroy_all
         # 2) Create a notification

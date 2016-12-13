@@ -16,7 +16,7 @@ class Activity < ActiveRecord::Base
             Notification.create_checked_in_notification(user,connection)
             connection.notifications.where(notification_type:"connection_expiration").destroy_all
             if new_level.take.value > current_level.take.value
-                Notification.create_new_level_notification(current_level,new_level)
+                Notification.create_new_level_notification(user,current_level,new_level)
             end
             status = true
             message = "Activity created"

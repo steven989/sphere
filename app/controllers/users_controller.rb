@@ -32,6 +32,7 @@ class UsersController < ApplicationController
             # --- badges
             @badges = current_user.badges.includes(:notifications).order(id: :asc)
             # --- challenges
+            # @challenges = current_user.current_challenges.includes(:notifications).order(id: :asc)
             @challenges = current_user.current_challenges.includes(:notifications).order(id: :asc)
             # --- level
             current_user_stats = current_user.stats

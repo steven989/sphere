@@ -10,26 +10,25 @@ class Challenge < ActiveRecord::Base
 
     def self.identify_challenges_for(current_user)
         number_of_challenges_to_display_to_user = SystemSetting.search("number_of_challenges_to_display_to_user").value_in_specified_type
-        current_challenges = current_user.user_challenges
-        number_of_challenges_already_displayed = current_challenges.length
+        current_challenges_ids = current_user.user_challenges.map {|user_challenge| user_challenge.challenge_id }
+        number_of_challenges_already_displayed = current_challenges_ids.length
         
         #1) Remove any challenges already completed and do not allow for repeats and already being shown
         list_of_challenges = Challenge.all.map {|challenge| challenge }
-        list_of_completed_and_no_repeat_challenges = current_user.user_challenge_completeds.repeated_allowed(false)
-        subset = list_of_challenges - list_of_completed_and_no_repeat_challenges - current_challenges
-        subset.map {|challenge| {id:challenge.id, criteria:challenge.criteria,reward:challenge.reward}}
+        list_of_completed_and_no_repeat_challenges_id = current_user.user_challenge_completeds.repeated_allowed(false).map {|completed_challenge| completed_challenge.challenge_id}
+        subset = list_of_challenges.select {|challenge| !(current_challenges_ids.include?(challenge.id) || list_of_completed_and_no_repeat_challenges_id.include?(challenge.id))}
         #2) Find all the different statistics fields that will be required and save their values in a hash database isn't accessed for every comparison
         unique_list_of_user_statistics = subset.map{|challenge_data| challenge_data[:criteria].scan(/@[^@]+@/)}.flatten.uniq
         #3) Load these statistics
         current_user_relevant_statistics = unique_list_of_user_statistics.map{|stat| {stat.gsub("@",'') => current_user.user_statistics.find_statistic(stat.gsub("@",'')).take.value.to_f}}.reduce Hash.new, :merge
         #4) Filter the subset of challenges by their criteria and the loaded user statistics data
         set_that_user_qualifies_for = subset.select {|challenge| eval(Challenge.decode_criteria_into_executable_command(challenge['criteria'])) }
-        #5) randomly pick gap number of challenges
+        #5) order the result by reward from biggest to smallest and pick the ones with the highest reward to show user
+        set_that_user_qualifies_for.sort! {|x,y| (y.reward.blank? ? 0 : y.reward) <=> (x.reward.blank? ? 0 : x.reward) }
         gap = [[number_of_challenges_to_display_to_user - number_of_challenges_already_displayed,0].max,set_that_user_qualifies_for.length].min
         result = []
-        gap.times do
-            result << set_that_user_qualifies_for[rand(set_that_user_qualifies_for.length)]
-            set_that_user_qualifies_for = set_that_user_qualifies_for - result
+        for i in 0..(gap-1)
+            result << set_that_user_qualifies_for[i]
         end
         result
     end

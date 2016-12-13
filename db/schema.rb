@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161212180616) do
+ActiveRecord::Schema.define(version: 20161213042428) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,11 +73,12 @@ ActiveRecord::Schema.define(version: 20161212180616) do
     t.text     "instructions"
     t.text     "description"
     t.string   "criteria"
-    t.string   "reward"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.boolean  "repeated_allowed", default: true
     t.string   "graphic"
+    t.integer  "days_to_complete", default: 7
+    t.integer  "reward"
   end
 
   create_table "connection_notes", force: :cascade do |t|
@@ -223,13 +224,20 @@ ActiveRecord::Schema.define(version: 20161212180616) do
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
     t.boolean  "repeated_allowed"
+    t.date     "date_started"
+    t.integer  "reward"
+    t.date     "date_to_be_completed"
   end
 
   create_table "user_challenges", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "challenge_id"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.date     "date_shown_to_user"
+    t.date     "date_started"
+    t.string   "status",               default: "presented"
+    t.date     "date_to_be_completed"
   end
 
   create_table "user_settings", force: :cascade do |t|

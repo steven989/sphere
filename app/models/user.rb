@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
   has_many :user_badges
   has_many :badges, through: :user_badges
   has_many :user_challenges
-  has_many :current_challenges, through: :user_challenges, class_name: "Challenge", foreign_key: "challenge_id", source: :challenge
+  has_many :current_challenges, -> {select("challenges.*,user_challenges.status,user_challenges.date_shown_to_user,user_challenges.date_started,user_challenges.date_to_be_completed")}, through: :user_challenges, class_name: "Challenge", foreign_key: "challenge_id", source: :challenge
   has_many :user_challenge_completeds
   has_many :completed_challenges, through: :user_challenge_completeds, class_name: "Challenge", foreign_key: "challenge_id", source: :challenge
   has_many :level_histories
@@ -88,8 +88,11 @@ class User < ActiveRecord::Base
     additional_challenges = Challenge.identify_challenges_for(self)
     if additional_challenges.length > 0 
       additional_challenges.each do |challenge|
-        self.user_challenges.create(challenge_id:challenge.id)
-        Notification.create_new_challenge_notification(challenge)
+        self.user_challenges.create(
+          challenge_id:challenge.id,
+          date_shown_to_user:Date.today
+          )
+        Notification.create_new_challenge_notification(self,challenge)
       end
     end
   end
@@ -99,7 +102,7 @@ class User < ActiveRecord::Base
     if additional_badges.length > 0 
       additional_badges.each do |badge|
         self.user_badges.create(badge_id:badge.id)
-        Notification.create_new_badge_notification(badge)
+        Notification.create_new_badge_notification(self,badge)
       end
     end    
   end

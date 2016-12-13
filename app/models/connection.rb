@@ -308,7 +308,7 @@ class Connection < ActiveRecord::Base
     private
 
     def callbacks_after_create
-      @@new_record = true
+      @new_record = true
     end
 
     def callbacks_after_update
