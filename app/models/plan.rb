@@ -84,7 +84,7 @@ class Plan < ActiveRecord::Base
                             details:details
                             )
                     status = true
-                    message = "Event successfully created"
+                    message = "Event created! We put it on your calendar for you"
                 end
             end
         end

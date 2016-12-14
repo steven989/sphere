@@ -86,6 +86,11 @@ class Badge < ActiveRecord::Base
             evaluation_result = User.find_users_matching_criteria(criteria)[:status]
             if evaluation_result
                 badgeObj = Badge.new(name:name,description:description,criteria:criteria)
+                if !((graphic == "undefined") || (graphic == "null") || graphic.blank?)
+                    badgeObj.remove_graphic!
+                    badgeObj.save
+                    badgeObj.graphic = graphic
+                end 
                 if badgeObj.save
                     status = true
                     message = "Badge successfully updated"

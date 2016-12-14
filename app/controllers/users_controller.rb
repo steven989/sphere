@@ -51,34 +51,42 @@ class UsersController < ApplicationController
     end
 
     def create_connection
-        if params[:name].blank? || params[:target_contact_interval_in_days].blank?
+      photo_uploaded = !((params[:photoUploaderInCreate] == "undefined") || (params[:photoUploaderInCreate] == "null") || params[:photoUploaderInCreate].blank?)
+      tags_inputted = !((params[:tags] == "undefined") || (params[:tags] == "null") || params[:tags].blank?)
+
+        if params[:name].blank?
               status = false
               message = "Please fill in required fields"
-              actions=[]
-              actions.push({action:"change_css",element:".modalView#mainImportView input[name=name]",css:{attribute:"border",value:"1px solid red"}}) if params[:name].blank?
-              actions.push({action:"change_css",element:".modalView#mainImportView input[name=target_contact_interval_in_days]",css:{attribute:"border",value:"1px solid red"}}) if params[:target_contact_interval_in_days].blank?
+              actions=[{action:"add_class",class:"errorFormInput",element:".modalView#mainImportView input[name=name]"}]
         else
-          first_name = Connection.parse_first_name(params[:name])
-          last_name = Connection.parse_last_name(params[:name])
-          interval = params[:target_contact_interval_in_days].blank? ? current_user.user_setting.get_value(:default_contact_interval_in_days) : params[:target_contact_interval_in_days]
-          connection = Connection.new(first_name:first_name,last_name:last_name,phone:params[:phone],email:params[:email],target_contact_interval_in_days:interval)
-          if connection.save
-              connection.update_attributes(user_id: current_user.id,active:true)
+          name = params[:name]
+          email = params[:email]
+          photo = photo_uploaded ? params[:photoUploaderInCreate] : nil
+          tags = tags_inputted ? JSON.parse(params[:tags]) : nil
+          notes = params[:notes]
+          result = Connection.insert_contact(current_user,name,email,nil,nil,nil,photo,tags,notes)
+          if result[:status]
+              raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+              notifications = current_user.get_notifications(false)
+              bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+              connection = result[:data]
               current_user.activities.create(connection_id:connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
               connection.update_score
               status = true
-              message = "Connection successfully added"
-              actions=[]
+              message = "#{connection.first_name} added to your Sphere!"
+              actions=[{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+              data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
           else
               status = false
-              message = "Could not be created #{connection.errors.full_messages.join(', ')}"
-              actions=[]
+              message = "Uh oh. Our robots couldn't add #{connection.first_name} for some reason. #{connection.errors.full_messages.join(', ')}"
+              actions = nil
+              data = nil
           end
         end
 
         respond_to do |format|
           format.json {
-            render json: {status:status, message:message,actions:actions}
+            render json: {status:status, message:message,actions:actions,data:data}
           } 
         end
     end

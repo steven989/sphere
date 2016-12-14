@@ -72,7 +72,7 @@ $(function(){
             var inc = 0;
 
             rowsToSend.each(function(){
-                var dataObject = {};
+                // var dataObject = {};
                 var idForKey = $(this).data('instance-id');
                 formData.append("ID$"+idForKey+"$ATTR$"+"delete",$(this).find('input.deleteCheck').prop('checked'));
                 formData.append("ID$"+idForKey+"$ATTR$"+"inputId",$(this).data('instance-id'));
@@ -83,7 +83,7 @@ $(function(){
                     } else if ($(this).prop('type') == 'file') {
                         formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).prop("files")[0]);
                     } else {
-                        dataObject[$(this).prop('name')] = $(this).val();    
+                        // dataObject[$(this).prop('name')] = $(this).val();    
                         formData.append("ID$"+idForKey+"$ATTR$"+$(this).prop('name'),$(this).val());
                     }
                 });

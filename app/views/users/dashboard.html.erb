@@ -5,6 +5,7 @@ $(function(){
     var modalInstance;
     var closeModalTimer;    
     var token;
+    var tokenInCreate;
     var userLevelNotifications = (<%= raw @notifications %>).user_level;
 
     // User-level notifications
@@ -24,7 +25,6 @@ $(function(){
                 }
                 domElements.each(function(){
                     var coordinates = getNotificationCoordinate(5,$(this).closest('.notificationContainer').width()/2-20,14);
-                    console.log($(this).closest('.notificationContainer'));
                     $(this).closest('.notificationContainer').append('<span class="badge" style="width:20px; height:20px;position:absolute;background-color:'+backgroundColor+';left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;padding-top:0px;">'+content+'</span>')
                 })
             });
@@ -123,6 +123,7 @@ $(function(){
                         formData.append("custom_frequency",custom_frequency);
                         formData.append("notes",form.find('[name=notes]').val());
                         formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
+
                       $.ajax({
                         url: '<%= update_connection_path %>',
                         type: 'PUT',
@@ -201,13 +202,20 @@ $(function(){
             $(".modalView#editConnection label[for=photoUploader]").html($(".modalView#editConnection #photoUploader").prop("files")[0].name);
     });
 
-    // tokenize the taggin in create contact modal
+    // Photo upload label within add connection modal to change display when a file is selected
+    $(".modalView#mainImportView #photoUploaderInCreate").on("change",function(){
+            $(".modalView#mainImportView label[for=photoUploaderInCreate]").html($(".modalView#mainImportView #photoUploaderInCreate").prop("files")[0].name);
+    });
+
+    // tokenize the tagging in create contact modal (this is not the edit contact modal)
     createTagginInCreate();
     function createTagginInCreate() {
-         var tokenInCreate = $('.modalView#mainImportView #tokenizeInCreate').tokenize({
-            autosize:true,
-        }); 
-
+        if ((typeof tokenInCreate == "undefined")) {
+             tokenInCreate = $('.modalView#mainImportView #tokenizeInCreate').tokenize({
+                autosize:true,
+            }); 
+        }
+        tokenInCreate.clear();
         tokenInCreate.tokenAdd("$add$tag$","+ Add Tags");
         $('.modalTokenBox ul.TokensContainer li.Token span').css("margin-right","10px");
         $('.modalView#mainImportView .modalTokenBox li.Token a').remove();
@@ -248,11 +256,11 @@ $(function(){
     function resetModal(modal,resetType) {
         if (resetType == 1 || resetType == 3) {
             // reset class
-            modal.parent().filter(function(){ return $(this).data('default-class') != undefined }).each(function(){
+            modal.find('*').filter(function(){ return $(this).data('default-class') != undefined }).each(function(){
                 $(this).prop("class",$(this).data('default-class'));
             })
             // Reset css
-            modal.parent().find('*').filter(function(){
+            modal.find('*').filter(function(){
                 return $(this).data('default-css') != undefined;
             }).each(function(){
                 var _this = $(this); 
@@ -262,14 +270,14 @@ $(function(){
             });
 
             // Reset the fields that should be hidden by default
-            modal.parent().find('.default_hidden').each(function(){
+            modal.find('.default_hidden').each(function(){
                 $(this).removeClass('hidden').addClass('hidden');
             });
         }
 
         if (resetType == 2 || resetType == 3) { 
             // Reset values
-            modal.parent().find('input').each(function(){
+            modal.find('input').each(function(){
                 if($(this).prop('type') != 'hidden' && $(this).prop('type') != 'checkbox' && $(this).data('skip-clear') == undefined ) {
                     $(this).val('');
                 }
@@ -308,10 +316,30 @@ $(function(){
         var button = submissionButton;
         if (!button.hasClass('disabled')) {
             var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);
+            var formData = new FormData();
+            form.find('.inputData').each(function(){
+                if ($(this).prop('type') == 'checkbox') {
+                    formData.append($(this).prop('name'),$(this).prop('checked'));
+                } else if ($(this).prop('type') == 'file') {
+                    formData.append($(this).prop('name'),$(this).prop("files")[0]);
+                } else if ($(this).prop('tagName') == 'SELECT') {
+                    if($(this).hasClass('tokenized')) {
+                        var tokenVariable = eval($(this).data('token-variable')).toArray();
+                        formData.append($(this).prop('name'),JSON.stringify(tokenVariable));
+                    } else {
+                        formData.append($(this).prop('name'),$(this).val());    
+                    }
+                } else {
+                    formData.append($(this).prop('name'),$(this).val());
+                }
+            });
+
           $.ajax({
             url: form.attr('action'),
             type: form.attr('method'),
-            data: form.serialize(),
+            processData: false,
+            contentType: false,
+            data: formData,
             dataType: 'JSON'
           }).done(function(data){
                 resetModal(form.closest('.remodal'),1);
@@ -319,11 +347,11 @@ $(function(){
                         if(data.message != undefined /* && alertElement.length > 0 */ ) {
                             toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
                         }
-                        setTimeout(function(){
-                            form.find('.alert').addClass('hidden');
-                            resetModal(form.closest('.remodal'),2);
-                            modalInstance.close();
-                        },2000)
+                        // setTimeout(function(){
+                        //     form.find('.alert').addClass('hidden');
+                        //     resetModal(form.closest('.remodal'),2);
+                        //     modalInstance.close();
+                        // },2000)
                 } else {
                         toastr.options.closeButton = true;
                         if(data.message != undefined /* && alertElement.length > 0 */) {
@@ -346,7 +374,8 @@ $(function(){
 
     $('.modalView#mainImportView .modalBottomFullButton').off('click').on('click',function(){
       var form = $('.modalView#mainImportView form');
-      modalAjaxFormSubmission(form);
+      var button = $('.modalView#mainImportView .modalButtonContainer .submitButton');
+      modalAjaxFormSubmission(form,button);
     })    
 
 
@@ -521,12 +550,12 @@ $(function(){
         $('[data-remodal-id=bubbleModal] .modalView#plans span.name').html(name);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         if (photoUrl) {
-            $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').removeClass('hidden');
-            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden').addClass('hidden');
-            $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').attr('src',photoUrl);
-        } else {
             $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden');
-            $('[data-remodal-id=bubbleModal] .modalView#plans img.photo').removeClass('hidden').addClass('hidden');
+            $('[data-remodal-id=bubbleModal] .modalView#plans div.icon').removeClass('hidden').addClass('hidden');
+            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').css({'background-image':'url('+photoUrl+')','background-size':'cover','background-position':'center','background-repeat':'no-repeat','background-color':'#EFEFEF'});
+        } else {
+            $('[data-remodal-id=bubbleModal] .modalView#plans div.icon').removeClass('hidden');
+            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden').addClass('hidden');
         }
         
         $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
@@ -814,7 +843,7 @@ $(function(){
     <div class="topTabsContent">
         <div id="mySphere">
 
-            <div id="canvas" style="position: relative; margin: auto;"></div>            
+            <div id="canvas" style="position: relative; margin: auto;overflow:scroll;"></div>            
 
         </div>
         <div id="challenges">
@@ -913,8 +942,8 @@ $(function(){
             <div style="color:#656268; font-size:20px;"><span class="name"></span></div>
             <div style="color:#656268; margin-top: 15px; font-size:15px;font-weight:lighter"><span class="lastHangout"></span></div>
             <div style="height:140px;margin-top:35px;">
-                <img class="photo transitionButton" src="" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;">
-                <div class="photo transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
+                <div class="photo transitionButton" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none; display:block; margin:auto;"></div>
+                <div class="icon transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
                     <%= fa_icon 'user-circle' %>
                 </div> 
             </div>
@@ -949,18 +978,18 @@ $(function(){
         <div class="modalContentContainer p-h-xxlg">
             <span class="textDarkGray">Event info</span>
             <form action="<%= plans_path %>" method="POST" >
-                <input type="date" class="formElement button m-b-sm m-t-sm" name="date" placeholder="Which day" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
-                <input type="text" class="formElement m-b-sm" name="time" placeholder="what time (e.g. 12:30pm)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="number" class="formElement m-b-sm" name="duration" placeholder="for how many hours (e.g. 0.5)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="text" class="formElement m-b-sm" name="name" placeholder="meeting/activity name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="text" class="formElement m-b-sm" name="location" placeholder="location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
-                <input type="text" class="formElement m-b-sm" name="details" placeholder="details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="date" class="formElement button m-b-sm m-t-sm inputData" name="date" placeholder="Which day" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="text" class="formElement m-b-sm inputData" name="time" placeholder="what time (e.g. 12:30pm)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="number" class="formElement m-b-sm inputData" name="duration" placeholder="for how many hours (e.g. 0.5)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="text" class="formElement m-b-sm inputData" name="name" placeholder="meeting/activity name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
+                <input type="text" class="formElement m-b-sm inputData" name="location" placeholder="location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
+                <input type="text" class="formElement m-b-sm inputData" name="details" placeholder="details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
                 <div style="display:inline-box; width:50px; height:20px; border-radius:5px; background-color:yellow" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent" data-alert-element=".modalView#makePlan #makePlanFormAlert">CANCEL</div>
-                <input type="hidden" name="connection_id">
-                <input type="hidden" name="plan_id">
+                <input type="hidden" class="inputData" name="connection_id">
+                <input type="hidden" class="inputData" name="plan_id">
                 <%= check_box_tag 'notify',true,@settings[:send_event_booking_notification_by_default], style:"display:inline-box;" %>
                 <label for="notify" class="textDarkGray">Send invite?</label>
-                <input type="text" class="input-text hidden default_hidden" name="connection_email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" >
+                <input type="text" class="input-text hidden default_hidden inputData" name="connection_email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" >
                 <div class="alert hidden default_hidden" id="makePlanFormAlert" style="margin-top:1px;line-height:15px;"></div>
             </form>
         </div>
@@ -1008,15 +1037,15 @@ $(function(){
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
-                        <input class="formElement halfRow left m-b-md" name="name" type="text" placeholder="name" required>
-                        <input class="formElement halfRow right m-b-md" name="email" type="text" placeholder="email" >
-                        <input name="photoUploaderInCreate" id="photoUploaderInCreate" type="file" accept="image/*">
+                        <input class="formElement halfRow left m-b-md inputData" data-default-class="formElement halfRow left m-b-md inputData" name="name" type="text" placeholder="name" required>
+                        <input class="formElement halfRow right m-b-md inputData" name="email" type="text" placeholder="email" >
+                        <input name="photoUploaderInCreate" class="inputData" id="photoUploaderInCreate" type="file" accept="image/*">
                         <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button">
                             <%= fa_icon 'id-badge' %>
                             Upload Photo
                         </label>                        
-                        <textarea class="formElement" name="notes" placeholder="notes" rows="2" required></textarea>
-                        <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox">
+                        <textarea class="formElement inputData" name="notes" placeholder="notes" rows="2" required></textarea>
+                        <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox inputData tokenized" data-token-variable="tokenInCreate">
                         </select>
                     </div>
                     <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
@@ -1024,7 +1053,7 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomFullButton sphereBlueBackground hoverable  disableWhileProcessed">
+            <div class="modalBottomFullButton sphereBlueBackground hoverable  disableWhileProcessed submitButton">
                 <span>ADD TO SPHERE</span>
             </div>
         </div>
@@ -1060,20 +1089,20 @@ $(function(){
             <div class="textDarkGray" id="settingsContainer" style="text-align:left">
                 <div class="m-b-md">
                     <div id="send_event_booking_notification_by_default_title"></div>
-                    <div><input type='checkbox' class="settingInput" name='send_event_booking_notification_by_default' id='send_event_booking_notification_by_default_value' value=''></div>
+                    <div><input type='checkbox' class="settingInput inputData" name='send_event_booking_notification_by_default' id='send_event_booking_notification_by_default_value' value=''></div>
                 </div>
                 <div class="m-b-md">
                     <div id="share_my_calendar_with_contacts_title"></div>
-                    <div><input type='checkbox' class="settingInput" name='share_my_calendar_with_contacts' id='share_my_calendar_with_contacts_value' value=''></div>
+                    <div><input type='checkbox' class="settingInput inputData" name='share_my_calendar_with_contacts' id='share_my_calendar_with_contacts_value' value=''></div>
                 </div>
                 <div class="m-b-md">
                     <div id="default_contact_interval_in_days_title"></div>
-                    <div><input type='number' class="settingInput settingInput formElement standardHeight" name='default_contact_interval_in_days' id='default_contact_interval_in_days_value'></div>
+                    <div><input type='number' class="settingInput settingInput formElement standardHeight inputData" name='default_contact_interval_in_days' id='default_contact_interval_in_days_value'></div>
                 </div>
                 <div class="m-b-md">
                     <div id="event_add_granularity_title"></div>
                     <div>
-                        <select class="settingInput formElement button standardHeight" name='event_add_granularity'>
+                        <select class="settingInput formElement button standardHeight inputData" name='event_add_granularity'>
                             <option value='detailed' id="event_add_granularity_detailed_value">Detailed</option>
                             <option value='quick' id="event_add_granularity_quick_value" >Quick</option>
                         </select>

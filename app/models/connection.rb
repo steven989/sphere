@@ -104,12 +104,12 @@ class Connection < ActiveRecord::Base
             message = error.message                  
         else
           status = true
-          message = "Contacts successfully imported from Google"
+          message = "Here's your contacts from Google! Pick the ones you want to import. We'll import their photos too if available"
           {status:status,message:message,data:contacts,access_token:token_object}
         end
     end
 
-    def self.insert_contact(user,name,email=nil,other_emails=nil,phones=nil,photo_object=nil)
+    def self.insert_contact(user,name,email=nil,other_emails=nil,phones=nil,photo_object=nil,photo_file_upload=nil,tags=nil,notes=nil)
           # If email matches an existing contact, merge the contacts and emails addresses (keep the current name and email in app, add any new emails to "additional emails") Otherwise create a new entry in the contacts
           interval = user.user_setting.get_value(:default_contact_interval_in_days)
           if email || other_emails
@@ -118,12 +118,15 @@ class Connection < ActiveRecord::Base
             unified_email_array += other_emails.split("|>-<+|%") if other_emails
             unified_email_array = unified_email_array.map {|email| email.gsub(" ","")} #remove any spaces in the email
             unified_email_array = unified_email_array.uniq
+            unified_email_array.reject! {|email| email.strip == ""}
           else 
             unified_email_array = nil
           end
 
           if phones
             unified_phones_array = phones.split("|>-<+|%")
+            unified_phones_array.reject! {|phone| phone.strip == ""}
+            unified_phones_array = nil if unified_phones_array.blank?
           else
             unified_phones_array = nil
           end
@@ -179,17 +182,30 @@ class Connection < ActiveRecord::Base
               end
 
               if matched_connection.save
+                if tags
+                  connection_tags = matched_connection.tags.map {|tag| tag}
+                  tags.reject! {|tag| matched_connection.include?(tag.strip)}
+                  tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
+                end
                 Connection.port_photo_url_to_access_url(matched_connection.id)
                 status = true
                 message = "Connection successfully updated"
+                data = matched_connection
               else
                 status = false
                 message = "Connection could not be saved be saved. #{matched_connection.errors.full_messages.join(', ')}"
+                data = name
               end
             else
-              primary_phone_to_update = unified_phones_array.slice!(0)
-              updated_additional_phones_array = unified_phones_array.uniq
-              updated_additional_phones_string = updated_additional_phones_array.to_s
+
+              if unified_phones_array.blank?
+                primary_phone_to_update = nil
+                updated_additional_phones_string = nil
+              else
+                primary_phone_to_update = unified_phones_array.slice!(0)
+                updated_additional_phones_array = unified_phones_array.uniq
+                updated_additional_phones_string = updated_additional_phones_array.to_s
+              end
 
               first_name_to_create = Connection.parse_first_name(name)
               last_name_to_create = Connection.parse_last_name(name)
@@ -198,7 +214,7 @@ class Connection < ActiveRecord::Base
               phone_to_create = primary_phone_to_update
               other_phones_to_create = updated_additional_phones_string
 
-              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
+              new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
               
               if photo_object && !photo_object[:body].blank?
                 encoded = Base64.strict_encode64(photo_object[:body])
@@ -206,18 +222,27 @@ class Connection < ActiveRecord::Base
               end
 
               if new_connection.save
+                Connection.find(new_connection.id).upload_photo(photo_file_upload) if photo_file_upload
                 Connection.port_photo_url_to_access_url(new_connection.id)
+                tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
                 status = true
                 message = "Connection successfully created"
+                data = new_connection
               else
                 status = false
                 message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
+                data = name
               end
             end
           else
-              primary_phone_to_update = unified_phones_array.slice!(0)
-              updated_additional_phones_array = unified_phones_array.uniq
-              updated_additional_phones_string = updated_additional_phones_array.to_s
+              if unified_phones_array.blank?
+                primary_phone_to_update = nil
+                updated_additional_phones_string = nil
+              else
+                primary_phone_to_update = unified_phones_array.slice!(0)
+                updated_additional_phones_array = unified_phones_array.uniq
+                updated_additional_phones_string = updated_additional_phones_array.to_s
+              end
 
               first_name_to_create = Connection.parse_first_name(name)
               last_name_to_create = Connection.parse_last_name(name)
@@ -226,18 +251,19 @@ class Connection < ActiveRecord::Base
               phone_to_create = primary_phone_to_update
               other_phones_to_create = updated_additional_phones_string
 
-              new_connection = user.connections.new(first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval)
+              new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
               
               if photo_object && !photo_object[:body].blank?
                 encoded = Base64.strict_encode64(photo_object[:body])
                 new_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
               end
-              
               if new_connection.save
+                Connection.find(new_connection.id).upload_photo(photo_file_upload) if photo_file_upload
                 Connection.port_photo_url_to_access_url(new_connection.id)
+                tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
                 status = true
                 message = "Connection successfully created"
-                data = nil
+                data = new_connection
               else
                 status = false
                 message = "#{name} could not be saved be saved. #{new_connection.errors.full_messages.join(', ')}"
@@ -245,6 +271,13 @@ class Connection < ActiveRecord::Base
               end
           end
           {status:status,message:message,data:data}
+    end
+
+    def upload_photo(photo)
+        self.remove_photo!
+        save
+        self.photo = photo
+        save
     end
 
     def self.create_from_import(user,contacts_imported,access_token=nil,expires_at=nil)
@@ -300,7 +333,7 @@ class Connection < ActiveRecord::Base
 
     def self.port_photo_url_to_access_url(id)
       connection = Connection.find(id)
-      if connection.photo && connection.photo.file && connection.photo.file.exists?
+      if connection.photo && connection.photo.file
         connection.update_attributes(photo_access_url:connection.photo.url)
       end
     end

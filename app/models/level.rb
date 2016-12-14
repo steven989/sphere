@@ -78,6 +78,11 @@ class Level < ActiveRecord::Base
             evaluation_result = User.find_users_matching_criteria(criteria)[:status]
             if evaluation_result
                 levelObj = Level.new(level:level,criteria:criteria)
+                if !((graphic == "undefined") || (graphic == "null") || graphic.blank?)
+                    levelObj.remove_graphic!
+                    levelObj.save
+                    levelObj.graphic = graphic
+                end 
                 if levelObj.save
                     status = true
                     message = "Level successfully updated"

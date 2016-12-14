@@ -69,7 +69,7 @@ class PlansController < ApplicationController
             notifications = current_user.get_notifications(false)
             data = {notifications:notifications}
             message= result[:message]
-            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
+            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(2000)"}]
         end
 
         respond_to do |format|
@@ -173,7 +173,7 @@ class PlansController < ApplicationController
         status = result[:status]
         message= result[:message]
         data = {notifications:notifications}
-        actions = [{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}},{action:"function_call",function:"closeModalInstance(2000)"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
+        actions = [{action:"function_call",function:"closeModalInstance(2000)"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
 
         respond_to do |format|
           format.json {

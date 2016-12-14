@@ -98,6 +98,11 @@ class Challenge < ActiveRecord::Base
             evaluation_result = User.find_users_matching_criteria(criteria)[:status]
             if evaluation_result
                 challengeObj = Challenge.new(name:name,description:description,instructions:instructions,repeated_allowed:repeated_allowed,criteria:criteria,reward:reward)
+                if !((graphic == "undefined") || (graphic == "null") || graphic.blank?)
+                    challengeObj.remove_graphic!
+                    challengeObj.save
+                    challengeObj.graphic = graphic
+                end 
                 if challengeObj.save
                     status = true
                     message = "Challenge successfully updated"
