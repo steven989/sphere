@@ -277,9 +277,16 @@
 
 .fullViewportContainer {
     width: 100%;
-    height: vh;
+    height: 100vh;
     background: none;
-    position: relative;
+    position: absolute;
+    top: 0px;
+    left:0px;
+}
+
+.loginScreen {
+    background-image: image-url("login-background.jpg");
+    background-size: cover;
 }
 
 .fullViewportContainer.loginScreen #title {
