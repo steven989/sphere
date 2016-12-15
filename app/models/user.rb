@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
 
   def get_raw_bubbles_data(connections_override=nil,json_or_not_json=false)
     connections = connections_override ? connections_override : self.connections.active
-    result = connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name, :photo_access_url).map{ |result| {id:result[0],display:result[3]+' '+result[4],size:result[1],distance:result[2],photo_url:result[5] } }
+    result = connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name, :photo_access_url).map{ |result| {id:result[0],display:result[3].to_s+' '+result[4].to_s,size:result[1],distance:result[2],photo_url:result[5] } }
     if json_or_not_json
       result.to_json
     else
