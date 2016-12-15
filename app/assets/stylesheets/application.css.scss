@@ -540,7 +540,8 @@ label[for=photoUploader]:hover {
     padding:0px;
     height: 400px;
     max-height: 100%;
-    width: 100%;
+    width: 95%;
+    margin: auto;
     max-width:625px;
     overflow:hidden;
 }
@@ -856,6 +857,13 @@ label[for=photoUploader]:hover {
 @media (max-width: 600px) { 
     .hideOnMobile {
         display: none;
+    }
+
+    .remodal.standardModal {
+        position: absolute;
+        bottom: 30px;
+        left: 0px;
+        right: 0px;
     }
 
     .showOnMobile {
