@@ -24,6 +24,14 @@ class Connection < ActiveRecord::Base
       name.split(" ")[0].nil? ? nil : name.split(" ")[0].humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
     end
 
+    def extract_display_name_from_email(email)
+      if email.blank?
+        nil
+      else
+        email.match(/(\S+)@/)[1]
+      end
+    end
+
     def self.parse_last_name(name)
        last_name_array = name.split(" ")
        if last_name_array.length == 0 
@@ -212,6 +220,7 @@ class Connection < ActiveRecord::Base
               end
 
               first_name_to_create = Connection.parse_first_name(name)
+              first_name_to_create = first_name_to_create.nil? ? extract_display_name_from_email(email) : first_name_to_create
               last_name_to_create = Connection.parse_last_name(name)
               email_to_create = email.blank? ? nil : email
               other_emails_to_create = other_emails.blank? ? "[]" : other_emails
@@ -250,6 +259,7 @@ class Connection < ActiveRecord::Base
               end
 
               first_name_to_create = Connection.parse_first_name(name)
+              first_name_to_create = first_name_to_create.nil? ? extract_display_name_from_email(email) : first_name_to_create
               last_name_to_create = Connection.parse_last_name(name)
               email_to_create = email.blank? ? nil : email
               other_emails_to_create = other_emails.blank? ? "[]" : other_emails
