@@ -605,7 +605,7 @@ $(function(){
          token.clear();
         $('.modalView#plans #tokenize').html("");
         allTags.forEach(function(tag){
-            $('.modalView#plans #tokenize').append("<option value="+tag+">"+tag+"</option>")
+            $('.modalView#plans #tokenize').append("<option value=\""+tag+"\">"+tag+"</option>")
         });
         tokenizeTagInCreateContactSelectionField();
 
@@ -841,9 +841,9 @@ $(function(){
         </ul>        
     </div> 
     <div class="topTabsContent">
-        <div id="mySphere">
+        <div id="mySphere" style="overflow:scroll;">
 
-            <div id="canvas" style="position: relative; margin: auto;overflow:scroll;"></div>            
+            <div id="canvas" style="position: relative; margin: auto;"></div>            
 
         </div>
         <div id="challenges">
@@ -1016,7 +1016,7 @@ $(function(){
                     <%= fa_icon 'id-badge' %>
                     Upload Photo
                 </label>
-                <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
+                <textarea name="notes" rows="4" placeholder="Notes. You can tag your notes like #howwemet" class="textDarkGray"></textarea>
                 <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
             </form>
         </div>
