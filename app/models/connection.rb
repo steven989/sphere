@@ -22,11 +22,11 @@ class Connection < ActiveRecord::Base
 
     def self.parse_first_name(name)
       name.split(" ")[0].nil? ? nil : name.split(" ")[0].humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
-    encoded
+    end
 
     def self.parse_last_name(name)
        last_name_array = name.split(" ")
-       if last_name_array.length == 0
+       if last_name_array.length == 0 
          nil
        else
           last_name_array.slice!(0)
