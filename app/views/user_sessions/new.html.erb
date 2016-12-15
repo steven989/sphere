@@ -14,14 +14,14 @@ $(function(){
 </script>
 <div class="fullViewportContainer loginScreen">
     <div id="title">
-        <%= image_tag "logo-white", width:"230" %>
+        <%= image_tag "logo-white.png", width:"230" %>
     </div>
     <div id="displayBox">
         <div class="p-h-xxlg p-v-xxlg" id="login">
             <%= form_tag user_sessions_path, method: 'POST' do %>
                 <div>
                     <div class="formElement button textDarkGray tallerInput" href=<%= "#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_login' : 'http://localhost:3000/auth/google_login'}" %>  id='googleLoginButton'>
-                        <%= image_tag 'google-logo-small', width: 20 %>
+                        <%= image_tag 'google-logo-small.png', width: 20 %>
                         <span class="m-l-xxxxxlg">
                             Login with Google
                         </span>
