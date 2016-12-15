@@ -17,7 +17,7 @@ class Connection < ActiveRecord::Base
 
     # Methods
     def name
-        first_name+" "+last_name
+        first_name.to_s+" "+last_name.to_s
     end
 
     def self.parse_first_name(name)
