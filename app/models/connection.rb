@@ -21,13 +21,17 @@ class Connection < ActiveRecord::Base
     end
 
     def self.parse_first_name(name)
-      name.split(" ")[0].humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
+      name.split(" ")[0].nil? ? nil : name.split(" ")[0].humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
     encoded
 
     def self.parse_last_name(name)
        last_name_array = name.split(" ")
-       last_name_array.slice!(0)
-       last_name_array.join(" ").humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
+       if last_name_array.length == 0
+         nil
+       else
+          last_name_array.slice!(0)
+          last_name_array.join(" ").humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
+       end
     end
 
     def update_score
