@@ -146,6 +146,7 @@ class User < ActiveRecord::Base
     if oauth || !password.blank?
       user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
       if user.save
+        StatisticDefinition.new_user_base_statistics(user)
         {status:true,user:user,message:nil}
       else
         {status:false,user:nil,message:user.errors.full_messages.join(', ')}

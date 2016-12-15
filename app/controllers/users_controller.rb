@@ -7,7 +7,14 @@ class UsersController < ApplicationController
     end
 
     def create
-        result = User.create_user(user_params[:email].downcase,user_params[:first_name],user_params[:last_name],user_params[:user_type],user_params[:password],user_params[:password_confirmation])
+        result = User.create_user(
+          user_params[:email].downcase,
+          user_params[:first_name],
+          user_params[:last_name],
+          user_params[:user_type],
+          user_params[:password],
+          user_params[:password_confirmation]
+          )
         if result[:status]
           auto_login(result[:user])
           redirect_to root_path
