@@ -49,7 +49,7 @@ class ConnectionsController < ApplicationController
     def import
         provider = params[:provider]
         if !current_user.authorized_by(provider,"contacts")
-            actions = [{action:"popup_refresh_main_on_close",url:"http://localhost:3000/auth/google_contacts"}]
+            actions = [{action:"popup_refresh_main_on_close",url:"#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_contacts' : 'http://localhost:3000/auth/google_contacts'}"}]
             status = false
             message = "Please connect Sphere with your Google Contacts in the popup"
             data=nil

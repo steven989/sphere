@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161213042428) do
+ActiveRecord::Schema.define(version: 20161215164936) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,9 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.integer  "activity_definition_id"
     t.integer  "initiator"
   end
+
+  add_index "activities", ["connection_id"], name: "index_activities_on_connection_id", using: :btree
+  add_index "activities", ["user_id"], name: "index_activities_on_user_id", using: :btree
 
   create_table "activity_definitions", force: :cascade do |t|
     t.string   "activity"
@@ -59,6 +62,8 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.boolean  "login"
   end
 
+  add_index "authorizations", ["user_id"], name: "index_authorizations_on_user_id", using: :btree
+
   create_table "badges", force: :cascade do |t|
     t.string   "name"
     t.string   "description"
@@ -89,6 +94,9 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.datetime "updated_at",    null: false
   end
 
+  add_index "connection_notes", ["connection_id"], name: "index_connection_notes_on_connection_id", using: :btree
+  add_index "connection_notes", ["user_id"], name: "index_connection_notes_on_user_id", using: :btree
+
   create_table "connection_score_histories", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "connection_id"
@@ -99,6 +107,9 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.datetime "updated_at",    null: false
   end
 
+  add_index "connection_score_histories", ["connection_id"], name: "index_connection_score_histories_on_connection_id", using: :btree
+  add_index "connection_score_histories", ["user_id"], name: "index_connection_score_histories_on_user_id", using: :btree
+
   create_table "connection_scores", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "connection_id"
@@ -108,6 +119,9 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
   end
+
+  add_index "connection_scores", ["connection_id"], name: "index_connection_scores_on_connection_id", using: :btree
+  add_index "connection_scores", ["user_id"], name: "index_connection_scores_on_user_id", using: :btree
 
   create_table "connections", force: :cascade do |t|
     t.integer  "user_id"
@@ -128,6 +142,8 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.string   "frequency_word"
     t.text     "notes"
   end
+
+  add_index "connections", ["user_id"], name: "index_connections_on_user_id", using: :btree
 
   create_table "level_histories", force: :cascade do |t|
     t.integer  "level"
@@ -158,6 +174,9 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.string   "notifiable_type"
   end
 
+  add_index "notifications", ["notifiable_id", "notifiable_type"], name: "index_notifications_on_notifiable_id_and_notifiable_type", using: :btree
+  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
+
   create_table "plans", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "connection_id"
@@ -176,6 +195,9 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.string   "edit_time_url"
     t.text     "details"
   end
+
+  add_index "plans", ["connection_id"], name: "index_plans_on_connection_id", using: :btree
+  add_index "plans", ["user_id"], name: "index_plans_on_user_id", using: :btree
 
   create_table "statistic_definitions", force: :cascade do |t|
     t.string   "name"
@@ -207,6 +229,7 @@ ActiveRecord::Schema.define(version: 20161213042428) do
   end
 
   add_index "tags", ["taggable_type", "taggable_id"], name: "index_tags_on_taggable_type_and_taggable_id", using: :btree
+  add_index "tags", ["user_id"], name: "index_tags_on_user_id", using: :btree
 
   create_table "user_badges", force: :cascade do |t|
     t.integer  "user_id"
@@ -229,6 +252,9 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.date     "date_to_be_completed"
   end
 
+  add_index "user_challenge_completeds", ["challenge_id"], name: "index_user_challenge_completeds_on_challenge_id", using: :btree
+  add_index "user_challenge_completeds", ["user_id"], name: "index_user_challenge_completeds_on_user_id", using: :btree
+
   create_table "user_challenges", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "challenge_id"
@@ -240,12 +266,17 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.date     "date_to_be_completed"
   end
 
+  add_index "user_challenges", ["challenge_id"], name: "index_user_challenges_on_challenge_id", using: :btree
+  add_index "user_challenges", ["user_id"], name: "index_user_challenges_on_user_id", using: :btree
+
   create_table "user_settings", force: :cascade do |t|
     t.integer  "user_id"
     t.string   "value",      default: "{}"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
   end
+
+  add_index "user_settings", ["user_id"], name: "index_user_settings_on_user_id", using: :btree
 
   create_table "user_statistics", force: :cascade do |t|
     t.integer  "user_id"
@@ -256,6 +287,10 @@ ActiveRecord::Schema.define(version: 20161213042428) do
     t.string   "data_type"
     t.float    "value"
   end
+
+  add_index "user_statistics", ["name"], name: "index_user_statistics_on_name", using: :btree
+  add_index "user_statistics", ["statistic_definition_id"], name: "index_user_statistics_on_statistic_definition_id", using: :btree
+  add_index "user_statistics", ["user_id"], name: "index_user_statistics_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",            null: false

@@ -22,7 +22,7 @@ class PlansController < ApplicationController
         end
 
         if !current_user.authorized_by("google","calendar")
-            actions = [{action:"popup_refresh_main_on_close",url:"http://localhost:3000/auth/google_calendar"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+            actions = [{action:"popup_refresh_main_on_close",url:"#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar'}"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Please connect Sphere with your Google Calendar in the popup"
             data = nil
@@ -101,7 +101,7 @@ class PlansController < ApplicationController
         end
 
         if !current_user.authorized_by("google","calendar")
-            actions = [{action:"popup_refresh_main_on_close",url:"http://localhost:3000/auth/google_calendar"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+            actions = [{action:"popup_refresh_main_on_close",url:"#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar'}"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
             status = false
             message = "Please connect Sphere with your Google Calendar in the popup"
             data = nil

@@ -63,7 +63,9 @@ gem 'google_contacts_api'
 # Oauth2
 gem 'oauth2'
 # Font awesome
-gem "font-awesome-rails"
+gem 'font-awesome-rails'
+# Dump database data into seed file
+gem 'seed_dump'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
