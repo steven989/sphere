@@ -22,7 +22,7 @@ class Connection < ActiveRecord::Base
 
     def self.parse_first_name(name)
       name.split(" ")[0].humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
-    end
+    encoded
 
     def self.parse_last_name(name)
        last_name_array = name.split(" ")
@@ -176,12 +176,12 @@ class Connection < ActiveRecord::Base
               (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
               (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
               
-              if photo_object && !photo_object[:body].blank?
-                encoded = Base64.strict_encode64(photo_object[:body])
-                matched_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-              end
-
               if matched_connection.save
+                if photo_object && !photo_object[:body].blank?
+                  encoded = Base64.strict_encode64(photo_object[:body])
+                  photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+                  Connection.find(matched_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                end
                 if tags
                   connection_tags = matched_connection.tags.map {|tag| tag}
                   tags.reject! {|tag| matched_connection.include?(tag.strip)}
@@ -216,13 +216,14 @@ class Connection < ActiveRecord::Base
 
               new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
               
-              if photo_object && !photo_object[:body].blank?
-                encoded = Base64.strict_encode64(photo_object[:body])
-                new_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-              end
-
               if new_connection.save
-                Connection.find(new_connection.id).upload_photo(photo_file_upload) if photo_file_upload
+                if photo_object && !photo_object[:body].blank?
+                  encoded = Base64.strict_encode64(photo_object[:body])
+                  photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                elsif photo_file_upload
+                  Connection.find(new_connection.id).upload_photo(photo_file_upload)
+                end
                 Connection.port_photo_url_to_access_url(new_connection.id)
                 tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
                 status = true
@@ -253,12 +254,14 @@ class Connection < ActiveRecord::Base
 
               new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
               
-              if photo_object && !photo_object[:body].blank?
-                encoded = Base64.strict_encode64(photo_object[:body])
-                new_connection.photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-              end
               if new_connection.save
-                Connection.find(new_connection.id).upload_photo(photo_file_upload) if photo_file_upload
+                if photo_object && !photo_object[:body].blank?
+                  encoded = Base64.strict_encode64(photo_object[:body])
+                  photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                elsif photo_file_upload
+                  Connection.find(new_connection.id).upload_photo(photo_file_upload)
+                end
                 Connection.port_photo_url_to_access_url(new_connection.id)
                 tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
                 status = true
@@ -273,11 +276,15 @@ class Connection < ActiveRecord::Base
           {status:status,message:message,data:data}
     end
 
-    def upload_photo(photo)
-        self.remove_photo!
-        save
+    def upload_photo(photo,data_uri=false)
+      self.remove_photo!
+      save
+      if data_uri
+        self.photo_data_uri = photo
+      else
         self.photo = photo
-        save
+      end
+      save
     end
 
     def self.create_from_import(user,contacts_imported,access_token=nil,expires_at=nil)
