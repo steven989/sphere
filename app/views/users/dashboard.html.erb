@@ -281,6 +281,25 @@ $(function(){
                 if($(this).prop('type') != 'hidden' && $(this).prop('type') != 'checkbox' && $(this).data('skip-clear') == undefined ) {
                     $(this).val('');
                 }
+            });
+            modal.find('.clearInputAfterUpdate').each(function(){
+                if($(this).hasClass('tokenized')) {
+                    if (eval($(this).data('token-variable'))) {
+                        eval($(this).data('token-variable')).clear();
+                    }
+                } else if($(this).prop('value') == undefined) {
+                    if($(this).data('default-value') == undefined) {
+                        $(this).html("");
+                    } else {
+                        $(this).html($(this).data('default-value'));
+                    }
+                } else {
+                    if($(this).data('default-value') == undefined) {
+                        $(this).val('');
+                    } else {
+                        $(this).val($(this).data('default-value'));
+                    }
+                }
             })
         }
 
@@ -380,7 +399,7 @@ $(function(){
 
 
     $('#addConnection').off('click').on('click',function(){
-        initializeReModal('[data-remodal-id=importModal]','standardModal',3);
+        initializeReModal('[data-remodal-id=importModal]','standardModal',1);
     });
 
     $('#navigation-tabs-container').easytabs({
@@ -1037,15 +1056,15 @@ $(function(){
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
-                        <input class="formElement halfRow left m-b-md inputData" data-default-class="formElement halfRow left m-b-md inputData" name="name" type="text" placeholder="name" required>
-                        <input class="formElement halfRow right m-b-md inputData" name="email" type="text" placeholder="email" >
-                        <input name="photoUploaderInCreate" class="inputData" id="photoUploaderInCreate" type="file" accept="image/*">
-                        <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button">
+                        <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement halfRow left m-b-md inputData" name="name" type="text" placeholder="name" required>
+                        <input class="formElement halfRow right m-b-md inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
+                        <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate" id="photoUploaderInCreate" type="file" accept="image/*">
+                        <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                             <%= fa_icon 'id-badge' %>
                             Upload Photo
                         </label>                        
-                        <textarea class="formElement inputData" name="notes" placeholder="notes" rows="2" required></textarea>
-                        <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox inputData tokenized" data-token-variable="tokenInCreate">
+                        <textarea class="formElement inputData clearInputAfterUpdate" name="notes" placeholder="notes" rows="2" required></textarea>
+                        <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox inputData tokenized clearInputAfterUpdate" data-token-variable="tokenInCreate">
                         </select>
                     </div>
                     <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>

@@ -196,7 +196,7 @@ class Connection < ActiveRecord::Base
                 end
                 if tags
                   connection_tags = matched_connection.tags.map {|tag| tag}
-                  tags.reject! {|tag| matched_connection.include?(tag.strip)}
+                  tags.reject! {|tag| connection_tags.include?(tag.strip)}
                   tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
                 end
                 Connection.port_photo_url_to_access_url(matched_connection.id)
