@@ -66,6 +66,8 @@ gem 'oauth2'
 gem 'font-awesome-rails'
 # Dump database data into seed file
 gem 'seed_dump'
+# Monitoring
+gem 'newrelic_rpm'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
