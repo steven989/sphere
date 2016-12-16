@@ -1,5 +1,8 @@
 class User < ActiveRecord::Base
   authenticates_with_sorcery!
+
+  scope :app_users, -> { where(user_type:"user") } 
+
   has_many :connections
   has_many :activities  
   has_many :connection_scores
@@ -177,7 +180,7 @@ class User < ActiveRecord::Base
         Notification.create_upcoming_plan_notification(self,connection,plan)
       end
 
-      # 3) update status of expired notifications
+      # 3) update status of expired connections
       if number_of_days_since_last_activity > target_contact_interval_in_days
         if connection.plans.where(date>=Date.today).length == 0
           connection.update_attributes(active:false)

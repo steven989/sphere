@@ -1,0 +1,6 @@
+Here is the status of the jobs that just finished running
+============================================================
+
+<% @report.each do |r| %>
+    <%= r[:task_name] %>: <%= r[:status] %> <%= "(#{r[:reason]})" unless r[:status] %> 
+<% end %>

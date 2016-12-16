@@ -5,8 +5,8 @@ class Notification < ActiveRecord::Base
     belongs_to :notifiable, polymorphic: true
 
     # Auto task
-    def destroy_notification 
-        self.destroy if notification.expiry_date < Date.today    # this will delete the notification the night immediately AFTER the expiry date specified
+    def self.destroy_expired_notifications
+        Notification.where("expiry_date < ?", Date.today).destroy_all # this will delete the notification the night immediately AFTER the expiry date specified
     end
 
     # This is a user-level notification

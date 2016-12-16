@@ -142,3 +142,11 @@
 #   {name: "number_of_challenges_to_display_to_user", data_type: "integer", value: "3", description: "This is the number of challenges a user will see at a time on their dashboard"}
 # ])
 
+ScheduledTask.create!([
+    {task_name:'system:daily_system_level_tasks',hour_of_day:2},
+    {task_name:'system:daily_user_and_connection_level_tasks',hour_of_day:3},
+    {task_name:'system:weekly_tasks',day_of_week:1,hour_of_day:1}
+])
+
+
+
