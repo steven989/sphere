@@ -77,8 +77,6 @@ class UsersController < ApplicationController
               notifications = current_user.get_notifications(false)
               bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
               connection = result[:data]
-              current_user.activities.create(connection_id:connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
-              connection.update_score
               status = true
               message = "#{connection.first_name} added to your Sphere!"
               actions=[{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]

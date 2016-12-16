@@ -237,6 +237,8 @@ class Connection < ActiveRecord::Base
                 elsif photo_file_upload
                   Connection.find(new_connection.id).upload_photo(photo_file_upload)
                 end
+                user.activities.create(connection_id:new_connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
+                new_connection.update_score
                 Connection.port_photo_url_to_access_url(new_connection.id)
                 tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
                 status = true
@@ -276,6 +278,8 @@ class Connection < ActiveRecord::Base
                 elsif photo_file_upload
                   Connection.find(new_connection.id).upload_photo(photo_file_upload)
                 end
+                user.activities.create(connection_id:new_connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
+                new_connection.update_score
                 Connection.port_photo_url_to_access_url(new_connection.id)
                 tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
                 status = true

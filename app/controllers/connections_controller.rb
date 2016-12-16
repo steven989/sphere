@@ -78,12 +78,23 @@ class ConnectionsController < ApplicationController
         access_token = session ? session[:access_token] : nil
         expires_at = session ? session[:expires_at] : nil
         result = Connection.create_from_import(current_user,params[:contactsToImport].values,access_token,expires_at)
-        actions = [{action:"function_call",function:"closeModalInstance(2000)"}]
-        message = result[:status] ? result[:message] : "Oops. Looks like our robots had some errors saving the contacts. Here are the details: #{result[:message]}"
+
+        if result[:status] 
+          raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+          notifications = current_user.get_notifications(false)
+          bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+          message = result[:message]
+          actions=[{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(2000)"}]
+          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+        else
+          message = "Oops. Looks like our robots had some errors saving the contacts. Here are the details: #{result[:message]}"
+          actions = nil
+          data = result[:data]
+        end
 
         respond_to do |format|
           format.json {
-            render json: {status:result[:status], message:message,actions:actions,data:result[:data]}
+            render json: {status:result[:status], message:message,actions:actions,data:data}
           } 
         end
     end
