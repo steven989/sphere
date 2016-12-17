@@ -130,7 +130,8 @@ class Connection < ActiveRecord::Base
             unified_email_array += other_emails.split("|>-<+|%") if other_emails
             unified_email_array = unified_email_array.map {|email| email.gsub(" ","")} #remove any spaces in the email
             unified_email_array = unified_email_array.uniq
-            unified_email_array.reject! {|email| email.strip == ""}
+            unified_email_array.reject! {|email| email.strip == "" || email == "NULL" || email == "null" || email == "nil" || email == "NIL"}
+            unified_email_array = nil if unified_email_array.length == 0
           else 
             unified_email_array = nil
           end
