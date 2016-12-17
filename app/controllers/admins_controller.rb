@@ -17,6 +17,8 @@ class AdminsController < ApplicationController
             @challenges = Challenge.all.order(created_at: :desc)
         elsif model_name == "activity_definition"
             @activity_definitions = ActivityDefinition.all.order(specificity_level: :asc, created_at: :desc)
+        elsif model_name == "system_setting"
+            @system_settings = SystemSetting.all.order(created_at: :asc)
         end
 
         respond_to do |format|
@@ -53,6 +55,60 @@ class AdminsController < ApplicationController
             message = "'#{model}' is not valid"
         end
         
+    end
+
+
+
+    def update_system_settings
+        parsed_params = {}
+        params.each do |key,value|
+            if key.match /ID\$(\d+)\$ATTR\$(\w+)/ #The keys are all in the shape of ID$123$ATTR$some_attribute
+                object_id = $1
+                attribute = $2
+                parsed_params[object_id] = {} unless parsed_params[object_id]
+                parsed_params[object_id][attribute.to_sym] = value
+            end
+        end
+
+        error_array = []
+        parsed_params.values.each do |valueReceived| 
+
+            delete = valueReceived[:delete] == "true" ? true : false
+            id = valueReceived[:id].blank? ? nil : valueReceived[:id].to_i
+            inputID = valueReceived[:inputId]
+
+
+            name = valueReceived[:name]
+            data_type = valueReceived[:data_type]
+            value = valueReceived[:value]
+            description = valueReceived[:description]
+
+            result = SystemSetting.update_system_setting(delete,id,name,data_type,value,description)
+
+            if !result[:status] 
+                error_array.push({inputId:inputID,message:result[:message],elements:result[:elements]})
+            end
+        end
+
+        if error_array.length > 0
+            status = false
+            message = "Encountered some errors while updating the system settings. #{error_array.map{|error| error[:message]}.join(', ') }. Specific issues highlighted below"
+            data = {errorInputIds: error_array.map {|error| error[:inputId]}}
+            actions = error_array.map {|error| error[:elements] ? error[:elements].map{|element| {action:"change_css",element:"#system_setting .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } : {action:"change_css",element:"#system_setting .update-instance[data-instance-id=#{error[:inputId]}]",css:{attribute:"border",value:"1px solid red"} } }.flatten
+            actions.push({action:"function_call",function:"reCheck('system_setting',receivedDataFromAJAX.data.errorInputIds,'update')"})
+            actions.reject! {|action| action.nil?}
+        else
+            status = true
+            message = "Successfully saved"
+            data = nil
+            actions = [{action:"function_call",function:"setTimeout(function(){ loadInputForm('system_setting')},2000)"}]
+        end
+
+        respond_to do |format|
+          format.json {
+            render json: {status:status, message:message,actions:actions,data:data}
+          } 
+        end          
     end
 
     def update_activity_definitions
@@ -99,7 +155,7 @@ class AdminsController < ApplicationController
 
         if error_array.length > 0
             status = false
-            message = "Encountered some errors while updating the activity definitions. See the highlighted cells"
+            message = "Encountered some errors while updating the activity definitions. #{error_array.map{|error| error.message}.join(', ') } See the highlighted cells"
             data = {errorInputIds: error_array.map {|error| error[:inputId]}}
             actions = error_array.map {|error| error[:elements] ? error[:elements].map{|element| {action:"change_css",element:"#activity_definition .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } : {action:"change_css",element:"#activity_definition .update-instance[data-instance-id=#{error[:inputId]}]",css:{attribute:"border",value:"1px solid red"} } }.flatten
             actions.push({action:"function_call",function:"reCheck('activity_definition',receivedDataFromAJAX.data.errorInputIds,'update')"})

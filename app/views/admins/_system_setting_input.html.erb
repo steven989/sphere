@@ -1,0 +1,30 @@
+<%= number_field_tag :rows_to_add,10 %>
+<button class="addRows" data-model-name="system_setting">Add Rows</button>
+<button class="updateToServer" href="<%= update_system_settings_path %>" data-method="put" data-alert-element=".inputs#system_setting .alert">Update all selected changes</button>
+<div class="alert hidden default_hidden" style="margin-top:1px;line-height:15px;"></div>
+<table>
+    <thead>
+        <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
+        <th>Setting</th>
+        <th>Description</th>
+        <th>Data Type (hash, integer, or blank for text)</th>
+        <th>Value</th>
+
+        <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
+    </thead>
+    <tbody>
+        <% @system_settings.each do |system_setting| %>
+           <tr class="update-instance" data-instance-id=<%= system_setting.id %>>
+               <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,system_setting.id, class:"updateInput" %></td>
+               <td><%= text_field_tag :name, system_setting.name,class:"updateInput" %></td>
+               <td><%= text_field_tag :description, system_setting.description,class:"updateInput" %></td>
+               <td><%= text_field_tag :data_type, system_setting.data_type,class:"updateInput" %></td>
+               <td><%= text_field_tag :value, system_setting.value,class:"updateInput" %></td>
+
+
+
+               <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
+           </tr> 
+        <% end %>
+    </tbody>
+</table>

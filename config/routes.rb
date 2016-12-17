@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   put  'admins/update_challenges' => 'admins#update_challenges', as: 'update_challenges'
   put  'admins/update_badges' => 'admins#update_badges', as: 'update_badges'
   put  'admins/update_activity_definitions' => 'admins#update_activity_definitions', as: 'update_activity_definitions'
+  put  'admins/update_system_settings' => 'admins#update_system_settings', as: 'update_system_settings'
   put  'admins/upload_graphics' => 'admins#upload_graphics', as: 'upload_graphics'
 
 
