@@ -416,7 +416,7 @@ body {
     height: 100%;
 }
 
-#photoUploader, #photoUploaderInCreate { display: none; }
+#photoUploader, #photoUploaderInCreate, #photoUploaderInUserInfo { display: none; }
 label[for=photoUploader] {
     border: 1px solid #E9E9E9;
     font-family: 'eausans_book';
