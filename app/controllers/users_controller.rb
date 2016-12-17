@@ -6,6 +6,13 @@ class UsersController < ApplicationController
         @user = User.new 
     end
 
+    def command
+      # \add-note
+      # \remind-me-to
+      # search for fields in connection, and tags
+      
+    end
+
     def create
         result = User.create_user(
           user_params[:email].downcase,
