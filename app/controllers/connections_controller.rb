@@ -116,7 +116,7 @@ class ConnectionsController < ApplicationController
         last_plan = Plan.last(current_user,connection)
 
         if last_plan
-            last_plan_time_string = last_plan.last_activity_date_difference_humanized
+            last_plan_time_string = last_plan.last_activity_date_differencfe_humanized
             last_plan_name_string = last_plan.name_with_parentheses_removed
             data[:lastPlanString] = "Last Hangout: #{last_plan_time_string} #{last_plan_name_string}"
         else
@@ -124,7 +124,7 @@ class ConnectionsController < ApplicationController
         end
 
         data[:connection_tags] = connection.tags.order(created_at: :asc).map {|tag| tag.tag}
-        data[:all_tags] = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq
+        data[:all_tags] = current_user.tags.where(taggable_type:"Connection").order(tag: :asc).map {|tag| tag.tag}.uniq
 
         upcoming_plan = Plan.first_upcoming(current_user,connection)
         if upcoming_plan
