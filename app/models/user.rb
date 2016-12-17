@@ -27,6 +27,12 @@ class User < ActiveRecord::Base
 
   after_create :import_default_settings
 
+  mount_uploader :photo, PhotoUploader
+
+
+  def display_name
+    first_name ? first_name : email.match(/(\S+)@/)[1]
+  end
 
   def get_raw_bubbles_data(connections_override=nil,json_or_not_json=false)
     connections = connections_override ? connections_override : self.connections.active
@@ -77,8 +83,8 @@ class User < ActiveRecord::Base
           maxBubbleSize:bubbles_parameters_object[:max_size_of_bubbles],
           numberOfRecursion:bubbles_parameters_object[:number_of_recursions],
           radiusOfCentralBubble:bubbles_parameters_object[:radius_of_central_bubble],
-          centralBubbleDisplay:self.email,
-          centralBubblePhotoURL:nil
+          centralBubbleDisplay:self.display_name,
+          centralBubblePhotoURL:self.photo_url
           }
           if json_or_not_json
             bubbles_parameters.to_json

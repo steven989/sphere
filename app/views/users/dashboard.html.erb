@@ -210,14 +210,11 @@ $(function(){
         }
     };
 
-    // Photo upload label within bubble modal to change display when a file is selected
-    $(".modalView#editConnection #photoUploader").on("change",function(){
-            $(".modalView#editConnection label[for=photoUploader]").html($(".modalView#editConnection #photoUploader").prop("files")[0].name);
-    });
 
-    // Photo upload label within add connection modal to change display when a file is selected
-    $(".modalView#mainImportView #photoUploaderInCreate").on("change",function(){
-            $(".modalView#mainImportView label[for=photoUploaderInCreate]").html($(".modalView#mainImportView #photoUploaderInCreate").prop("files")[0].name);
+
+    // Photo upload label within bubble modal to change display when a file is selected
+    $(".hiddenUploader").on("change",function(){
+            $("label[for="+$(this).prop('id')+"]").html($(this).prop("files")[0].name);
     });
 
     // tokenize the tagging in create contact modal (this is not the edit contact modal)
@@ -369,11 +366,6 @@ $(function(){
                         if(data.message != undefined /* && alertElement.length > 0 */ ) {
                             toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
                         }
-                        // setTimeout(function(){
-                        //     form.find('.alert').addClass('hidden');
-                        //     resetModal(form.closest('.remodal'),2);
-                        //     modalInstance.close();
-                        // },2000)
                 } else {
                         toastr.options.closeButton = true;
                         if(data.message != undefined /* && alertElement.length > 0 */) {
@@ -401,6 +393,7 @@ $(function(){
             });
         });        
     }
+    submitButtonListener();
 
 
 
@@ -688,7 +681,9 @@ $(function(){
     }
 
     function populateUserInfoForm() {
-
+        $('.modalView#userInfo input[name=firstName]').val(returnedData.first_name);
+        $('.modalView#userInfo input[name=lastName]').val(returnedData.last_name);
+        $('.modalView#userInfo input[name=phoneNumber]').val(returnedData.phone);
     }
 
     function populateSettingsForm () {
@@ -1036,7 +1031,7 @@ $(function(){
                     Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
                 </div>
 
-                <input name="photoUploader" id="photoUploader" type="file" accept="image/*">
+                <input name="photoUploader" class="hiddenUploader" id="photoUploader" type="file" accept="image/*">
                 <label for="photoUploader" class="textDarkGray" style="margin-top: 20px;">
                     <%= fa_icon 'id-badge' %>
                     Upload Photo
@@ -1064,7 +1059,7 @@ $(function(){
                     <div class="vex-custom-field-wrapper">
                         <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement halfRow left m-b-md inputData" name="name" type="text" placeholder="name" required>
                         <input class="formElement halfRow right m-b-md inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
-                        <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate" id="photoUploaderInCreate" type="file" accept="image/*">
+                        <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
                         <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                             <%= fa_icon 'id-badge' %>
                             Upload Photo
@@ -1145,11 +1140,11 @@ $(function(){
 
     <div class="modalView" id="userInfo">
         <div class="modalContentContainer p-h-xxlg">
-            <form action="<%= update_user_info_path %>" data-method="PUT">
+            <form action="<%= update_user_info_path %>" method="PUT">
                 <input type="text" class="formElement inputData m-b-md" data-default-class="formElement inputData m-b-md" name="firstName" placeholder="First name">
                 <input type="text" class="formElement inputData m-b-md" data-default-class="formElement inputData m-b-md" name="lastName" placeholder="Last name">
                 <input type="text" class="formElement inputData m-b-md" data-default-class="formElement inputData m-b-md" name="phoneNumber" placeholder="Phone">
-                <input name="photoUploaderInUserInfo" class="inputData clearInputAfterUpdate" id="photoUploaderInUserInfo" type="file" accept="image/*">
+                <input name="photoUploaderInUserInfo" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInUserInfo" type="file" accept="image/*">
                 <label for="photoUploaderInUserInfo" class="textDarkGray m-b-md formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                     <%= fa_icon 'id-badge' %>
                     Upload Photo

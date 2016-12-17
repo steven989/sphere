@@ -34,7 +34,35 @@ class UsersController < ApplicationController
     end
 
     def update_user_info
-      
+      current_user.update_attributes(first_name:params[:firstName],last_name:params[:lastName],phone:params[:phoneNumber])
+      photo_uploaded = !((params[:photoUploaderInUserInfo] == "undefined") || (params[:photoUploaderInUserInfo] == "null") || params[:photoUploaderInUserInfo].blank?)
+      if photo_uploaded
+        current_user.remove_photo!
+        current_user.save
+        current_user.photo = params[:photoUploaderInUserInfo]
+        if current_user.save
+          raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+          notifications = current_user.get_notifications(false)
+          bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+          current_user.update_attributes(photo_access_url:current_user.photo.url)
+          status = true
+          message = "Your info is updated!"
+          actions = [{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
+          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+        else
+          status = false
+          message = "Hmm. We seem to ran into some issues with your photo. Try a different one!"
+        end
+      else
+        status = true
+        actions = [{action:"function_call",function:"closeModalInstance(100)"}]
+        message = "Your info is updated!"
+      end
+      respond_to do |format|
+        format.json {
+          render json: {status:status, message:message,actions:actions,data:data}
+        } 
+      end
     end
 
     def dashboard
@@ -172,7 +200,7 @@ class UsersController < ApplicationController
       if user_setting.update_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity})
         status = true
         message = "Settings successfully updated"
-        actions = [{action:"function_call",function:"closeModalInstance(2000)"}]
+        actions = [{action:"function_call",function:"closeModalInstance(100)"}]
       else
         status = false
         message = "Settings could not be updated: user_setting.errors.full_messages.join(', ')"

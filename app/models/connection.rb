@@ -192,7 +192,9 @@ class Connection < ActiveRecord::Base
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
                   photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                  Connection.find(matched_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                  Connection.find(matched_connection.id).upload_photo(photo_data_uri,true)
+                elsif photo_file_upload
+                  Connection.find(matched_connection.id).upload_photo(photo_file_upload)
                 end
                 if tags
                   connection_tags = matched_connection.tags.map {|tag| tag}
@@ -233,7 +235,7 @@ class Connection < ActiveRecord::Base
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
                   photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
                 elsif photo_file_upload
                   Connection.find(new_connection.id).upload_photo(photo_file_upload)
                 end
@@ -274,7 +276,7 @@ class Connection < ActiveRecord::Base
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
                   photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
                 elsif photo_file_upload
                   Connection.find(new_connection.id).upload_photo(photo_file_upload)
                 end
