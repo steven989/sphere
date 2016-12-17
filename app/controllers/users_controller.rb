@@ -34,7 +34,12 @@ class UsersController < ApplicationController
     end
 
     def update_user_info
-      current_user.update_attributes(first_name:params[:firstName],last_name:params[:lastName],phone:params[:phoneNumber])
+
+      first_name = params[:firstName] ? params[:firstName] : current_user.first_name
+      last_name = params[:lastName] ? params[:lastName] : current_user.last_name
+      
+      current_user.update_attributes(first_name:first_name,last_name:last_name,phone:params[:phoneNumber])
+      
       photo_uploaded = !((params[:photoUploaderInUserInfo] == "undefined") || (params[:photoUploaderInUserInfo] == "null") || params[:photoUploaderInUserInfo].blank?)
       if photo_uploaded
         current_user.remove_photo!
