@@ -1,0 +1,51 @@
+<%= number_field_tag :rows_to_add,10 %>
+<button class="addRows" data-model-name="activity_definition">Add Rows</button>
+<button class="updateToServer" href="<%= update_activity_definitions_path %>" data-method="put" data-alert-element=".inputs#activity_definition .alert">Update all selected changes</button>
+<div class="alert hidden default_hidden" style="margin-top:1px;line-height:15px;"></div>
+<table>
+    <thead>
+        <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
+        <th>Specificity Level (1 = least)</th>
+        <th>Activity</th>
+        <th>Points: Shared Experience One-To-One</th>
+        <th>Points: Shared Experience Private Group</th>
+        <th>Points: Shared Experience Public Group</th>
+        <th>Points: Provided Help</th>
+        <th>Points: Received Help</th>
+        <th>Points: Provided Gift</th>
+        <th>Points: Received Gift</th>
+        <th>Points: Shared Outcome</th>
+        <th>Points: Shared Challenge</th>
+        <th>Points: Digital Communication</th>
+        <th>Points: In-Person Communication</th>
+        <th>Points: Shared Interest</th>
+        <th>Points: Intimacy Level (Cannot be blank)</th>
+
+        <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
+    </thead>
+    <tbody>
+        <% @activity_definitions.each do |activity_definition| %>
+           <tr class="update-instance" data-instance-id=<%= activity_definition.id %>>
+               <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,activity_definition.id, class:"updateInput" %></td>
+               <td><%= number_field_tag :specificity_level, activity_definition.specificity_level,class:"updateInput" %></td>
+               <td><%= text_field_tag :activity, activity_definition.activity,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_shared_experience_one_to_one, activity_definition.point_shared_experience_one_to_one,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_shared_experience_group_private, activity_definition.point_shared_experience_group_private,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_shared_experience_group_public, activity_definition.point_shared_experience_group_public,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_provide_help, activity_definition.point_provide_help,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_receive_help, activity_definition.point_receive_help,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_provide_gift, activity_definition.point_provide_gift,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_receive_gift, activity_definition.point_receive_gift,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_shared_outcome, activity_definition.point_shared_outcome,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_shared_challenge, activity_definition.point_shared_challenge,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_communication_digital, activity_definition.point_communication_digital,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_communication_in_person, activity_definition.point_communication_in_person,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_shared_interest, activity_definition.point_shared_interest,class:"updateInput" %></td>
+               <td><%= number_field_tag :point_intimacy, activity_definition.point_intimacy,class:"updateInput" %></td>
+
+
+               <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
+           </tr> 
+        <% end %>
+    </tbody>
+</table>

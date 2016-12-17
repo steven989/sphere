@@ -138,6 +138,7 @@ $(function(){
                     returnedData = data.data;
                 }
                 if (data.actions != undefined && data.actions.length > 0) {
+                    console.log(data.actions);
                     performActions(data.actions);    
                 }
           })
@@ -244,6 +245,9 @@ $(function(){
                 <li class="tab">
                     <a href="#users"><i class="fa fa-paperclip"></i><br>Users</a>
                 </li>
+                <li class="tab loadInputForm" data-input-form-model="activity_definition">
+                    <a href="#activity_definitions"><i class="fa fa-tasks"></i><br>Activity Definitions</a>
+                </li>
                 <li class="tab loadInputForm" data-input-form-model="level">
                     <a href="#levels"><i class="fa fa-tasks"></i><br>Levels</a>
                 </li>
@@ -265,6 +269,12 @@ $(function(){
                   <div id="users">
                     <h2>Users</h2>
                     <!-- content -->
+                  </div>
+                  <div id="activity_definitions">
+                    <h2>Activity Definitions</h2>
+                    <div class="inputs" id="activity_definition" >
+
+                    </div>
                   </div>
                   <div id="levels">
                     <h2>Levels</h2>
