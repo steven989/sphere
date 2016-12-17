@@ -110,7 +110,7 @@ class UsersController < ApplicationController
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           status = true
           message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
-          actions = [{action:"function_call",function:"closeModalInstance(2000)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+          actions = [{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           status = false
