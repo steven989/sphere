@@ -74,6 +74,8 @@ class UsersController < ApplicationController
         if current_user.is? "admin"
           redirect_to admin_dashboard_path
         else
+          @authorized_google_calendar = current_user.authorized_by("google","calendar")
+          @authorized_google_contacts = current_user.authorized_by("google","contacts")
           @settings = current_user.user_setting.value_evaled
           @raw_bubbles_data = current_user.get_raw_bubbles_data(nil,true)
           @bubbles_parameters = current_user.get_bubbles_display_system_settings(true)

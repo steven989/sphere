@@ -3,7 +3,7 @@ $(function(){
     $('.googleLoginButton').off("click").on("click",function(){
             event.preventDefault();
             event.stopPropagation()
-            var win = window.open($(this).attr('href'));
+            var win = window.open($(this).attr('href'),"_blank","width=500,height=600");
             var checkConnect = setInterval(function() {
                     if (!win || !win.closed) return;
                     clearInterval(checkConnect);
