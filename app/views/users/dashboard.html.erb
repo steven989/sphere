@@ -194,7 +194,7 @@ $(function(){
     var clockedRotate = {
         rotater:null,
         degree:0,
-        start:function(element,period,clockWise=true){
+        start:function(element,period,clockWise){
             clockedRotate.rotater = setInterval(function(){
                 element.css({'transform':'rotate('+((clockedRotate.degree*45)%360).toString()+'deg)'});
                 if (clockWise) {
@@ -312,7 +312,7 @@ $(function(){
         if (button.hasClass('disableWhileProcessed')) {
             button.removeClass('disabled').addClass('disabled');
             button.html('<span class=\'rotater\' style=\'display:inline-block;\'><%= fa_icon 'spinner' %></span>');
-            clockedRotate.start(button.find('.rotater'),150);
+            clockedRotate.start(button.find('.rotater'),150,true);
             button.val("Wait...");
             status = false;
         }
@@ -765,7 +765,7 @@ $(function(){
 
     // Toggle check in button status
 
-    function checkInButtons(state=true,options={}) {
+    function checkInButtons(state,options) {
         _this = $('#checkinButton');
         if (state) {
             _this.html("CHECK IN");

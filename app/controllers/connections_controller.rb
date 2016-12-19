@@ -116,7 +116,7 @@ class ConnectionsController < ApplicationController
         last_plan = Plan.last(current_user,connection)
 
         if last_plan
-            last_plan_time_string = last_plan.last_activity_date_differencfe_humanized
+            last_plan_time_string = last_plan.last_activity_date_difference_humanized
             last_plan_name_string = last_plan.name_with_parentheses_removed
             data[:lastPlanString] = "Last Hangout: #{last_plan_time_string} #{last_plan_name_string}"
         else
@@ -138,7 +138,7 @@ class ConnectionsController < ApplicationController
             data[:upcomingPlanString] = "No current plans :("
             data[:hasUpcomingPlan] = false
         end
-        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons(#{check_in_button_state})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"}]
+        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons(#{check_in_button_state},{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"}]
         respond_to do |format|
           format.json {
             render json: {status:true, message:nil,actions:actions,data:data}
