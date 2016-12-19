@@ -184,7 +184,7 @@ class User < ActiveRecord::Base
       if self.plans.where(connection_id:connection.id).length > 0
         plans = self.plans.where(connection_id:connection.id)
         plan = plans.order(date: :desc).limit(1).take
-        Notification.create_upcoming_plan_notification(self,connection,plan)
+        Notification.create_upcoming_plan_notification(self,connection)
       end
 
       # 3) update status of expired connections
