@@ -46,6 +46,7 @@ class ConnectionsController < ApplicationController
         end
     end
 
+
     def import
         provider = params[:provider]
         if !current_user.authorized_by(provider,"contacts")
@@ -99,6 +100,33 @@ class ConnectionsController < ApplicationController
         end
     end
 
+    def destroy
+       connection = Connection.find(params[:connection_id])
+       connection.activities.destroy_all
+       connection.connection_score.destroy
+       connection.connection_score_histories.destroy_all
+       connection.plans.destroy_all
+       connection.notifications.destroy_all
+       connection.tags.destroy_all
+       connection.destroy
+       redirect_to root_path
+    end
+
+    def destroy_all
+        current_user.activities.destroy_all
+        current_user.connection_scores.destroy_all
+        current_user.connection_score_histories.destroy_all
+        current_user.plans.destroy_all
+        current_user.notifications.destroy_all
+        current_user.tags.destroy_all
+        current_user.connections.destroy_all
+        current_user.user_challenges.destroy_all
+        current_user.user_badges.destroy_all
+        current_user.current_challenges.destroy_all
+        current_user.user_statistics.find_statistic('xp').take.update_attributes(value:0)
+        current_user.user_statistics.find_statistic('level').take.update_attributes(value:0)
+        redirect_to root_path
+    end
 
     def populate_connection_modal
 
@@ -106,9 +134,6 @@ class ConnectionsController < ApplicationController
         connection = Connection.find(params[:connection_id])
         date_of_last_activity_with_this_connection = connection.activities.where("activity not ilike '%added%to%sphere'").last && connection.activities.where("activity not ilike '%added%to%sphere'").order(:date).last.date
         check_in_button_state = date_of_last_activity_with_this_connection && Date.today > date_of_last_activity_with_this_connection
-        puts '---------------------------------------------------'
-        puts check_in_button_state
-        puts '---------------------------------------------------'
         data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
         data[:name] = connection.name

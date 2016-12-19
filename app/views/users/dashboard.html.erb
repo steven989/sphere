@@ -587,6 +587,8 @@ $(function(){
         var contact_frequency = returnedData.contact_frequency;
         var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
 
+        var currentHref = $('#destroy_single_connection').attr('href');
+        $('#destroy_single_connection').attr('href',currentHref+"?connection_id="+returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.name').html(name);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         if (photoUrl) {
@@ -1069,8 +1071,8 @@ $(function(){
                     <%= fa_icon 'id-badge' %>
                     Upload Photo
                 </label>
-                <textarea name="notes" rows="4" placeholder="Notes. You can tag your notes like #howwemet" class="textDarkGray"></textarea>
-                <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
+                <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
+                <%= link_to "Delete Connection (testing purpose button)", destroy_connection_path, method: :put, id: "destroy_single_connection" %>
             </form>
         </div>
         <div class="modalButtonContainer">
@@ -1152,6 +1154,7 @@ $(function(){
                     <div id="default_contact_interval_in_days_title"></div>
                     <div><input type='number' class="settingInput settingInput formElement standardHeight inputData" name='default_contact_interval_in_days' id='default_contact_interval_in_days_value'></div>
                 </div>
+                <a href="<%= clear_connections_path %>">Clear contacts (testing button)</a>
 <!--                 <div class="m-b-md">
                     <div id="event_add_granularity_title"></div>
                     <div>

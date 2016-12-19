@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   scope :app_users, -> { where(user_type:"user") } 
 
   has_many :connections
-  has_many :activities  
+  has_many :activities
   has_many :connection_scores
   has_many :connection_score_histories
   has_many :notifications
