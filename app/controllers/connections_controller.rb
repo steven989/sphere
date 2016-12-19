@@ -106,6 +106,9 @@ class ConnectionsController < ApplicationController
         connection = Connection.find(params[:connection_id])
         date_of_last_activity_with_this_connection = connection.activities.where("activity not ilike '%added%to%sphere'").last && connection.activities.where("activity not ilike '%added%to%sphere'").order(:date).last.date
         check_in_button_state = date_of_last_activity_with_this_connection && Date.today > date_of_last_activity_with_this_connection
+        puts '---------------------------------------------------'
+        puts check_in_button_state
+        puts '---------------------------------------------------'
         data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
         data[:name] = connection.name
@@ -138,7 +141,7 @@ class ConnectionsController < ApplicationController
             data[:upcomingPlanString] = "No current plans :("
             data[:hasUpcomingPlan] = false
         end
-        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons(#{check_in_button_state},{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"}]
+        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"}]
         respond_to do |format|
           format.json {
             render json: {status:true, message:nil,actions:actions,data:data}
