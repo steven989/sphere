@@ -853,89 +853,9 @@ label[for=photoUploader]:hover {
 }
 
 
-/*FOR RESPONSIVE DESIGN*/
-@media (max-width: 600px) { 
-    .hideOnMobile {
-        display: none;
-    }
-
-    .remodal.standardModal {
-        position: absolute;
-        bottom: 30px;
-        left: 0px;
-        right: 0px;
-    }
-
-    .showOnMobile {
-        display: initial !important;
-    }
-
-    .profileButtonsContainer.hideOnMobile {
-        width: 130px;
-        right: 50px;
-        top: 60px;
-        background-color: rgb(246,246,246);
-        border-radius: 5px;
-        border: 1px solid #E9E9E9;
-        padding: 10px;
-    }
-
-    .profileButtonsContainer.hideOnMobile .divider {
-        margin: 10px 0px;
-    }
-
-    .profileButtonsContainer.hideOnMobile .profileButton {
-        font-size:20px;
-        text-align: right;
-        width: 100%;
-        color: #707070;
-        display: block;
-    }
-
-    .profileButtonsContainer.hideOnMobile .profileButton p {
-        font-size:15px;
-        text-align: right;
-        margin-right:15px;
-        transition:color 0.2s ease;
-    }
-
-    .profileButtonsContainer.hideOnMobile .profileButton i {
-        color: #707070;
-        transition:color 0.2s ease;
-    }
-
-    .profileButtonsContainer.hideOnMobile .profileButton:hover p, .profileButtonsContainer.hideOnMobile .profileButton:hover i {
-        color: #B5ADAC;
-    }
-
-
-    .profileButtonsContainer.showOnMobile {
-        width: 120px;
-        right: 20px;
-    }
-
-    .profileButtonsContainer.showOnMobile .profileButton {
-        width: 55%;
-    }
-
-    div.topTabs-header.clearfix {
-        position: fixed;
-        bottom:0px;
-        left:0px;
-        z-index:10;
-        height: 70px;
-    }
-
-    #navigation {
-        width: 100%;
-        z-index:11;
-    }
-}
-
-
 /* Search bar */
 #searchBar {
-    position: absolute;
+    position: fixed;
     right: 50px;
     bottom: 50px;
     width: 220px;
@@ -996,6 +916,100 @@ label[for=photoUploader]:hover {
 }
 
 
+/*FOR RESPONSIVE DESIGN*/
+@media (max-width: 600px) { 
+    .hideOnMobile {
+        display: none;
+    }
+
+    .remodal.standardModal {
+        position: absolute;
+        bottom: 30px;
+        left: 0px;
+        right: 0px;
+    }
+
+    .showOnMobile {
+        display: initial !important;
+    }
+
+    .profileButtonsContainer.hideOnMobile {
+        width: 130px;
+        right: 50px;
+        top: 60px;
+        background-color: rgb(246,246,246);
+        border-radius: 5px;
+        border: 1px solid #E9E9E9;
+        padding: 10px;
+    }
+
+    .profileButtonsContainer.hideOnMobile .divider {
+        margin: 10px 0px;
+    }
+
+    .profileButtonsContainer.hideOnMobile .profileButton {
+        font-size:20px;
+        text-align: right;
+        width: 100%;
+        color: #707070;
+        display: block;
+    }
+
+    .profileButtonsContainer.hideOnMobile .profileButton p {
+        font-size:15px;
+        text-align: right;
+        margin-right:15px;
+        transition:color 0.2s ease;
+    }
+
+    .profileButtonsContainer.hideOnMobile .profileButton i {
+        color: #707070;
+        transition:color 0.2s ease;
+    }
+
+    .profileButtonsContainer.hideOnMobile .profileButton:hover p, .profileButtonsContainer.hideOnMobile .profileButton:hover i {
+        color: #B5ADAC;
+    }
+
+    .profileButtonsContainer.showOnMobile {
+        width: 120px;
+        right: 20px;
+    }
+
+    .profileButtonsContainer.showOnMobile .profileButton {
+        width: 55%;
+    }
+
+    div.topTabs-header.clearfix {
+        position: fixed;
+        bottom:0px;
+        left:0px;
+        z-index:10;
+        height: 70px;
+    }
+
+    #navigation {
+        width: 100%;
+        z-index:11;
+    }
+
+    #searchBar {
+        position: fixed;
+        right: 20px;
+        bottom: 80px;
+        width: 220px;
+        height: 30px;
+    }
+
+    .topTabsContent {
+        padding:0px !important;
+        height: 100vh;
+    }
+
+}
+
+
+
 /* Customization of plugins */
 
 /* Toastr notification */
@@ -1003,6 +1017,7 @@ label[for=photoUploader]:hover {
 .toast-success {
   background-color: #34BF49 !important;
 }
+
 
 
 

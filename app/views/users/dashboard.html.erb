@@ -24,33 +24,54 @@ $(function(){
         ]
     };
     var fuse = new Fuse(bubblesData, options);
-
     function searchBarListener() {
+
+        $('#searchBar input').off("focus").on("focus",function(){
+            $('#searchBar .result, #searchBar .speechBubbleThingy').each(function(){
+                $(this).removeClass('hidden');
+            });
+
+            $('#searchBar').on('click',function(){
+                event.stopPropagation();
+            });
+
+            $('.topTabsContent,.topTabs-header.clearfix').off("click").on("click",function(){
+
+                    $('#searchBar .result, #searchBar .speechBubbleThingy').each(function(){
+                        $(this).removeClass('hidden').addClass('hidden');
+                    });            
+            })
+
+        });
+
         $('#searchBar input').off("input").on("input",function(){
-            var result = fuse.search($(this).val());
-            $('#searchBar .result ul').empty();
-            if (result.length > 0) {
-                result.forEach(function(connection){
-                    $('#searchBar .result ul').append("<li class='item'><span class='name'>"+connection.display+(connection.email ? "</span><br><span class='email'>"+connection.email : "")+(connection.tags ? "</span><br><span class='tags'>"+connection.tags.join(', ') : "")+"</span></li>");
-                });                
+            if ($(this).val()=="") {
+                $('#searchBar .result ul').empty();
+                $('#searchBar .result ul').append("<li class='item'><span class='email'>Search connection by name, email or, tags</span></li>");
             } else {
-                $('#searchBar .result ul').append("<li class='item'><span class='tags'>No connection found</span></li>");                
+                var result = fuse.search($(this).val());
+                $('#searchBar .result ul').empty();
+                if (result.length > 0) {
+                    result.forEach(function(connection){
+                        $('#searchBar .result ul').append("<li class='item' data-bubble-id='connectionBubble"+connection.id+"'><span class='name'>"+connection.display+(connection.email ? "</span><br><span class='email'>"+connection.email : "")+(connection.tags ? "</span><br><span class='tags'>"+connection.tags.join(', ') : "")+"</span></li>");
+                    });
+                    $('#searchBar .result .item').off("click").on("click",function(){
+                        $($("#"+$(this).data('bubble-id'))).trigger('click');
+                    $('#searchBar .result, #searchBar .speechBubbleThingy').each(function(){
+                        $(this).removeClass('hidden')});
+                    })
+                } else {
+                    $('#searchBar .result ul').append("<li class='item'><span class='tags'>No connection found</span></li>");
+                }                
             }
+
         });
     }
     searchBarListener();
 
-    // Clicking on anything BUT certain elements
-    function clickOnAnythingBut(exceptionElements,perform) {
-        exceptionElements.each(function(){
-            $(this).off("click").on("click",function(){
-                event.stopPropagation();
-            })
-        });
-        $(document).off("click").on("click",function(){
-            perform();
-            $(document).off("click");
-        })
+    function updateBubblesData(data) {
+        bubblesData = data;
+        fuse = new Fuse(bubblesData, options);
     }
 
     // User-level notifications
@@ -103,19 +124,6 @@ $(function(){
                         var percentageValueOfRemainingDays = Math.max(Math.min(remaining_days_until_expiry*1.0/7.0,1),0.2);
                         
                         paintProgressBar($(this).parent('.connectBubbleContainer'),1,"#ED1C24",percentageValueOfRemainingDays);
-
-                        // $(this).parent('.connectBubbleContainer').circleProgress({
-                        //     // value: percentageValueOfRemainingDays,
-                        //     value: 0.8,
-                        //     thickness:5,
-                        //     lineCap:'round',
-                        //     size: $(this).parent('.connectBubbleContainer').width(),
-                        //     fill: {color: '#ED1C24'},
-                        //     emptyFill: 'rgba(0,0,0,0)',
-                        //     startAngle:(0.5*Math.PI),
-                        //     reverse:true,
-                        //     animationStartValue: 1
-                        // });
 
                     }
                     // 1.2) Notification icons
@@ -945,21 +953,14 @@ $(function(){
 
             <div id="canvas" style="position: relative; margin: auto;"></div>            
             <div id="searchBar">
-                <div class="result">
+                <div class="result hidden">
                     <ul>
                         <li class="item">
-                            <span class="name">Josh Hong</span>
-                            <span class="email">sanborn.hilland@gmail.com</span>
-                            <span class="tags">Tags...</span>
-                        </li>
-                        <li class="item">
-                            <span class="name">Sanborn Hilland</span>
-                            <span class="email">sanborn.hilland@gmail.com</span>
-                            <span class="tags">Tags...</span>
+                            <span class="email">Search connection by name, email, or tags</span>
                         </li>
                     </ul>
                 </div>
-                <div class="speechBubbleThingy"></div>
+                <div class="speechBubbleThingy hidden"></div>
                 <input type="text" class="formElement" placeholder="Search Sphere">
             </div>
         </div>

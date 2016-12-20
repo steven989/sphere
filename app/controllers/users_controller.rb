@@ -60,7 +60,7 @@ class UsersController < ApplicationController
           current_user.update_attributes(photo_access_url:current_user.photo.url)
           status = true
           message = "Your info is updated!"
-          actions = [{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
+          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           status = false
@@ -136,7 +136,7 @@ class UsersController < ApplicationController
               connection = result[:data]
               status = true
               message = "#{connection.first_name} added to your Sphere!"
-              actions=[{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+              actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
               data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
           else
               status = false
@@ -168,7 +168,7 @@ class UsersController < ApplicationController
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           status = true
           message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
-          actions = [{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           status = false

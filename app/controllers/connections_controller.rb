@@ -85,7 +85,7 @@ class ConnectionsController < ApplicationController
           notifications = current_user.get_notifications(false)
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           message = result[:message]
-          actions=[{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
+          actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           message = "Oops. Looks like our robots had some errors saving the contacts. Here are the details: #{result[:message]}"

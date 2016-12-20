@@ -15,7 +15,7 @@ class Connection < ActiveRecord::Base
     scope :active, -> { where(active:true) } 
     mount_uploader :photo, PhotoUploader
     # Validations
-    validates :email, email: true
+    validates :email, email: true, allow_blank: true
 
     # Methods
     def name
