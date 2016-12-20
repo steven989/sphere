@@ -933,6 +933,61 @@ label[for=photoUploader]:hover {
 }
 
 
+/* Search bar */
+#searchBar {
+    position: absolute;
+    right: 50px;
+    bottom: 50px;
+    width: 220px;
+    height: 30px;
+}
+
+#searchBar .result ul {
+    box-shadow: -1px -3px 6px 0px rgba(0,0,0,0.16);
+    position: absolute;
+    bottom: 50px;
+    right: 0px;
+    background-color: #FAFAFA;
+    border-radius: 5px;
+    overflow: hidden;
+    list-style: none;
+    width: 220px;
+    z-index: 3;
+}
+
+#searchBar .speechBubbleThingy { 
+    box-shadow:-1px -8px 19px 0px rgba(0,0,0,0.16);
+    height: 30px;
+    width: 30px;
+    background-color: #FAFAFA;
+    position: absolute;
+    bottom: 45px;
+    right: 15px;
+    transform:rotate(55deg) skewY(-20deg);
+    z-index: 2;
+
+}
+
+#searchBar .result .item {
+    padding: 15px;
+    cursor: pointer;
+    transition:background 0.2s ease; 
+}
+
+#searchBar .result .item:hover {
+    background: linear-gradient(#0b73a0,#1695cc);
+    color: #FFF;
+    cursor: pointer;
+}
+
+#searchBar .result .name {
+    font-weight:bold;
+    font-size: 15px;
+}
+
+#searchBar .result .tags {
+    font-style: italic
+}
 
 /* For Admin Dashboard*/
 

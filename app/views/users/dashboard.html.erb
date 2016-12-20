@@ -7,6 +7,51 @@ $(function(){
     var token;
     var tokenInCreate;
     var userLevelNotifications = (<%= raw @notifications %>).user_level;
+    var bubblesData = <%= raw @raw_bubbles_data %>;
+
+    // Search 
+    var options = {
+      shouldSort: true,
+      matchAllTokens: true,
+      findAllMatches: true,
+      threshold: 0.2,
+      maxPatternLength: 32,
+      minMatchCharLength: 1,
+      keys: [
+        "display",
+        "email",
+        "tags"
+        ]
+    };
+    var fuse = new Fuse(bubblesData, options);
+
+    function searchBarListener() {
+        $('#searchBar input').off("input").on("input",function(){
+            var result = fuse.search($(this).val());
+            $('#searchBar .result ul').empty();
+            if (result.length > 0) {
+                result.forEach(function(connection){
+                    $('#searchBar .result ul').append("<li class='item'><span class='name'>"+connection.display+(connection.email ? "</span><br><span class='email'>"+connection.email : "")+(connection.tags ? "</span><br><span class='tags'>"+connection.tags.join(', ') : "")+"</span></li>");
+                });                
+            } else {
+                $('#searchBar .result ul').append("<li class='item'><span class='tags'>No connection found</span></li>");                
+            }
+        });
+    }
+    searchBarListener();
+
+    // Clicking on anything BUT certain elements
+    function clickOnAnythingBut(exceptionElements,perform) {
+        exceptionElements.each(function(){
+            $(this).off("click").on("click",function(){
+                event.stopPropagation();
+            })
+        });
+        $(document).off("click").on("click",function(){
+            perform();
+            $(document).off("click");
+        })
+    }
 
     // User-level notifications
     function showUserLevelNotifications() {
@@ -899,7 +944,24 @@ $(function(){
         <div id="mySphere" style="overflow:scroll;">
 
             <div id="canvas" style="position: relative; margin: auto;"></div>            
-
+            <div id="searchBar">
+                <div class="result">
+                    <ul>
+                        <li class="item">
+                            <span class="name">Josh Hong</span>
+                            <span class="email">sanborn.hilland@gmail.com</span>
+                            <span class="tags">Tags...</span>
+                        </li>
+                        <li class="item">
+                            <span class="name">Sanborn Hilland</span>
+                            <span class="email">sanborn.hilland@gmail.com</span>
+                            <span class="tags">Tags...</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="speechBubbleThingy"></div>
+                <input type="text" class="formElement" placeholder="Search Sphere">
+            </div>
         </div>
         <div id="challenges">
             <div class="title">

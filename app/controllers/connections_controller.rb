@@ -133,7 +133,7 @@ class ConnectionsController < ApplicationController
         data = {}
         connection = Connection.find(params[:connection_id])
         date_of_last_activity_with_this_connection = connection.activities.where("activity not ilike '%added%to%sphere'").last && connection.activities.where("activity not ilike '%added%to%sphere'").order(:date).last.date
-        check_in_button_state = date_of_last_activity_with_this_connection && Date.today > date_of_last_activity_with_this_connection
+        check_in_button_state =  date_of_last_activity_with_this_connection.nil? || Date.today > date_of_last_activity_with_this_connection
         data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
         data[:name] = connection.name
