@@ -174,7 +174,6 @@
     margin-right: 15px;   
 }
 
-
 .m-l-xxxxxlg {
     margin-left: 45px;
 }
@@ -453,6 +452,7 @@ body {
 }
 
 #navigation li {
+    margin-top: 10px;
     border: none !important;
     width: 25%;
     height: 100%;
@@ -1034,6 +1034,10 @@ label[for=photoUploader]:hover {
     #navigation {
         width: 100%;
         z-index:11;
+    }
+
+    #navigation li {
+        margin-top: 0px;
     }
 
     #searchBar {
