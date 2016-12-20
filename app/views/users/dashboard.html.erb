@@ -768,8 +768,9 @@ $(function(){
     // Toggle check in button status
 
     function checkInButtons(state,options) {
+        var changeToState = state == "true" ? true : false;
         _this = $('#checkinButton');
-        if (state) {
+        if (changeToState) {
             _this.html("CHECK IN");
             _this.removeClass('disabled');
             if (_this.data('transition-button') != undefined ) {
