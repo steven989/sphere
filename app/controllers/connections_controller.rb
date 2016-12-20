@@ -6,6 +6,33 @@ class ConnectionsController < ApplicationController
         redirect_to :root 
     end
 
+    def update_name
+        connection_id = params[:id]
+        if name = params[:value]
+            first_name = Connection.parse_first_name(name)
+            last_name = Connection.parse_last_name(name)
+            connection = Connection.find(connection_id)
+            connection.update_attributes(first_name:first_name,last_name:last_name)
+            status = true
+            message = "Name updated!"
+            raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+            notifications = current_user.get_notifications(false)
+            bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+            actions=[{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+            data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+        else
+            status = false
+            message = nil
+            actions = nil
+            data = nil
+        end
+        respond_to do |format|
+          format.json {
+            render json: {status:status,message:message,actions:actions,data:data}
+          } 
+        end        
+    end
+
     def update
         connection = Connection.find(params[:connection_id])
         photo_uploaded = !((params[:photo] == "undefined") || (params[:photo] == "null") || params[:photo].blank?)
