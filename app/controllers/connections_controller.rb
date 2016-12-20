@@ -103,7 +103,7 @@ class ConnectionsController < ApplicationController
     def destroy
        connection = Connection.find(params[:connection_id])
        connection.activities.destroy_all
-       connection.connection_score.destroy
+       connection.connection_score.destroy if connection.connection_score
        connection.connection_score_histories.destroy_all
        connection.plans.destroy_all
        connection.notifications.destroy_all
