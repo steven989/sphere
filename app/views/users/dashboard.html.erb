@@ -653,8 +653,7 @@ $(function(){
         var contact_frequency = returnedData.contact_frequency;
         var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
 
-        var currentHref = $('#destroy_single_connection').attr('href');
-        $('#destroy_single_connection').attr('href',currentHref+"?connection_id="+returnedData.connection_id);
+        $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.name').val(name).data('id',returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         if (photoUrl) {

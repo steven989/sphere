@@ -18,9 +18,10 @@ class UsersController < ApplicationController
           user_params[:email].downcase,
           user_params[:first_name],
           user_params[:last_name],
-          user_params[:user_type],
+          "user",
           user_params[:password],
-          user_params[:password_confirmation]
+          user_params[:password_confirmation],
+          false
           )
         if result[:status]
           auto_login(result[:user])
