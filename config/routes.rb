@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   post  'connections/create_from_import' => 'connections#create_from_import', as: 'create_from_import'
   put  'connections/destroy' => 'connections#destroy', as: 'destroy_connection'
   put  'connections/destroy' => 'connections#destroy_all', as: 'clear_connections'
+  put 'connections/update_name' => 'connections#update_name', as: 'update_connection_name'
 
   # Admins controller
   get 'admins/dashboard' => 'admins#dashboard', as: 'admin_dashboard'

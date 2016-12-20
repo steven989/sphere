@@ -21,6 +21,11 @@
 
 /*Some standard components*/
 
+.hoverInput:hover {
+    background-color: #ECECEC;
+    transition: background-color 0.2s ease;
+}
+
 .formElement {
     background-color: #FAFAFA;
     border-radius: 5px;
@@ -69,6 +74,39 @@
 
 .formElement:hover {
     background-color: #F1F1F1;
+}
+
+.p-v-xs {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.p-h-xs {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+
+.p-v-sm {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.p-h-sm {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+.p-v-md {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.p-h-md {
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 
@@ -484,6 +522,7 @@ label[for=photoUploader]:hover {
 }
 
 
+
 .modalTokenBox ul.TokensContainer {
     height: 38px !important;
     border: none !important;
@@ -554,7 +593,7 @@ label[for=photoUploader]:hover {
 .remodal.standardModal .modalView .modalContentContainer {
     position: absolute;
     left: 0px;
-    top: 10%;
+    top: 8%;
     width: 100%;
     height:100%;
     overflow-y:scroll;

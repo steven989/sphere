@@ -9,6 +9,7 @@ class AdminsController < ApplicationController
 
     def render_model_input_form
         model_name = params[:modelName]
+        @available_user_statistics = StatisticDefinition.order(name: :asc).map {|statdef| statdef.name}.join(', ')
         if model_name == "level"
             @levels = Level.all.order(level: :asc)
         elsif model_name == "badge"
