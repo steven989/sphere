@@ -1,7 +1,7 @@
 <%= number_field_tag :rows_to_add,10 %>
 <button class="addRows" data-model-name="challenge">Add Rows</button>
-<button class="updateToServer" href="<%= update_challenges_path %>" data-method="put" data-alert-element=".inputs#challenge .alert">Update all selected changes</button>
-<div class="alert hidden default_hidden" style="margin-top:1px;line-height:15px;"></div>
+<button class="updateToServer" href="<%= update_challenges_path %>" data-method="put" data-alert-element=".inputs#challenge .alert">Update all selected changes</button><br>
+<em>Available user statistics: <%= @available_user_statistics %></em>
 <table>
     <thead>
         <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
@@ -9,7 +9,7 @@
         <th>Description</th>
         <th>Instructions</th>
         <th>Repeat Allowed?</th>
-        <th>Criteria</th>
+        <th>Criteria (available user statistics: <%= @available_user_statistics %>)</th>
         <th>Reward</th>
         <th>Graphic</th>
         <th>Upload New Graphic</th>
