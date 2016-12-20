@@ -59,7 +59,12 @@ $(function(){
                         $($("#"+$(this).data('bubble-id'))).trigger('click');
                     $('#searchBar .result, #searchBar .speechBubbleThingy').each(function(){
                         $(this).removeClass('hidden')});
-                    })
+                    });
+                    $('#searchBar .result .item').hover(function(){
+                        $($("#"+$(this).data('bubble-id'))).removeClass('glowBlue').addClass('glowBlue');
+                    },function(){
+                        $($("#"+$(this).data('bubble-id'))).removeClass('glowBlue');
+                    });
                 } else {
                     $('#searchBar .result ul').append("<li class='item'><span class='tags'>No connection found</span></li>");
                 }                

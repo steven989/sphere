@@ -18,7 +18,7 @@ class ConnectionsController < ApplicationController
             raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
             notifications = current_user.get_notifications(false)
             bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-            actions=[{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+            actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
             data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
             status = false

@@ -21,6 +21,10 @@
 
 /*Some standard components*/
 
+.glowBlue {
+    box-shadow: 0px 0px 47px 3px rgba(25,230,203,1);
+}
+
 .hoverInput:hover {
     background-color: #ECECEC;
     transition: background-color 0.2s ease;
