@@ -93,78 +93,91 @@ $(function(){
                 }
 
             // 2) Set some attributes
-            $(this).attr('href',"<%= populate_connection_modal_path %>?connection_id="+$(this).data('connection-id'))
-            $(this).data('method','get')
+            if ($(this).data('connection-id')=='0') {
+                $(this).attr('href',"<%= get_user_info_path %>");
+                $(this).data('method','get');                
+            } else {
+                $(this).attr('href',"<%= populate_connection_modal_path %>?connection_id="+$(this).data('connection-id'));
+                $(this).data('method','get');
+            }
 
             // 3) Modal on clicking each bubble
             $(this).off("click").on("click",function(){
                 var _this = $(this);
-                $('[data-remodal-id=bubbleModal] .modalView').each(function(){
-                    if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
-                        else {$(this).removeClass('hidden')};
-                });
-                $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
-                $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
-                $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
-                $('.createActivity').each(function(){
-                    $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
-                });
-                $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
-                    var button = $(this);
-                    if (!button.hasClass('disabled')) {
-                        var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
-                        var formData = new FormData();
-                        var form = $('.modalView#editConnection form');
-                        var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
-                        var custom_frequency;
-                        formData.append("connection_id",_this.data('connection-id'));
-                        if (frequency=="other") { custom_frequency = form.find('.details input').val();}
-                        formData.append("contact_frequency",frequency);
-                        formData.append("custom_frequency",custom_frequency);
-                        formData.append("notes",form.find('[name=notes]').val());
-                        formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
+                if (_this.data('connection-id')=='0') {
+                    resetModal($('[data-remodal-id=bubbleModal]'),1);
+                    buttonAjax(_this,{});
+                } else {
+                    $('[data-remodal-id=bubbleModal] .modalView').each(function(){
+                        if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
+                            else {$(this).removeClass('hidden')};
+                    });
+                    $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
+                    $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
+                    $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
+                    $('.createActivity').each(function(){
+                        $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
+                    });
+                    $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
+                        var button = $(this);
+                        if (!button.hasClass('disabled')) {
+                            var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
+                            var formData = new FormData();
+                            var form = $('.modalView#editConnection form');
+                            var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
+                            var custom_frequency;
+                            formData.append("connection_id",_this.data('connection-id'));
+                            if (frequency=="other") { custom_frequency = form.find('.details input').val();}
+                            formData.append("contact_frequency",frequency);
+                            formData.append("custom_frequency",custom_frequency);
+                            formData.append("notes",form.find('[name=notes]').val());
+                            formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
 
-                      $.ajax({
-                        url: '<%= update_connection_path %>',
-                        type: 'PUT',
-                        processData: false,
-                        contentType: false,
-                        data: formData,
-                        dataType: 'JSON'
-                      }).done(function(data){
-                            if (data.status) {
-                                    if(data.message != undefined /* && alertElement.length > 0 */ ) {
-                                        toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
+                          $.ajax({
+                            url: '<%= update_connection_path %>',
+                            type: 'PUT',
+                            processData: false,
+                            contentType: false,
+                            data: formData,
+                            dataType: 'JSON'
+                          }).done(function(data){
+                                if (data.status) {
+                                        if(data.message != undefined /* && alertElement.length > 0 */ ) {
+                                            toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
+                                        }
+                                } else {
+                                    toastr.options.closeButton = true;
+                                    if(data.message != undefined /* && alertElement.length > 0 */) {
+                                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                                     }
-                            } else {
-                                toastr.options.closeButton = true;
-                                if(data.message != undefined /* && alertElement.length > 0 */) {
-                                    toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                                 }
-                            }
-                            if (data.actions != undefined && data.actions.length > 0) {
-                                performActions(data.actions);    
-                            }
-                            reEnableButton(disabledButtonObject);
-                          });
-                    }
-                })
-                resetModal($('[data-remodal-id=bubbleModal]'),3);
-                buttonAjax(_this,{});
-            });
+                                if (data.actions != undefined && data.actions.length > 0) {
+                                    performActions(data.actions);    
+                                }
+                                reEnableButton(disabledButtonObject);
+                              });
+                        }
+                    })
+                    resetModal($('[data-remodal-id=bubbleModal]'),3);
+                    buttonAjax(_this,{});
+                } // if (_this.data('connection-id')=='0')
+
+            }); // $(this).off("click").on("click")
         });
     }
 
 
     // open modal instance
     function initializeReModal(element,modifier,resetType) {
-        modalInstance = $(element).remodal({
-        closeOnConfirm:false,
-        modifier:modifier
-        });
-        resetModal($(element),resetType);
-        clearTimeout(closeModalTimer);
-        modalInstance.open();        
+        if(!modalInstance || modalInstance.state != "opened") {
+            modalInstance = $(element).remodal({
+            closeOnConfirm:false,
+            modifier:modifier
+            });
+            resetModal($(element),resetType);
+            clearTimeout(closeModalTimer);
+            modalInstance.open();
+        }
     }
 
     // close modal instance 
@@ -181,7 +194,7 @@ $(function(){
     var clockedRotate = {
         rotater:null,
         degree:0,
-        start:function(element,period,clockWise=true){
+        start:function(element,period,clockWise){
             clockedRotate.rotater = setInterval(function(){
                 element.css({'transform':'rotate('+((clockedRotate.degree*45)%360).toString()+'deg)'});
                 if (clockWise) {
@@ -197,14 +210,11 @@ $(function(){
         }
     };
 
-    // Photo upload label within bubble modal to change display when a file is selected
-    $(".modalView#editConnection #photoUploader").on("change",function(){
-            $(".modalView#editConnection label[for=photoUploader]").html($(".modalView#editConnection #photoUploader").prop("files")[0].name);
-    });
 
-    // Photo upload label within add connection modal to change display when a file is selected
-    $(".modalView#mainImportView #photoUploaderInCreate").on("change",function(){
-            $(".modalView#mainImportView label[for=photoUploaderInCreate]").html($(".modalView#mainImportView #photoUploaderInCreate").prop("files")[0].name);
+
+    // Photo upload label within bubble modal to change display when a file is selected
+    $(".hiddenUploader").on("change",function(){
+            $("label[for="+$(this).prop('id')+"]").html($(this).prop("files")[0].name);
     });
 
     // tokenize the tagging in create contact modal (this is not the edit contact modal)
@@ -241,16 +251,6 @@ $(function(){
             $('.modalView#mainImportView #tokenizeInCreate').append("<option value="+tag+">"+tag+"</option>")
         }); 
     }
-    
-
-    // make plans
-    function addListenerToPlanForm() {
-        $('.modalView#makePlan .modalBottomRightButton').off('click').on('click',function(){
-          var form = $('.modalView#makePlan form');
-          modalAjaxFormSubmission(form,$(this));
-        });        
-    }
-
 
     // Modal resets
     function resetModal(modal,resetType) {
@@ -312,7 +312,7 @@ $(function(){
         if (button.hasClass('disableWhileProcessed')) {
             button.removeClass('disabled').addClass('disabled');
             button.html('<span class=\'rotater\' style=\'display:inline-block;\'><%= fa_icon 'spinner' %></span>');
-            clockedRotate.start(button.find('.rotater'),150);
+            clockedRotate.start(button.find('.rotater'),150,true);
             button.val("Wait...");
             status = false;
         }
@@ -366,11 +366,6 @@ $(function(){
                         if(data.message != undefined /* && alertElement.length > 0 */ ) {
                             toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
                         }
-                        // setTimeout(function(){
-                        //     form.find('.alert').addClass('hidden');
-                        //     resetModal(form.closest('.remodal'),2);
-                        //     modalInstance.close();
-                        // },2000)
                 } else {
                         toastr.options.closeButton = true;
                         if(data.message != undefined /* && alertElement.length > 0 */) {
@@ -388,14 +383,18 @@ $(function(){
         }   
     }
 
+    // General listener for submit buttons
+    function submitButtonListener() {
+        $('.submitButton').each(function(){
+            $(this).off("click").on("click",function(){
+                var button = $(this);
+                var form = $($(this).data('submit-form'));
+                modalAjaxFormSubmission(form,button);
+            });
+        });        
+    }
+    submitButtonListener();
 
-    // Add connections
-
-    $('.modalView#mainImportView .modalBottomFullButton').off('click').on('click',function(){
-      var form = $('.modalView#mainImportView form');
-      var button = $('.modalView#mainImportView .modalButtonContainer .submitButton');
-      modalAjaxFormSubmission(form,button);
-    })    
 
 
     $('#addConnection').off('click').on('click',function(){
@@ -483,16 +482,23 @@ $(function(){
 
     // Importing contacts
     $('#importContactsGoogle').off("click").on("click",function(){
-        buttonAjax($(this),$(this).data('data-to-send'));
+        var authorized_google_contacts = <%= @authorized_google_contacts %>;
+        if (!authorized_google_contacts) {
+            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_contacts' : 'http://localhost:3000/auth/google_contacts' %>";
+            var win = window.open(url,"_blank","width=500,height=600");
+            var checkConnect = setInterval(function() {
+                    if (!win || !win.closed) return;
+                    clearInterval(checkConnect);
+                    window.location.reload();
+                }, 100);
+        } else {
+            buttonAjax($(this),$(this).data('data-to-send'));            
+        }
     });
 
     // Account settings
     $('#accountSettings').off("click").on("click",function(){
         buttonAjax($(this),{});
-    });
-
-    $('.modalView#settingsSelect .modalBottomLeftButton').off("click").on("click",function(){
-        closeModalInstance(0);
     });
 
     $('.modalView#settingsSelect .modalBottomRightButton').off("click").on("click",function(){
@@ -533,13 +539,13 @@ $(function(){
           }).done(function(data){
                 if (data.status) {
                         if(data.message != undefined /* && alertElement.length > 0 */ ) {
-                            toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
+                            toastr.success(data.message,null, {timeOut: 3000,closeButton:false});
                         }
                 } else {
                     toastr.options.closeButton = true;
 
                     if(data.message != undefined /* && alertElement.length > 0 */) {
-                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                        toastr.error(data.message,null, {timeOut: 6000,closeButton:true});
                     }
                 }
                 if (data.data != undefined) {
@@ -552,6 +558,21 @@ $(function(){
           })            
         }
     }
+
+    // Get Calendar Authorization
+
+    function getCalendarAuthorization() {
+        $('.getCalendarAuthorization').off("click").on("click",function(){
+            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar' %>";
+            var win = window.open(url,"_blank","width=500,height=600");
+            var checkConnect = setInterval(function() {
+                    if (!win || !win.closed) return;
+                    clearInterval(checkConnect);
+                    window.location.reload();
+                }, 100);      
+        });        
+    }
+    getCalendarAuthorization();
 
     // Specific callback functions for after modal population
     function populateBubblesModal() {
@@ -566,6 +587,8 @@ $(function(){
         var contact_frequency = returnedData.contact_frequency;
         var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
 
+        var currentHref = $('#destroy_single_connection').attr('href');
+        $('#destroy_single_connection').attr('href',currentHref+"?connection_id="+returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.name').html(name);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         if (photoUrl) {
@@ -591,14 +614,21 @@ $(function(){
                 buttonAjax($(this),{plan_id:returnedData.planData.id,notify:$('.modalView#makePlan #notify').prop('checked')});
             });
             $('.modalView#makePlan form').attr('action',"<%= modify_plan_path %>").attr('method','PUT');
+            var authorized_by_google_calendar = returnedData.authorized_by_google_calendar == "true" ? true : false;
+            if (authorized_by_google_calendar) {
+                $('.modalView#makePlan .modalBottomRightButton').removeClass("getCalendarAuthorization").addClass("submitButton");
+            } else {
+                $('.modalView#makePlan .modalBottomRightButton').removeClass("submitButton").addClass("getCalendarAuthorization");
+            }
             $('.modalView#makePlan .modalBottomRightButton').html("UPDATE");
             $('.modalView#plans .modalBottomLeftButton').html("RESCHEDULE");
             
-            addListenerToPlanForm();
+            submitButtonListener();
+            getCalendarAuthorization();
         } else {
             $('.modalView#makePlan div#deleteEvent').removeClass('hidden').addClass('hidden');
             $('.modalView#makePlan form').attr('action',"<%= plans_path %>").attr('method','POST');
-            addListenerToPlanForm();
+            submitButtonListener();
             $('.modalView#makePlan .modalBottomRightButton').html("PUT IN CALENDAR");
             $('.modalView#plans .modalBottomLeftButton').html("MAKE PLANS");
         }
@@ -685,6 +715,12 @@ $(function(){
         })
     }
 
+    function populateUserInfoForm() {
+        $('.modalView#userInfo input[name=firstName]').val(returnedData.first_name);
+        $('.modalView#userInfo input[name=lastName]').val(returnedData.last_name);
+        $('.modalView#userInfo input[name=phoneNumber]').val(returnedData.phone);
+    }
+
     function populateSettingsForm () {
 
         var form = $('.modalView#settingsSelect #settingsContainer');
@@ -710,7 +746,7 @@ $(function(){
                     if (!win || !win.closed) return;
                     clearInterval(checkConnect);
                     window.location.reload();
-                }, 100);                        
+                }, 100);
             } else if (actionObject.action=="hide") {
                 $(actionObject.element).removeClass('hidden').addClass('hidden');
             } else if (actionObject.action=="unhide") {
@@ -731,7 +767,7 @@ $(function(){
 
     // Toggle check in button status
 
-    function checkInButtons(state=true,options={}) {
+    function checkInButtons(state,options) {
         _this = $('#checkinButton');
         if (state) {
             _this.html("CHECK IN");
@@ -837,7 +873,7 @@ $(function(){
             </div>
         </div>
         <div class="profileButtonsContainer hideOnMobile showOnDesktop" >
-            <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path(current_user) %>" data-method="GET">
+            <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path %>" data-method="GET">
                 <p class="showOnMobile" style="display:none;">Settings</p>
                 <%= fa_icon 'cog' %>
             </div>
@@ -1014,7 +1050,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed submitButton">PUT IN CALENDAR</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed <%= @authorized_google_calendar ? 'submitButton' : 'getCalendarAuthorization' %>" data-submit-form=".modalView#makePlan form">PUT IN CALENDAR</div>
         </div>
     </div>
     <div class="modalView hidden" id="editConnection">
@@ -1030,13 +1066,13 @@ $(function(){
                     Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
                 </div>
 
-                <input name="photoUploader" id="photoUploader" type="file" accept="image/*">
+                <input name="photoUploader" class="hiddenUploader" id="photoUploader" type="file" accept="image/*">
                 <label for="photoUploader" class="textDarkGray" style="margin-top: 20px;">
                     <%= fa_icon 'id-badge' %>
                     Upload Photo
                 </label>
-                <textarea name="notes" rows="4" placeholder="Notes. You can tag your notes like #howwemet" class="textDarkGray"></textarea>
-                <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
+                <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
+                <%= link_to "Delete Connection (testing purpose button)", destroy_connection_path, method: :put, id: "destroy_single_connection" %>
             </form>
         </div>
         <div class="modalButtonContainer">
@@ -1051,14 +1087,14 @@ $(function(){
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
-                <div class="formElement button textDarkGray disableWhileProcessed" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" data-alert-element="[data-remodal-id=importModal] .alert" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
+                <div class="formElement button textDarkGray disableWhileProcessed" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
                         <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement halfRow left m-b-md inputData" name="name" type="text" placeholder="name" required>
                         <input class="formElement halfRow right m-b-md inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
-                        <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate" id="photoUploaderInCreate" type="file" accept="image/*">
+                        <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
                         <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                             <%= fa_icon 'id-badge' %>
                             Upload Photo
@@ -1072,7 +1108,7 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomFullButton sphereBlueBackground hoverable  disableWhileProcessed submitButton">
+            <div class="modalBottomFullButton sphereBlueBackground hoverable  disableWhileProcessed submitButton" data-submit-form=".modalView#mainImportView form">
                 <span>ADD TO SPHERE</span>
             </div>
         </div>
@@ -1110,15 +1146,16 @@ $(function(){
                     <div id="send_event_booking_notification_by_default_title"></div>
                     <div><input type='checkbox' class="settingInput inputData" name='send_event_booking_notification_by_default' id='send_event_booking_notification_by_default_value' value=''></div>
                 </div>
-                <div class="m-b-md">
+<!--                 <div class="m-b-md">
                     <div id="share_my_calendar_with_contacts_title"></div>
                     <div><input type='checkbox' class="settingInput inputData" name='share_my_calendar_with_contacts' id='share_my_calendar_with_contacts_value' value=''></div>
-                </div>
+                </div> -->
                 <div class="m-b-md">
                     <div id="default_contact_interval_in_days_title"></div>
                     <div><input type='number' class="settingInput settingInput formElement standardHeight inputData" name='default_contact_interval_in_days' id='default_contact_interval_in_days_value'></div>
                 </div>
-                <div class="m-b-md">
+                <a href="<%= clear_connections_path %>">Clear contacts (testing button)</a>
+<!--                 <div class="m-b-md">
                     <div id="event_add_granularity_title"></div>
                     <div>
                         <select class="settingInput formElement button standardHeight inputData" name='event_add_granularity'>
@@ -1126,13 +1163,33 @@ $(function(){
                             <option value='quick' id="event_add_granularity_quick_value" >Quick</option>
                         </select>
                     </div>
-                </div>                
+                </div>                 -->
             </div>
-            <div class="alert hidden default_hidden"></div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereRedBackground hoverable">CANCEL</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed" href="<%= update_user_settings_path(current_user) %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">UPDATE</div>
+            <div class="modalBottomLeftButton sphereBlueBackground hoverable ajaxButton" href="<%= get_user_info_path %>" data-method="GET">MY INFO</div>
+            <div class="modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed" href="<%= update_user_settings_path %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">UPDATE</div>
+        </div>
+    </div>
+
+
+
+    <div class="modalView" id="userInfo">
+        <div class="modalContentContainer p-h-xxlg">
+            <form action="<%= update_user_info_path %>" method="PUT">
+                <input type="text" class="formElement inputData m-b-md" data-default-class="formElement inputData m-b-md" name="firstName" placeholder="First name">
+                <input type="text" class="formElement inputData m-b-md" data-default-class="formElement inputData m-b-md" name="lastName" placeholder="Last name">
+                <input type="text" class="formElement inputData m-b-md" data-default-class="formElement inputData m-b-md" name="phoneNumber" placeholder="Phone">
+                <input name="photoUploaderInUserInfo" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInUserInfo" type="file" accept="image/*">
+                <label for="photoUploaderInUserInfo" class="textDarkGray m-b-md formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
+                    <%= fa_icon 'id-badge' %>
+                    Upload Photo
+                </label>
+            </form>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomLeftButton sphereBlueBackground hoverable ajaxButton"  href="<%= get_user_settings_path %>" data-method="GET">SETTINGS</div>
+            <div class="modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed submitButton" data-submit-form=".modalView#userInfo form">UPDATE</div>
         </div>
     </div>
 </div>

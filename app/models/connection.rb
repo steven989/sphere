@@ -14,6 +14,8 @@ class Connection < ActiveRecord::Base
     # Other stuff
     scope :active, -> { where(active:true) } 
     mount_uploader :photo, PhotoUploader
+    # Validations
+    validates :email, email: true
 
     # Methods
     def name
@@ -130,7 +132,8 @@ class Connection < ActiveRecord::Base
             unified_email_array += other_emails.split("|>-<+|%") if other_emails
             unified_email_array = unified_email_array.map {|email| email.gsub(" ","")} #remove any spaces in the email
             unified_email_array = unified_email_array.uniq
-            unified_email_array.reject! {|email| email.strip == ""}
+            unified_email_array.reject! {|email| email.strip == "" || email == "NULL" || email == "null" || email == "nil" || email == "NIL"}
+            unified_email_array = nil if unified_email_array.length == 0
           else 
             unified_email_array = nil
           end
@@ -192,7 +195,9 @@ class Connection < ActiveRecord::Base
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
                   photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                  Connection.find(matched_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                  Connection.find(matched_connection.id).upload_photo(photo_data_uri,true)
+                elsif photo_file_upload
+                  Connection.find(matched_connection.id).upload_photo(photo_file_upload)
                 end
                 if tags
                   connection_tags = matched_connection.tags.map {|tag| tag}
@@ -228,12 +233,12 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
-              
+
               if new_connection.save
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
                   photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
                 elsif photo_file_upload
                   Connection.find(new_connection.id).upload_photo(photo_file_upload)
                 end
@@ -247,7 +252,7 @@ class Connection < ActiveRecord::Base
               else
                 status = false
                 message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
-                data = name
+                data = new_connection
               end
             end
           else
@@ -269,12 +274,12 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
-              
+
               if new_connection.save
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
                   photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true) if (photo_object && !photo_object[:body].blank?)
+                  Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
                 elsif photo_file_upload
                   Connection.find(new_connection.id).upload_photo(photo_file_upload)
                 end
@@ -288,7 +293,7 @@ class Connection < ActiveRecord::Base
               else
                 status = false
                 message = "#{name} could not be saved be saved. #{new_connection.errors.full_messages.join(', ')}"
-                data = name
+                data = new_connection
               end
           end
           {status:status,message:message,data:data}

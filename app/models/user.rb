@@ -3,8 +3,9 @@ class User < ActiveRecord::Base
 
   scope :app_users, -> { where(user_type:"user") } 
 
+  # Associations
   has_many :connections
-  has_many :activities  
+  has_many :activities
   has_many :connection_scores
   has_many :connection_score_histories
   has_many :notifications
@@ -22,11 +23,20 @@ class User < ActiveRecord::Base
   has_one :user_setting, dependent: :destroy
   has_many :tags
 
+  # Validations
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
+  validates :email, presence: true
+  validates :email, email: true
   validates :email, uniqueness: true
 
   after_create :import_default_settings
 
+  mount_uploader :photo, PhotoUploader
+
+
+  def display_name
+    (first_name || last_name) ? first_name.to_s+last_name.to_s  : email.match(/(\S+)@/)[1]
+  end
 
   def get_raw_bubbles_data(connections_override=nil,json_or_not_json=false)
     connections = connections_override ? connections_override : self.connections.active
@@ -77,8 +87,8 @@ class User < ActiveRecord::Base
           maxBubbleSize:bubbles_parameters_object[:max_size_of_bubbles],
           numberOfRecursion:bubbles_parameters_object[:number_of_recursions],
           radiusOfCentralBubble:bubbles_parameters_object[:radius_of_central_bubble],
-          centralBubbleDisplay:self.email,
-          centralBubblePhotoURL:nil
+          centralBubbleDisplay:self.display_name,
+          centralBubblePhotoURL:self.photo_url
           }
           if json_or_not_json
             bubbles_parameters.to_json
@@ -178,7 +188,7 @@ class User < ActiveRecord::Base
       if self.plans.where(connection_id:connection.id).length > 0
         plans = self.plans.where(connection_id:connection.id)
         plan = plans.order(date: :desc).limit(1).take
-        Notification.create_upcoming_plan_notification(self,connection,plan)
+        Notification.create_upcoming_plan_notification(self,connection)
       end
 
       # 3) update status of expired connections
@@ -235,6 +245,7 @@ class User < ActiveRecord::Base
       operator_with_replacement = operators_specified.map {|operator| {operator => "#{operator_dictionary[operator.gsub('#','').downcase]}"} }
       stat_with_replacement.each {|replacement| criteriaDup.gsub!(replacement.keys[0],replacement.values[0]) }
       operator_with_replacement.each {|replacement| criteriaDup.gsub!(replacement.keys[0],replacement.values[0]) }
+      criteriaDup.gsub!("==","=")
       criteriaDup
   end
 

@@ -27,13 +27,63 @@ class UsersController < ApplicationController
           redirect_to root_path
         else
           redirect_to(login_path, alert: "Could not create user. #{result[:message]}")
+          flash[:display] = "signup"
         end
+    end
+
+    def get_user_info
+      data = {first_name:current_user.first_name,last_name:current_user.last_name,phone:current_user.phone}
+      actions = [{action:"function_call",function:"populateUserInfoForm()"},{action:"hide",element:".modalView#settingsSelect"},{action:"unhide",element:".modalView#userInfo"},{action:"function_call",function:"initializeReModal('[data-remodal-id=settingsModal]','standardModal',1)"}]
+      respond_to do |format|
+        format.json {
+          render json: {status:true, message:nil,actions:actions,data:data}
+        } 
+      end
+    end
+
+    def update_user_info
+
+      first_name = params[:firstName] ? params[:firstName] : current_user.first_name
+      last_name = params[:lastName] ? params[:lastName] : current_user.last_name
+      
+      current_user.update_attributes(first_name:first_name,last_name:last_name,phone:params[:phoneNumber])
+      
+      photo_uploaded = !((params[:photoUploaderInUserInfo] == "undefined") || (params[:photoUploaderInUserInfo] == "null") || params[:photoUploaderInUserInfo].blank?)
+      if photo_uploaded
+        current_user.remove_photo!
+        current_user.save
+        current_user.photo = params[:photoUploaderInUserInfo]
+        if current_user.save
+          raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+          notifications = current_user.get_notifications(false)
+          bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+          current_user.update_attributes(photo_access_url:current_user.photo.url)
+          status = true
+          message = "Your info is updated!"
+          actions = [{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
+          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+        else
+          status = false
+          message = "Hmm. We seem to ran into some issues with your photo. Try a different one!"
+        end
+      else
+        status = true
+        actions = [{action:"function_call",function:"closeModalInstance(100)"}]
+        message = "Your info is updated!"
+      end
+      respond_to do |format|
+        format.json {
+          render json: {status:status, message:message,actions:actions,data:data}
+        } 
+      end
     end
 
     def dashboard
         if current_user.is? "admin"
           redirect_to admin_dashboard_path
         else
+          @authorized_google_calendar = current_user.authorized_by("google","calendar")
+          @authorized_google_contacts = current_user.authorized_by("google","contacts")
           @settings = current_user.user_setting.value_evaled
           @raw_bubbles_data = current_user.get_raw_bubbles_data(nil,true)
           @bubbles_parameters = current_user.get_bubbles_display_system_settings(true)
@@ -90,7 +140,8 @@ class UsersController < ApplicationController
               data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
           else
               status = false
-              message = "Uh oh. Our robots couldn't add #{connection.first_name} for some reason. #{connection.errors.full_messages.join(', ')}"
+              connection = result[:data]
+              message = "Uh oh. Our robots couldn't add #{connection.first_name}: #{connection.errors.full_messages.join(', ')}"
               actions = nil
               data = nil
           end
@@ -150,7 +201,7 @@ class UsersController < ApplicationController
                               }
         respond_to do |format|
           format.json {
-            render json: {status:true,data:formattedSettingsHash,actions:[{action:"function_call",function:"populateSettingsForm()"}]}
+            render json: {status:true,data:formattedSettingsHash,actions:[{action:"function_call",function:"populateSettingsForm()"},{action:"hide",element:".modalView#userInfo"},{action:"unhide",element:".modalView#settingsSelect"}]}
           } 
         end
     end
@@ -165,7 +216,7 @@ class UsersController < ApplicationController
       if user_setting.update_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity})
         status = true
         message = "Settings successfully updated"
-        actions = [{action:"function_call",function:"closeModalInstance(2000)"}]
+        actions = [{action:"function_call",function:"closeModalInstance(100)"}]
       else
         status = false
         message = "Settings could not be updated: user_setting.errors.full_messages.join(', ')"

@@ -125,12 +125,10 @@ $(function(){
             receivedDataFromAJAX = data;
                 if (data.status) {
                         if(data.message != undefined) {
-                            // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-success").removeClass("hidden");
                             toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
                         }
                 } else {
                     if(data.message != undefined) {
-                        // alertElement.html(data.message).removeClass("alert-danger").removeClass("alert-success").addClass("alert-danger").removeClass("hidden");
                         toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                     }
                 }
@@ -138,6 +136,7 @@ $(function(){
                     returnedData = data.data;
                 }
                 if (data.actions != undefined && data.actions.length > 0) {
+                    console.log(data.actions);
                     performActions(data.actions);    
                 }
           })
@@ -244,6 +243,12 @@ $(function(){
                 <li class="tab">
                     <a href="#users"><i class="fa fa-paperclip"></i><br>Users</a>
                 </li>
+                <li class="tab loadInputForm" data-input-form-model="system_setting">
+                    <a href="#system_settings"><i class="fa fa-tasks"></i><br>System Settings</a>
+                </li>
+                <li class="tab loadInputForm" data-input-form-model="activity_definition">
+                    <a href="#activity_definitions"><i class="fa fa-tasks"></i><br>Activity Definitions</a>
+                </li>
                 <li class="tab loadInputForm" data-input-form-model="level">
                     <a href="#levels"><i class="fa fa-tasks"></i><br>Levels</a>
                 </li>
@@ -265,6 +270,18 @@ $(function(){
                   <div id="users">
                     <h2>Users</h2>
                     <!-- content -->
+                  </div>
+                  <div id="system_settings">
+                    <h2>System Settings</h2>
+                    <div class="inputs" id="system_setting" >
+
+                    </div>
+                  </div>
+                  <div id="activity_definitions">
+                    <h2>Activity Definitions</h2>
+                    <div class="inputs" id="activity_definition" >
+
+                    </div>
                   </div>
                   <div id="levels">
                     <h2>Levels</h2>

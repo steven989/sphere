@@ -68,6 +68,8 @@ gem 'font-awesome-rails'
 gem 'seed_dump'
 # Monitoring
 gem 'newrelic_rpm'
+# Email validation
+gem 'email_validator'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

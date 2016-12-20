@@ -31,7 +31,7 @@ class ConnectionsController < ApplicationController
                 Connection.port_photo_url_to_access_url(connection.id)
                 status = true
                 message = "Awesome. We updated #{connection.first_name}'s info for you!"
-                actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(2000)"}]
+                actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(100)"}]
                 
             else
                 status = false
@@ -45,6 +45,7 @@ class ConnectionsController < ApplicationController
           } 
         end
     end
+
 
     def import
         provider = params[:provider]
@@ -84,7 +85,7 @@ class ConnectionsController < ApplicationController
           notifications = current_user.get_notifications(false)
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           message = result[:message]
-          actions=[{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(2000)"}]
+          actions=[{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           message = "Oops. Looks like our robots had some errors saving the contacts. Here are the details: #{result[:message]}"
@@ -99,6 +100,33 @@ class ConnectionsController < ApplicationController
         end
     end
 
+    def destroy
+       connection = Connection.find(params[:connection_id])
+       connection.activities.destroy_all
+       connection.connection_score.destroy if connection.connection_score
+       connection.connection_score_histories.destroy_all
+       connection.plans.destroy_all
+       connection.notifications.destroy_all
+       connection.tags.destroy_all
+       connection.destroy
+       redirect_to root_path
+    end
+
+    def destroy_all
+        current_user.activities.destroy_all
+        current_user.connection_scores.destroy_all
+        current_user.connection_score_histories.destroy_all
+        current_user.plans.destroy_all
+        current_user.notifications.destroy_all
+        current_user.tags.destroy_all
+        current_user.connections.destroy_all
+        current_user.user_challenges.destroy_all
+        current_user.user_badges.destroy_all
+        current_user.current_challenges.destroy_all
+        current_user.user_statistics.find_statistic('xp').take.update_attributes(value:0)
+        current_user.user_statistics.find_statistic('level').take.update_attributes(value:0)
+        redirect_to root_path
+    end
 
     def populate_connection_modal
 
@@ -124,7 +152,7 @@ class ConnectionsController < ApplicationController
         end
 
         data[:connection_tags] = connection.tags.order(created_at: :asc).map {|tag| tag.tag}
-        data[:all_tags] = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq
+        data[:all_tags] = current_user.tags.where(taggable_type:"Connection").order(tag: :asc).map {|tag| tag.tag}.uniq
 
         upcoming_plan = Plan.first_upcoming(current_user,connection)
         if upcoming_plan
@@ -132,12 +160,13 @@ class ConnectionsController < ApplicationController
             time = upcoming_plan.datetime_humanized
             data[:upcomingPlanString] = "#{activity} #{time}"
             data[:hasUpcomingPlan] = true
+            data[:authorized_by_google_calendar] = current_user.authorized_by("google","calendar")
             data[:planData] = {id:upcoming_plan.id,date:upcoming_plan.date_time_in_zone('date'),time:upcoming_plan.date_time_in_zone('time'),length:upcoming_plan.length,name:upcoming_plan.name_with_parentheses_removed,location:upcoming_plan.location,details:upcoming_plan.details}
         else
             data[:upcomingPlanString] = "No current plans :("
             data[:hasUpcomingPlan] = false
         end
-        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons(#{check_in_button_state})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"}]
+        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"}]
         respond_to do |format|
           format.json {
             render json: {status:true, message:nil,actions:actions,data:data}

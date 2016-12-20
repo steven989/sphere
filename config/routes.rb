@@ -15,8 +15,10 @@ Rails.application.routes.draw do
   post 'users/create_activity' => 'users#create_activity', as: 'create_activity'
   post 'users/create' => 'users#create', as: 'create_user'
   get 'users/new' => 'users#new', as: 'create_account'
-  get 'users/:id/settings' => 'users#get_user_settings', as: 'get_user_settings'
-  put 'users/:id/settings' => 'users#update_user_settings', as: 'update_user_settings'
+  get 'users/settings' => 'users#get_user_settings', as: 'get_user_settings'
+  put 'users/settings' => 'users#update_user_settings', as: 'update_user_settings'
+  put 'users/info' => 'users#update_user_info', as: 'update_user_info'
+  get 'users/info' => 'users#get_user_info', as: 'get_user_info'
   put 'users/update_tags' => 'users#update_tags', as: 'update_tags'
 
 
@@ -27,6 +29,8 @@ Rails.application.routes.draw do
   put  'connections/update' => 'connections#update', as: 'update_connection'
   put  'connections/import' => 'connections#import', as: 'import_connection'
   post  'connections/create_from_import' => 'connections#create_from_import', as: 'create_from_import'
+  put  'connections/destroy' => 'connections#destroy', as: 'destroy_connection'
+  put  'connections/destroy' => 'connections#destroy_all', as: 'clear_connections'
 
   # Admins controller
   get 'admins/dashboard' => 'admins#dashboard', as: 'admin_dashboard'
@@ -34,7 +38,10 @@ Rails.application.routes.draw do
   put  'admins/update_levels' => 'admins#update_levels', as: 'update_levels'
   put  'admins/update_challenges' => 'admins#update_challenges', as: 'update_challenges'
   put  'admins/update_badges' => 'admins#update_badges', as: 'update_badges'
+  put  'admins/update_activity_definitions' => 'admins#update_activity_definitions', as: 'update_activity_definitions'
+  put  'admins/update_system_settings' => 'admins#update_system_settings', as: 'update_system_settings'
   put  'admins/upload_graphics' => 'admins#upload_graphics', as: 'upload_graphics'
+
 
   # Plans controller
   post 'plans' => 'plans#create', as: 'plans'
