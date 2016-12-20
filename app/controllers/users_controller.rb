@@ -20,6 +20,7 @@ class UsersController < ApplicationController
           redirect_to root_path
         else
           redirect_to(login_path, alert: "Could not create user. #{result[:message]}")
+          flash[:display] = "signup"
         end
     end
 
@@ -132,7 +133,8 @@ class UsersController < ApplicationController
               data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
           else
               status = false
-              message = "Uh oh. Our robots couldn't add #{connection.first_name} for some reason. #{connection.errors.full_messages.join(', ')}"
+              connection = result[:data]
+              message = "Uh oh. Our robots couldn't add #{connection.first_name}: #{connection.errors.full_messages.join(', ')}"
               actions = nil
               data = nil
           end

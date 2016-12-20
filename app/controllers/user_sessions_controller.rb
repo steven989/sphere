@@ -23,9 +23,11 @@ class UserSessionsController < ApplicationController
         redirect_back_or_to(:root, notice: 'Login successful')
       else
         if user 
-          redirect_to(login_path, alert: "Incorrect password")
+          redirect_to(login_path, alert: "Password doesn't match what we have on file!")
+          flash[:display] = "login"
         else
-          redirect_to(login_path, alert: "You do not have an account")
+          redirect_to(login_path, alert: "Hmm we can't seem to find your account. Create one today!")
+          flash[:display] = "login"
         end
       end
     end

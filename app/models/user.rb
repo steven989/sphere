@@ -3,6 +3,7 @@ class User < ActiveRecord::Base
 
   scope :app_users, -> { where(user_type:"user") } 
 
+  # Associations
   has_many :connections
   has_many :activities
   has_many :connection_scores
@@ -22,7 +23,10 @@ class User < ActiveRecord::Base
   has_one :user_setting, dependent: :destroy
   has_many :tags
 
+  # Validations
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
+  validates :email, presence: true
+  validates :email, email: true
   validates :email, uniqueness: true
 
   after_create :import_default_settings

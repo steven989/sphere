@@ -1,5 +1,17 @@
 <script>
 $(function(){
+    <% if flash[:alert] %>
+        var alert = "<%= flash[:alert] %>";
+        toastr.error(alert, {timeOut: 5000,closeButton:true});
+    <% end %>
+
+    <% if flash[:display] %>
+        <% if flash[:display] == "login" %>
+            transition($(".loginScreen #signup"),$(".loginScreen #login"));
+        <% elsif flash[:display] == "signup" %>
+            transition($(".loginScreen #login"),$(".loginScreen #signup"));
+        <% end %>
+    <% end %>
     $('.googleLoginButton').off("click").on("click",function(){
             event.preventDefault();
             event.stopPropagation()

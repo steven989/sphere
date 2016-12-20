@@ -14,6 +14,8 @@ class Connection < ActiveRecord::Base
     # Other stuff
     scope :active, -> { where(active:true) } 
     mount_uploader :photo, PhotoUploader
+    # Validations
+    validates :email, email: true
 
     # Methods
     def name
@@ -231,7 +233,7 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
-              
+
               if new_connection.save
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
@@ -250,7 +252,7 @@ class Connection < ActiveRecord::Base
               else
                 status = false
                 message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
-                data = name
+                data = new_connection
               end
             end
           else
@@ -272,7 +274,7 @@ class Connection < ActiveRecord::Base
               other_phones_to_create = updated_additional_phones_string
 
               new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
-              
+
               if new_connection.save
                 if photo_object && !photo_object[:body].blank?
                   encoded = Base64.strict_encode64(photo_object[:body])
@@ -291,7 +293,7 @@ class Connection < ActiveRecord::Base
               else
                 status = false
                 message = "#{name} could not be saved be saved. #{new_connection.errors.full_messages.join(', ')}"
-                data = name
+                data = new_connection
               end
           end
           {status:status,message:message,data:data}
