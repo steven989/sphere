@@ -200,7 +200,7 @@ class User < ActiveRecord::Base
 
       # 3) update status of expired connections
       if number_of_days_since_last_activity > target_contact_interval_in_days
-        if connection.plans.where(date>=Date.today).length == 0
+        if connection.plans.where("date >= ?",Date.today).length == 0
           connection.update_attributes(active:false)
         end
       end
