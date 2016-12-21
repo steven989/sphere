@@ -2,7 +2,7 @@ namespace :system do
 
     desc 'Run scheduled tasks on the hour'
     task :run_scheduled_events, [:force_all] => [:environment] do |t, args|
-        force_all = args[:force_all].nil? ? false : args[:force_all]
+        force_all = args[:force_all].nil? ? false : (args[:force_all] == "true" ? true : false)
         ScheduledTask.run_all_tasks(force_all)
     end 
 
