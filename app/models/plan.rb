@@ -14,15 +14,14 @@ class Plan < ActiveRecord::Base
 
         connection_email = !connection_email_override.blank? ? connection_email_override : connection.email
 
-        # Check to see if there's an existing valid access token we can use without making a server request
-        if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
-          token_object = user.authorizations.where(provider:'google').take.refresh_token!  
-        else
-          token_object = {access_token:access_token,expires_at:expires_at}
-        end
-
         # Authenticate with Google and retrieve primary calendar
         begin
+            # Check to see if there's an existing valid access token we can use without making a server request
+            if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
+              token_object = user.authorizations.where(provider:'google').take.refresh_token!  
+            else
+              token_object = {access_token:access_token,expires_at:expires_at}
+            end
             service = Google::Apis::CalendarV3::CalendarService.new
             access_token = AccessToken.new(token_object[:access_token])
             service.authorization = access_token

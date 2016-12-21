@@ -15,8 +15,6 @@ class PlansController < ApplicationController
             summary+=" (with #{connection.name})"
         end
 
-        
-
         if !connection_email.blank? && connection.email.blank?
             connection.update_attributes(email:connection_email)
         end
@@ -60,16 +58,28 @@ class PlansController < ApplicationController
                                        "primary"
                                     )
 
-            if result[:access_token]
-                session[:access_token] = result[:access_token][:access_token]
-                session[:expires_at] = result[:access_token][:expires_at]
-            end
-            Notification.create_upcoming_plan_notification(current_user,connection)
             status = result[:status]
-            notifications = current_user.get_notifications(false)
-            data = {notifications:notifications}
-            message= result[:message]
-            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(100)"}]
+            if status
+                if result[:access_token]
+                    session[:access_token] = result[:access_token][:access_token]
+                    session[:expires_at] = result[:access_token][:expires_at]
+                end
+                Notification.create_upcoming_plan_notification(current_user,connection)
+                notifications = current_user.get_notifications(false)
+                data = {notifications:notifications}
+                message= result[:message]
+                actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(100)"}]
+            elsif !status && result[:message].include?("")
+                message = "Hmm looks like we don't have access to your Google calendar. Click on the import button again to connect your Google account!"
+                scope = current_user.authorizations.where(provider:'google').take.scope_value
+                scope.reject! {|s| s == "calendar"}
+                current_user.authorizations.where(provider:'google').take.update_scope(scope)
+                session[:access_token] = nil
+                session[:expires_at] = nil
+                actions = [{action:"function_call",function:"changeVariableValue('authorized_google_calendar',false)"}]
+            else
+                message = "Uh oh. There seems to be some issues: #{result[:message]}"
+            end
         end
 
         respond_to do |format|

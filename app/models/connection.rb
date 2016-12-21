@@ -101,13 +101,12 @@ class Connection < ActiveRecord::Base
     end
     
     def self.import_from_google(user,access_token=nil,expires_at=nil,output_type="summarized_array")
-        if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
-          token_object = user.authorizations.where(provider:'google').take.refresh_token!  
-        else
-          token_object = {access_token:access_token,expires_at:expires_at}
-        end
-
         begin
+          if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
+            token_object = user.authorizations.where(provider:'google').take.refresh_token!  
+          else
+            token_object = {access_token:access_token,expires_at:expires_at}
+          end
           client = OAuth2::Client.new(ENV['GOOGLE_OAUTH_CLIENT_ID'],ENV['GOOGLE_OAUTH_CLIENT_SECRET'])
           oauth_access_token_for_user = OAuth2::AccessToken.new(client,token_object[:access_token])
           google_contacts_user = GoogleContactsApi::User.new(oauth_access_token_for_user)

@@ -9,7 +9,7 @@ $(function(){
     var userLevelNotifications = (<%= raw @notifications %>).user_level;
     var bubblesData = <%= raw @raw_bubbles_data %>;
     var authorized_google_contacts = <%= @authorized_google_contacts %>;
-
+    var authorized_google_calendar = <%= @authorized_google_calendar %>;
     // Search 
     var options = {
       shouldSort: true,
@@ -564,6 +564,24 @@ $(function(){
         }
     });
 
+    // Putting in calendar
+    $('.putInCalendar').off("click").on("click",function(){
+        _this = $(this);
+        if (!authorized_google_calendar) {
+            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar' %>";
+            var win = window.open(url,"_blank","width=500,height=600");
+            var checkConnect = setInterval(function() {
+                    if (!win || !win.closed) return;
+                    clearInterval(checkConnect);
+                    authorized_google_calendar = true;
+                    modalAjaxFormSubmission($(_this.data('submit-form')),_this);
+                }, 100);
+        } else {
+            modalAjaxFormSubmission($(_this.data('submit-form')),_this);
+        }
+    });
+
+
     function changeVariableValue(variable,value) {
         eval(variable+"="+value);
     }
@@ -633,20 +651,6 @@ $(function(){
         }
     }
 
-    // Get Calendar Authorization
-
-    function getCalendarAuthorization() {
-        $('.getCalendarAuthorization').off("click").on("click",function(){
-            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar' %>";
-            var win = window.open(url,"_blank","width=500,height=600");
-            var checkConnect = setInterval(function() {
-                    if (!win || !win.closed) return;
-                    clearInterval(checkConnect);
-                    window.location.reload();
-                }, 100);      
-        });        
-    }
-    getCalendarAuthorization();
 
     // Specific callback functions for after modal population
     function populateBubblesModal() {
@@ -688,16 +692,11 @@ $(function(){
             });
             $('.modalView#makePlan form').attr('action',"<%= modify_plan_path %>").attr('method','PUT');
             var authorized_by_google_calendar = returnedData.authorized_by_google_calendar == "true" ? true : false;
-            if (authorized_by_google_calendar) {
-                $('.modalView#makePlan .modalBottomRightButton').removeClass("getCalendarAuthorization").addClass("submitButton");
-            } else {
-                $('.modalView#makePlan .modalBottomRightButton').removeClass("submitButton").addClass("getCalendarAuthorization");
-            }
+
             $('.modalView#makePlan .modalBottomRightButton').html("UPDATE");
             $('.modalView#plans .modalBottomLeftButton').html("RESCHEDULE");
             
             submitButtonListener();
-            getCalendarAuthorization();
         } else {
             $('.modalView#makePlan div#deleteEvent').removeClass('hidden').addClass('hidden');
             $('.modalView#makePlan form').attr('action',"<%= plans_path %>").attr('method','POST');
@@ -1134,7 +1133,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed <%= @authorized_google_calendar ? 'submitButton' : 'getCalendarAuthorization' %>" data-submit-form=".modalView#makePlan form">PUT IN CALENDAR</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed putInCalendar" data-submit-form=".modalView#makePlan form">PUT IN CALENDAR</div>
         </div>
     </div>
     <div class="modalView hidden" id="editConnection">

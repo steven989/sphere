@@ -99,9 +99,9 @@ class ConnectionsController < ApplicationController
                 message = "Hmm looks like we don't have access to your #{provider.capitalize} contacts. Click on the import button again to connect your #{provider.capitalize} account!"
                 scope = current_user.authorizations.where(provider:provider).take.scope_value
                 scope.reject! {|s| s == "contacts"}
+                current_user.authorizations.where(provider:provider).take.update_scope(scope)
                 session[:access_token] = nil
                 session[:expires_at] = nil
-                current_user.authorizations.where(provider:provider).take.update_scope(scope)
                 actions = [{action:"function_call",function:"changeVariableValue('authorized_google_contacts',false)"}]
             else
                 message = "Uh oh. There seems to be some issues: #{result[:message]}"
