@@ -69,7 +69,7 @@ class AuthorizationsController < ApplicationController
         else
             authorization = current_user.authorizations.new(provider:"google",scope:"['email','profile','contacts']",data:"{email:'#{request.env['omniauth.auth']['extra']['raw_info']['email']}',name:'#{request.env['omniauth.auth']['extra']['raw_info']['name']}',access_token:'#{request.env['omniauth.auth']['credentials']['token']}',refresh_token:'#{request.env['omniauth.auth']['credentials']['refresh_token']}'}")
         end
-        
+
         if authorization.save
 
         else

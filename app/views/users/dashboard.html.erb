@@ -8,6 +8,7 @@ $(function(){
     var tokenInCreate;
     var userLevelNotifications = (<%= raw @notifications %>).user_level;
     var bubblesData = <%= raw @raw_bubbles_data %>;
+    var authorized_google_contacts = <%= @authorized_google_contacts %>;
 
     // Search 
     var options = {
@@ -548,19 +549,24 @@ $(function(){
 
     // Importing contacts
     $('#importContactsGoogle').off("click").on("click",function(){
-        var authorized_google_contacts = <%= @authorized_google_contacts %>;
+        _this = $(this);
         if (!authorized_google_contacts) {
             var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_contacts' : 'http://localhost:3000/auth/google_contacts' %>";
             var win = window.open(url,"_blank","width=500,height=600");
             var checkConnect = setInterval(function() {
                     if (!win || !win.closed) return;
                     clearInterval(checkConnect);
-                    window.location.reload();
+                    authorized_google_contacts = true;
+                    buttonAjax(_this,_this.data('data-to-send'));
                 }, 100);
         } else {
-            buttonAjax($(this),$(this).data('data-to-send'));            
+            buttonAjax(_this,_this.data('data-to-send'));
         }
     });
+
+    function changeVariableValue(variable,value) {
+        eval(variable+"="+value);
+    }
 
     // Account settings
     $('#accountSettings').off("click").on("click",function(){
@@ -593,8 +599,10 @@ $(function(){
 
     // Standard ajax call for buttons
     function buttonAjax(button,data) {
-        event.preventDefault();
-        event.stopPropagation();
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();            
+        }
         if (!button.hasClass('disabled')) {
           var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);
           $.ajax({

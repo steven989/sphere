@@ -115,12 +115,12 @@ class Connection < ActiveRecord::Base
           contacts = output_type == "api_contact_class" ? imported : imported.map {|contact| {id:contact.id,name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }} 
         rescue => error
             status = false
-            message = error.message                  
+            message = error.message
         else
           status = true
           message = "Here's your contacts from Google! Pick the ones you want to import. We'll import their photos too if available"
-          {status:status,message:message,data:contacts,access_token:token_object}
         end
+        {status:status,message:message,data:contacts,access_token:token_object}
     end
 
     def self.insert_contact(user,name,email=nil,other_emails=nil,phones=nil,photo_object=nil,photo_file_upload=nil,tags=nil,notes=nil)

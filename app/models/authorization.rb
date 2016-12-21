@@ -5,6 +5,14 @@ class Authorization < ActiveRecord::Base
         eval(data)
     end
 
+    def scope_value
+        eval(scope)
+    end
+
+    def update_scope(scope_aray)
+        update_attributes(scope:scope_aray.to_s)
+    end
+
     def data_value_for_key(key)
         data_value[key.to_sym]
     end

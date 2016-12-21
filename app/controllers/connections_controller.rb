@@ -76,24 +76,38 @@ class ConnectionsController < ApplicationController
 
     def import
         provider = params[:provider]
-        if !current_user.authorized_by(provider,"contacts")
-            actions = [{action:"popup_refresh_main_on_close",url:"#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_contacts' : 'http://localhost:3000/auth/google_contacts'}"}]
-            status = false
-            message = "Please connect Sphere with your Google Contacts in the popup"
-            data=nil
-        else
+        # if !current_user.authorized_by(provider,"contacts")
+        #     actions = [{action:"popup_refresh_main_on_close",url:"#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_contacts' : 'http://localhost:3000/auth/google_contacts'}"}]
+        #     status = false
+        #     message = "Please connect Sphere with your Google Contacts in the popup"
+        #     data=nil
+        # else
+
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil
             result = Connection.import_from_google(current_user,access_token,expires_at,"summarized_array")
             data = result[:data]
             status = result[:status]
-            message = result[:message]
-            if result[:access_token]
-                session[:access_token] = result[:access_token][:access_token]
-                session[:expires_at] = result[:access_token][:expires_at]
+            if status
+                if result[:access_token]
+                    session[:access_token] = result[:access_token][:access_token]
+                    session[:expires_at] = result[:access_token][:expires_at]
+                end
+                message = result[:message]
+                actions=[{action:"transitionViews",from:"[data-remodal-id=importModal] .modalView#mainImportView",to:"[data-remodal-id=importModal] .modalView#listSelect"},{action:"function_call",function:"populateImportSelectionList(returnedData)"}]
+            elsif !status && result[:message].include?("Unauthorized")
+                message = "Hmm looks like we don't have access to your #{provider.capitalize} contacts. Click on the import button again to connect your #{provider.capitalize} account!"
+                scope = current_user.authorizations.where(provider:provider).take.scope_value
+                scope.reject! {|s| s == "contacts"}
+                session[:access_token] = nil
+                session[:expires_at] = nil
+                current_user.authorizations.where(provider:provider).take.update_scope(scope)
+                actions = [{action:"function_call",function:"changeVariableValue('authorized_google_contacts',false)"}]
+            else
+                message = "Uh oh. There seems to be some issues: #{result[:message]}"
             end
-            actions=[{action:"transitionViews",from:"[data-remodal-id=importModal] .modalView#mainImportView",to:"[data-remodal-id=importModal] .modalView#listSelect"},{action:"function_call",function:"populateImportSelectionList(returnedData)"}]
-        end
+            
+        # end
 
         respond_to do |format|
           format.json {
