@@ -83,6 +83,7 @@ class UsersController < ApplicationController
         if current_user.is? "admin"
           redirect_to admin_dashboard_path
         else
+          @current_user_email = current_user.email
           @authorized_google_calendar = current_user.authorized_by("google","calendar")
           @authorized_google_contacts = current_user.authorized_by("google","contacts")
           @settings = current_user.user_setting.value_evaled

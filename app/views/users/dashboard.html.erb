@@ -560,7 +560,7 @@ $(function(){
     $('#importContactsGoogle').off("click").on("click",function(){
         _this = $(this);
         if (!authorized_google_contacts) {
-            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_contacts' : 'http://localhost:3000/auth/google_contacts' %>";
+            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_contacts?login_hint='+@current_user_email : 'http://localhost:3000/auth/google_contacts?login_hint='+@current_user_email %>";
             var win = window.open(url,"_blank","width=500,height=600");
             var checkConnect = setInterval(function() {
                     if (!win || !win.closed) return;
@@ -577,7 +577,7 @@ $(function(){
     $('.putInCalendar').off("click").on("click",function(){
         _this = $(this);
         if (!authorized_google_calendar) {
-            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar' %>";
+            var url = "<%= Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar?login_hint='+@current_user_email : 'http://localhost:3000/auth/google_calendar?login_hint='+@current_user_email %>";
             var win = window.open(url,"_blank","width=500,height=600");
             var checkConnect = setInterval(function() {
                     if (!win || !win.closed) return;
