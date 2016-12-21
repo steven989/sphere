@@ -119,7 +119,8 @@ class ConnectionsController < ApplicationController
     def create_from_import
         access_token = session ? session[:access_token] : nil
         expires_at = session ? session[:expires_at] : nil
-        result = Connection.create_from_import(current_user,params[:contactsToImport].values,access_token,expires_at)
+        merge_name = params[:mergeName].blank? ? nil : (params[:mergeName] == "true" ? true : false)
+        result = Connection.create_from_import(current_user,params[:contactsToImport].values,access_token,expires_at,merge_name)
 
         if result[:status] 
           raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)

@@ -490,7 +490,7 @@ label[for=photoUploader]:hover {
 /* Import contacts modal view */
 
 .modalView#listSelect .modalContentContainer {
-    height:300px;
+    height:350px;
 }
 
 .modalView#listSelect .modalContentContainer #importContacts {
@@ -501,6 +501,10 @@ label[for=photoUploader]:hover {
     table-layout: fixed;
     width:100%;
     text-align: left;
+}
+
+.modalView#listSelect .modalContentContainer #importContacts #importSelectionTable tr {
+    cursor: pointer;
 }
 
 

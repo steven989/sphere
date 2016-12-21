@@ -557,6 +557,7 @@ $(function(){
     }
 
     // Importing contacts
+
     $('#importContactsGoogle').off("click").on("click",function(){
         _this = $(this);
         if (!authorized_google_contacts) {
@@ -572,6 +573,11 @@ $(function(){
             buttonAjax(_this,_this.data('data-to-send'));
         }
     });
+
+    // Clicking on rows of the import contacts view
+    $('#importContacts #importSelectionTable').off("click").on("click",'tr',function(){
+        $(this).find('input.importCheck').prop('checked',!$(this).find('input.importCheck').prop('checked'));
+    })
 
     // Putting in calendar
     $('.putInCalendar').off("click").on("click",function(){
@@ -891,7 +897,7 @@ $(function(){
         returnedData,list = null; //this is to clear up the reference to the object to make it available for garbage collection after we're done
         contacts.forEach(function(contact){
             contact.incID = incrementer;
-            $('.modalView#listSelect #importSelectionTable tbody').append('<tr data-inc-id='+incrementer+'><td class="import" ><input type="checkbox" data-inc-id='+incrementer+' data-id="'+contact.id+'" data-name="'+contact.name+'" data-email="'+contact.email+'" data-phone="'+contact.phone.join('|>-<+|%')+'" data-other-emails="'+contact.other_emails.join('|>-<+|%')+'" ></td><td class="name" >'+contact.name+'</td><td class="email">'+contact.email+'</td><td class="phone">'+contact.phone.join(', ')+'</td><td class="other_emails">'+contact.other_emails.join(', ')+'</td></tr>');
+            $('.modalView#listSelect #importSelectionTable tbody').append('<tr data-inc-id='+incrementer+'><td class="import" ><input type="checkbox" class="importCheck" data-inc-id='+incrementer+' data-id="'+contact.id+'" data-name="'+contact.name+'" data-email="'+contact.email+'" data-phone="'+contact.phone.join('|>-<+|%')+'" data-other-emails="'+contact.other_emails.join('|>-<+|%')+'" ></td><td class="name" >'+contact.name+'</td><td class="email">'+contact.email+'</td><td class="phone">'+contact.phone.join(', ')+'</td><td class="other_emails">'+contact.other_emails.join(', ')+'</td></tr>');
             incrementer++;
         });
         
@@ -914,7 +920,7 @@ $(function(){
                     contactListToSend.push({id:$(this).data('id'),name:$(this).data('name'),email:$(this).data('email'),phone:$(this).data('phone'),other_emails:$(this).data('other-emails') })
                 }
             });
-            buttonAjax($(this),{contactsToImport:contactListToSend});
+            buttonAjax($(this),{contactsToImport:contactListToSend,mergeName:$('#importContacts #mergeName').prop('checked')});
         });
 
         
@@ -1175,7 +1181,7 @@ $(function(){
 </div>
 
 
-<div data-remodal-id="importModal" data-default-css="([{'attribute':'height','value':'400px'}])">
+<div data-remodal-id="importModal" style="height:450px;" data-default-css="([{'attribute':'height','value':'450px'}])">
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
@@ -1184,8 +1190,8 @@ $(function(){
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
-                        <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement halfRow left m-b-md inputData" name="name" type="text" placeholder="name" required>
-                        <input class="formElement halfRow right m-b-md inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
+                        <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-md inputData" name="name" type="text" placeholder="name" required>
+                        <input class="formElement m-b-md inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
                         <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
                         <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                             <%= fa_icon 'id-badge' %>
@@ -1210,6 +1216,8 @@ $(function(){
             <div id="importContacts">
                 <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;position:absolute;top:0px;left:0px;"></div>
                 <input type="text" class="search formElement" placeholder="Search">
+                <%= check_box_tag 'mergeName',true,true, style:"display:inline-box;", class:"m-t-sm" %>
+                <label for="mergeName" class="textDarkGray m-t-sm">Merge contacts with the same name</label>
                 <table id="importSelectionTable" class="table table-sm m-t-md table-hover textDarkGray">
                     <thead class="thead-default">
                         <th>Import?</th>
