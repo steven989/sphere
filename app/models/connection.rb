@@ -111,7 +111,8 @@ class Connection < ActiveRecord::Base
           oauth_access_token_for_user = OAuth2::AccessToken.new(client,token_object[:access_token])
           google_contacts_user = GoogleContactsApi::User.new(oauth_access_token_for_user)
           imported = google_contacts_user.contacts
-          contacts = output_type == "api_contact_class" ? imported : imported.map {|contact| {id:contact.id,name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }} 
+          existing_contacts = user.connections.map{|connection| connection.email }
+          contacts = output_type == "api_contact_class" ? imported : imported.inject([]) {|accumulator,contact| accumulator.push({id:contact.id,name:contact.title, email:contact.primary_email, other_emails: contact.emails.delete_if{|e| e == contact.primary_email}, phone: contact.phone_numbers }) unless existing_contacts.include?(contact.primary_email); accumulator} 
         rescue => error
             status = false
             message = error.message
