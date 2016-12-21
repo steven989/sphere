@@ -82,9 +82,18 @@ $(function(){
 
     // In place update
     function inPlaceUpdate() {
-        $('.inPlaceField').off("focusout").on("focusout",function(){
-            buttonAjax($(this),{id:$(this).data('id'),value:$(this).val()});
-        });
+        $('.inPlaceField').each(function(){
+            var currentValue;
+            $(this).off("focusin").on("focusin",function(){
+                currentValue = $(this).val();
+            });
+
+            $(this).off("focusout").on("focusout",function(){
+                if ($(this).val() != currentValue) {
+                    buttonAjax($(this),{id:$(this).data('id'),value:$(this).val()});    
+                }
+            });
+        })
     }
     inPlaceUpdate();
 
