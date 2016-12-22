@@ -74,7 +74,6 @@ class ConnectionsController < ApplicationController
                 data = nil
             end
         end
-
         respond_to do |format|
           format.json {
             render json: {status:status,message:message,actions:actions,data:data}

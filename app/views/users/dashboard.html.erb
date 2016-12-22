@@ -182,68 +182,79 @@ $(function(){
 
             // 3) Modal on clicking each bubble
             $(this).off("click").on("click",function(){
-                var _this = $(this);
-                if (_this.data('connection-id')=='0') {
-                    resetModal($('[data-remodal-id=bubbleModal]'),1);
-                    buttonAjax(_this,{});
-                } else {
-                    $('[data-remodal-id=bubbleModal] .modalView').each(function(){
-                        if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
-                            else {$(this).removeClass('hidden')};
-                    });
-                    $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
-                    $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
-                    $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
-                    $('.createActivity').each(function(){
-                        $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
-                    });
-                    $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
-                        var button = $(this);
-                        if (!button.hasClass('disabled')) {
-                            var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
-                            var formData = new FormData();
-                            var form = $('.modalView#editConnection form');
-                            var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
-                            var custom_frequency;
-                            formData.append("connection_id",_this.data('connection-id'));
-                            if (frequency=="other") { custom_frequency = form.find('.details input').val();}
-                            formData.append("contact_frequency",frequency);
-                            formData.append("custom_frequency",custom_frequency);
-                            formData.append("notes",form.find('[name=notes]').val());
-                            formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
+                if (!$(this).hasClass('disabled')) {
+                    var overLayHtml = $(this).find('.overlayWithName span').html();
+                    $(this).find('.overlayWithName span').html('<%= fa_icon "spinner", class:"rotater" %>');
+                    $(this).find('.overlayWithName').css({'opacity':'1'});
+                    clockedRotate.start($(this).find('.overlayWithName span .rotater'),150,true);
+                    var _this = $(this);
+                    if (_this.data('connection-id')=='0') {
+                        resetModal($('[data-remodal-id=bubbleModal]'),1);
+                        buttonAjax(_this,{});
+                        _this.find('.overlayWithName span').html(overLayHtml);
+                        _this.find('.overlayWithName').css({'opacity':''});
+                        clockedRotate.end();
+                    } else {
+                        $('[data-remodal-id=bubbleModal] .modalView').each(function(){
+                            if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
+                                else {$(this).removeClass('hidden')};
+                        });
+                        $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
+                        $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
+                        $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
+                        $('.createActivity').each(function(){
+                            $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
+                        });
+                        $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
+                            var button = $(this);
+                            if (!button.hasClass('disabled')) {
+                                var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
+                                var formData = new FormData();
+                                var form = $('.modalView#editConnection form');
+                                var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
+                                var custom_frequency;
+                                formData.append("connection_id",_this.data('connection-id'));
+                                if (frequency=="other") { custom_frequency = form.find('.details input').val();}
+                                formData.append("contact_frequency",frequency);
+                                formData.append("custom_frequency",custom_frequency);
+                                formData.append("notes",form.find('[name=notes]').val());
+                                formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
 
-                          $.ajax({
-                            url: '<%= update_connection_path %>',
-                            type: 'PUT',
-                            processData: false,
-                            contentType: false,
-                            data: formData,
-                            dataType: 'JSON'
-                          }).done(function(data){
-                                if (data.status) {
-                                        if(data.message != undefined /* && alertElement.length > 0 */ ) {
-                                            toastr.success(data.message,null, {timeOut: 5000,closeButton:false});                       
+                              $.ajax({
+                                url: '<%= update_connection_path %>',
+                                type: 'PUT',
+                                processData: false,
+                                contentType: false,
+                                data: formData,
+                                dataType: 'JSON'
+                              }).done(function(data){
+                                    if (data.status) {
+                                            if(data.message != undefined){
+                                                toastr.success(data.message,null,{timeOut: 5000,closeButton:false});                       
+                                            }
+                                    } else {
+                                        toastr.options.closeButton = true;
+                                        if(data.message != undefined /* && alertElement.length > 0 */) {
+                                            toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                                         }
-                                } else {
-                                    toastr.options.closeButton = true;
-                                    if(data.message != undefined /* && alertElement.length > 0 */) {
-                                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                                     }
-                                }
-                                if (data.data != undefined) {
-                                    returnedData = data.data;
-                                }
-                                if (data.actions != undefined && data.actions.length > 0) {
-                                    performActions(data.actions);    
-                                }
-                                reEnableButton(disabledButtonObject);
-                              });
-                        }
-                    })
-                    resetModal($('[data-remodal-id=bubbleModal]'),3);
-                    buttonAjax(_this,{});
-                } // if (_this.data('connection-id')=='0')
-
+                                    if (data.data != undefined) {
+                                        returnedData = data.data;
+                                    }
+                                    reEnableButton(disabledButtonObject);
+                                    if (data.actions != undefined && data.actions.length > 0) {
+                                        performActions(data.actions);    
+                                    }
+                                  });
+                            }
+                        })
+                        resetModal($('[data-remodal-id=bubbleModal]'),3);
+                        buttonAjax(_this,{});
+                        _this.find('.overlayWithName span').html(overLayHtml);
+                        _this.find('.overlayWithName').css({'opacity':''});
+                        clockedRotate.end();
+                    } // if (_this.data('connection-id')=='0')
+                } //if (!button.hasClass('disabled'))
             }); // $(this).off("click").on("click")
         });
     }
@@ -336,9 +347,11 @@ $(function(){
     function resetModal(modal,resetType) {
         if (resetType == 1 || resetType == 3) {
             // reset class
-            eval(modal.data('default-css')).forEach(function(cssReset){ 
-                modal.css(cssReset.attribute,cssReset.value);
-            });
+            if (modal.data('default-css')){
+                eval(modal.data('default-css')).forEach(function(cssReset){ 
+                    modal.css(cssReset.attribute,cssReset.value);
+                });                
+            }
             modal.find('*').filter(function(){ return $(this).data('default-class') != undefined }).each(function(){
                 $(this).prop("class",$(this).data('default-class'));
             })
