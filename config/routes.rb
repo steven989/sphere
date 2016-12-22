@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   put  'connections/destroy' => 'connections#destroy', as: 'destroy_connection'
   put  'connections/destroy' => 'connections#destroy_all', as: 'clear_connections'
   put 'connections/update_name' => 'connections#update_name', as: 'update_connection_name'
+  put 'connections/update_email' => 'connections#update_email', as: 'update_connection_email'
   get 'connections/list_expired_connections' => 'connections#list_expired_connections', as: 'list_expired_connections'
   put 'connections/revive_expired_connections' => 'connections#revive_expired_connections', as: 'revive_expired_connections'
 
