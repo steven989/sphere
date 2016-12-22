@@ -1,6 +1,7 @@
 <script>
 var test;
 $(function(){
+    $('[data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});;
     var returnedData;
     var modalInstance;
     var closeModalTimer;    
@@ -291,8 +292,6 @@ $(function(){
         }
     };
 
-
-
     // Photo upload label within bubble modal to change display when a file is selected
     $(".hiddenUploader").on("change",function(){
             $("label[for="+$(this).prop('id')+"]").html($(this).prop("files")[0].name);
@@ -337,6 +336,9 @@ $(function(){
     function resetModal(modal,resetType) {
         if (resetType == 1 || resetType == 3) {
             // reset class
+            eval(modal.data('default-css')).forEach(function(cssReset){ 
+                modal.css(cssReset.attribute,cssReset.value);
+            });
             modal.find('*').filter(function(){ return $(this).data('default-class') != undefined }).each(function(){
                 $(this).prop("class",$(this).data('default-class'));
             })
@@ -704,25 +706,46 @@ $(function(){
             $('[data-remodal-id=bubbleModal] .modalView#plans div.icon').removeClass('hidden');
             $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden').addClass('hidden');
         }
-        
+
+        $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
+        $('.modalView#makePlan input[name=notify]').prop('checked',<%= @settings[:send_event_booking_notification_by_default] %>);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
         if (returnedData.hasUpcomingPlan) {
             $('.modalView#makePlan input[name=date]').val(returnedData.planData.date);
-            $('.modalView#makePlan input[name=time]').val(returnedData.planData.time);
-            $('.modalView#makePlan input[name=duration]').val(returnedData.planData.length);
+            $('.modalView#makePlan input[name=timeFrom]').val(returnedData.planData.start_time);
+            $('.modalView#makePlan input[name=timeTo]').val(returnedData.planData.end_time);
             $('.modalView#makePlan input[name=name]').val(returnedData.planData.name);
             $('.modalView#makePlan input[name=location]').val(returnedData.planData.location);
             $('.modalView#makePlan input[name=details]').val(returnedData.planData.details);
             $('.modalView#makePlan input[name=plan_id]').val(returnedData.planData.id);
+            $('.modalView#makePlan input[name=notify]').prop('checked',returnedData.planData.notify);
+            // ----- this part adds the green selected highlight to the activities button group based on text //
+            var selectedActivities = 0;
+            $('.modalView#makePlan .chooseActivity button').each(function(){
+                if($(this).data('value')==returnedData.planData.name) {
+                    $(this).removeClass('active').addClass('active');
+                    selectedActivities++;
+                } else {
+                    $(this).removeClass('active');
+                    if ($(this).data('value') == 'other' && selectedActivities == 0){
+                        $(this).addClass('active');
+                        $($(this).data('slide-down')).slideDown();
+                    }
+                }
+            });
+            // ------ Make the delete event button visible if there's already a plan
             $('.modalView#makePlan div#deleteEvent').removeClass('hidden');
             $('.modalView#makePlan div#deleteEvent').off('click').on('click',function(){
                 buttonAjax($(this),{plan_id:returnedData.planData.id,notify:$('.modalView#makePlan #notify').prop('checked')});
             });
+            // ------ Update the label for the notify checkbox
+            $('.modalView#makePlan label[for=notify]').html("Send update to "+name.split(" ")[0]+"?");
+            // ------ Change the modal button properties
             $('.modalView#makePlan form').attr('action',"<%= modify_plan_path %>").attr('method','PUT');
-            var authorized_by_google_calendar = returnedData.authorized_by_google_calendar == "true" ? true : false;
-
             $('.modalView#makePlan .modalBottomRightButton').html("UPDATE");
             $('.modalView#plans .modalBottomLeftButton').html("RESCHEDULE");
+            // ------ Update the google calendar authorization status
+            var authorized_by_google_calendar = returnedData.authorized_by_google_calendar == "true" ? true : false;
             
             submitButtonListener();
         } else {
@@ -793,12 +816,53 @@ $(function(){
             $('.modalView#editConnection form .details').css("display","none");
         }
 
+        // related to the monthly, weekly and other contact frequency button group
         $('.modalView#editConnection .contactFrequency button').each(function(){
             if ($(this).data('value') == contact_frequency) {
                 $(this).removeClass('active').addClass('active');
             } else {
                 $(this).removeClass('active');
             }
+        }) 
+        // related to scheduling activities select button group
+        $('.modalView#makePlan .chooseActivity button').each(function(){
+            $(this).on("click",function(){
+                if ($(this).data('value') != "other") {
+                    $($(this).data('slide-down')+' input').val($(this).data('value'));
+                }                
+            });
+        });
+
+        // Related to the date and time pickers in the scheduling events modal view
+        $('#scheduleDatePicker').datepicker({
+            dateFormat: "yy-mm-dd",
+            minDate: new Date('<%= Date.today %>'),
+            onSelect: function(){
+                $('#scheduleTimeFrom').focus();
+            }
+        });
+
+        $('#scheduleTimeFrom').timepicker({'scrollDefault':'7:00am'});
+        $('#scheduleTimeFrom').on('changeTime',function(){
+            $('#scheduleTimeTo').val($(this).val());
+            $('#scheduleTimeTo').timepicker({
+                'scrollDefault':'7:00am',
+                'disableTimeRanges': [['12am',$(this).val()]]
+            });
+            $('#scheduleTimeTo').focus();
+
+        });
+        $('#scheduleTimeTo').timepicker({'scrollDefault':'7:00am'});
+        $('#scheduleTimeTo').on('changeTime',function(){
+            setTimeout(function(){
+                        $('#scheduleLocation').focus();
+                    },100);
+        });
+    }
+
+    buttonGroupWithOther();
+    function buttonGroupWithOther() {
+        $('.buttonGroupWithOther button').each(function(){
             $(this).off("click").on("click",function(){
                 event.preventDefault();
                 event.stopPropagation();
@@ -806,13 +870,13 @@ $(function(){
                     $(this).removeClass('active');
                 })
                 if($(this).data('value') == "other") {
-                    $('.modalView#editConnection form .details').slideDown();
+                    $($(this).data('slide-down')).slideDown();
                 } else {
-                    $('.modalView#editConnection form .details').slideUp();
+                    $($(this).data('slide-down')).slideUp();
                 }
                 $(this).removeClass('active').addClass('active');
             })
-        })
+        })        
     }
 
     function populateUserInfoForm() {
@@ -1166,21 +1230,49 @@ $(function(){
     <% end %>
     <div class="modalView hidden" id="makePlan">
         <div class="modalContentContainer p-h-xxlg">
-            <span class="textDarkGray">Event info</span>
+            <span class="textDarkGray">Choose Activity and Date</span>
             <form action="<%= plans_path %>" method="POST" >
-                <input type="date" class="formElement button m-b-sm m-t-sm inputData" name="date" placeholder="Which day" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
-                <input type="text" class="formElement m-b-sm inputData" name="time" placeholder="what time (e.g. 12:30pm)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="number" class="formElement m-b-sm inputData" name="duration" placeholder="for how many hours (e.g. 0.5)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="text" class="formElement m-b-sm inputData" name="name" placeholder="meeting/activity name" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" required />
-                <input type="text" class="formElement m-b-sm inputData" name="location" placeholder="location (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
-                <input type="text" class="formElement m-b-sm inputData" name="details" placeholder="details (optional)" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" />
-                <div style="display:inline-box; width:50px; height:20px; border-radius:5px; background-color:yellow" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent" data-alert-element=".modalView#makePlan #makePlanFormAlert">CANCEL</div>
+                <div class="btn-group buttonGroupWithOther chooseActivity" style="height:50px;"  role="group">
+                    <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Food"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Food"><%= image_tag 'food', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Catch up"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Catch up"><%= image_tag 'phone', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;font-size:30px;" data-value="other"  data-slide-down=".modalView#makePlan .activityName"><%= fa_icon 'plus' %></button>
+                </div>
+                <div class="formElement m-t-sm activityName" style="display:none;">
+                    <span class="icon textDarkGray" ><%= fa_icon 'soccer-ball-o' %></span>
+                    <input type="text" id="scheduleActivityName" data-skip-clear="true" data-default-value="Coffee" class="inputData field textDarkGray" name="name" placeholder="Activity" value="Coffee" required />
+                </div>
+                <div class="formElement button m-t-sm date" data-default-class="formElement button m-t-sm date">
+                    <span class="icon textDarkGray" ><%= fa_icon 'calendar-o' %></span>
+                    <input type="text" style="float:left" class="button inputData field textDarkGray" name="date" id="scheduleDatePicker" placeholder="Date (YYYY-MM-DD)" />
+                </div>
+                <div class="formElement halfRow left m-t-sm timeFrom" data-default-class="formElement halfRow left m-t-sm timeFrom" style="float:left;">
+                    <span class="icon textDarkGray" ><%= fa_icon 'clock-o' %></span>
+                    <input type="text" class="inputData field textDarkGray" id="scheduleTimeFrom" name="timeFrom" placeholder="From (e.g. 1:05pm)" required />
+                </div>
+                <div class="formElement halfRow right m-t-sm timeTo" data-default-class="formElement halfRow right m-t-sm timeTo" style="float:right;">
+                    <span class="icon textDarkGray" ><%= fa_icon 'clock-o' %></span>
+                    <input type="text" class="inputData field textDarkGray" id="scheduleTimeTo" name="timeTo" placeholder="To (e.g. 2pm)" required />
+                </div>
+                <div class="formElement m-t-sm" style="margin-top:55px;">
+                    <span class="icon textDarkGray" ><%= fa_icon 'map-marker' %></span>
+                    <input type="text" id="scheduleLocation" class="inputData field textDarkGray" name="location" placeholder="Location (Optional)" />
+                </div>
+                <div class="formElement m-t-sm">
+                    <span class="icon textDarkGray" ><%= fa_icon 'pencil' %></span>
+                    <input  type="text" class="inputData field textDarkGray" name="details" placeholder="Notes (Optional)" />
+                </div>
+                <div class="formElement m-t-sm hidden default_hidden errorFormInput email" data-default-class="formElement m-t-sm hidden default_hidden errorFormInput email">
+                    <span class="icon textDarkGray" >@</span>
+                    <input type="text" class="input-text inputData field textDarkGray" placeholder="Email" name="connection_email">
+                </div>
                 <input type="hidden" class="inputData" name="connection_id">
                 <input type="hidden" class="inputData" name="plan_id">
-                <%= check_box_tag 'notify',true,@settings[:send_event_booking_notification_by_default], style:"display:inline-box;" %>
+                <%= check_box_tag 'notify',true,@settings[:send_event_booking_notification_by_default], style:"display:inline-box;", class:'inputData' %>
                 <label for="notify" class="textDarkGray">Send invite?</label>
-                <input type="text" class="input-text hidden default_hidden inputData" name="connection_email" data-default-css="([{'attribute':'border','value':'1px solid rgba(0,0,0,0.1)'}])" >
-                <div class="alert hidden default_hidden" id="makePlanFormAlert" style="margin-top:1px;line-height:15px;"></div>
+                    <div class="btn btn-red disableWhileProcessed" style="display:block;color:#FFF;width:150px;" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent">CANCEL</div>
+            
             </form>
         </div>
         <div class="modalButtonContainer">
@@ -1192,10 +1284,10 @@ $(function(){
         <div class="modalContentContainer">
             <form id="connectionInfo">
                 <span class="textDarkGray">How often do you want to stay in touch?</span>
-                <div class="btn-group contactFrequency" role="group">
-                    <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="weekly">WEEKLY</button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:34%" data-value="monthly">MONTHLY</button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="other">OTHER</button>
+                <div class="btn-group contactFrequency buttonGroupWithOther" role="group">
+                    <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="weekly" data-slide-down=".modalView#editConnection .details" >WEEKLY</button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:34%" data-value="monthly" data-slide-down=".modalView#editConnection .details" >MONTHLY</button>
+                    <button class="btn btn-light-grey btn-secondary" data-slide-down=".modalView#editConnection .details" style="width:33%" data-value="other">OTHER</button>
                 </div>
                 <div class="details" style="display:none;" >
                     Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days

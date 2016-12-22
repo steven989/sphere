@@ -2,12 +2,12 @@ class PlansController < ApplicationController
 
     def create
         date = params[:date]
-        time = params[:time]
-        duration = params[:duration]
+        start_time = params[:timeFrom]
+        end_time = params[:timeTo]
         summary = params[:name]
         location = params[:location]
         details = params[:details]
-        notify = params[:notify].blank? ? false : true
+        notify = params[:notify].blank? ? false : (params[:notify] == "true"? true : false)
         connection_email = params[:connection_email]
 
         unless params[:connection_id] == 0
@@ -19,33 +19,38 @@ class PlansController < ApplicationController
             connection.update_attributes(email:connection_email)
         end
 
-        if !current_user.authorized_by("google","calendar")
-            actions = [{action:"popup_refresh_main_on_close",url:"#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar'}"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
-            status = false
-            message = "Please connect Sphere with your Google Calendar in the popup"
-            data = nil
-        elsif connection.email.blank? && notify
-            actions = [{action:"unhide",element:".modalView#makePlan input[name=connection_email]"},{action:"change_css",element:".modalView#makePlan input[name=connection_email]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"480"}}]
+        if connection.email.blank? && notify
+            actions = [{action:"unhide",element:".modalView#makePlan .formElement.email"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"430"}}]
             status = false
             message ="Please enter an email for #{connection.first_name} as we don't seem to have it"
             data = nil
         elsif Chronic.parse(date).nil?
-            actions = [{action:"change_css",element:".modalView#makePlan input[name=date]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.date"}]
             status = false
-            message = "Oops. Our robot can't seem to understand your date input of '#{date}'. Try something esle"
+            message = "Oops. Our robot can't seem to understand your date input of '#{date}'. Try something else"
             data = nil
-        elsif Chronic.parse(time).nil?
-            actions = [{action:"change_css",element:".modalView#makePlan input[name=time]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+        elsif Chronic.parse(start_time).nil?
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.timeFrom"}]
             status = false
-            message = "Oops. Our robot can't seem to understand your time input of '#{time}'. Try something esle"
+            message = "Oops. We can't seem to understand your time input of '#{start_time}'. Try something else"
             data = nil
+        elsif Chronic.parse(end_time).nil?
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan  .formElement.timeTo"}]
+            status = false
+            message = "Sorry! We can't seem to understand your time input of '#{end_time}'. Try something else"
+            data = nil
+        elsif Chronic.parse(end_time) - Chronic.parse(start_time) < 0
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.timeFrom"},{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.timeTo"}]
+            status = false
+            message = "End time can't be before start time! Try again"
+            data = nil            
         else
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil            
             result = Plan.create_event(current_user,
                                         {   date:date,
-                                            time:time,
-                                            duration:duration,
+                                            start_time:start_time,
+                                            end_time:end_time,
                                             summary:summary,
                                             location:location,
                                             details:details,
@@ -69,7 +74,7 @@ class PlansController < ApplicationController
                 data = {notifications:notifications}
                 message= result[:message]
                 actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(100)"}]
-            elsif !status && result[:message].include?("")
+            elsif !status && result[:message].include?("Unauthorize")
                 message = "Hmm looks like we don't have access to your Google calendar. Click on the import button again to connect your Google account!"
                 scope = current_user.authorizations.where(provider:'google').take.scope_value
                 scope.reject! {|s| s == "calendar"}
@@ -91,12 +96,12 @@ class PlansController < ApplicationController
 
     def update
         date = params[:date]
-        time = params[:time]
-        duration = params[:duration]
+        start_time = params[:timeFrom]
+        end_time = params[:timeTo]
         summary = params[:name]
         location = params[:location]
         details = params[:details]
-        notify = params[:notify].blank? ? false : true
+        notify = params[:notify].blank? ? false : (params[:notify] == "true"? true : false)
         connection_email = params[:connection_email]
 
         unless params[:connection_id] == 0
@@ -110,33 +115,38 @@ class PlansController < ApplicationController
             summary+=" (with #{connection.name})"
         end
 
-        if !current_user.authorized_by("google","calendar")
-            actions = [{action:"popup_refresh_main_on_close",url:"#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_calendar' : 'http://localhost:3000/auth/google_calendar'}"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
-            status = false
-            message = "Please connect Sphere with your Google Calendar in the popup"
-            data = nil
-        elsif connection.email.blank? && notify
-            actions = [{action:"unhide",element:".modalView#makePlan input[name=connection_email]"},{action:"change_css",element:".modalView#makePlan input[name=connection_email]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"480"}}]
+        if connection.email.blank? && notify
+            actions = [{action:"unhide",element:".modalView#makePlan .formElement.email"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"430"}}]
             status = false
             message ="Please enter an email for #{connection.first_name} as we don't seem to have it"
             data = nil
         elsif Chronic.parse(date).nil?
-            actions = [{action:"change_css",element:".modalView#makePlan input[name=date]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.date"}]
             status = false
-            message = "Oops. Our robot can't seem to understand your date input of '#{date}'. Try something esle"
+            message = "Oops. Our robot can't seem to understand your date input of '#{date}'. Try something else"
             data = nil
-        elsif Chronic.parse(time).nil?
-            actions = [{action:"change_css",element:".modalView#makePlan input[name=time]",css:{attribute:"border",value:"1px solid red"}},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"450"}}]
+        elsif Chronic.parse(start_time).nil?
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.timeFrom"}]
             status = false
-            message = "Oops. Our robot can't seem to understand your time input of '#{time}'. Try something esle"
+            message = "Oops. We can't seem to understand your time input of '#{start_time}'. Try something else"
+            data = nil
+        elsif Chronic.parse(end_time).nil?
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan  .formElement.timeTo"}]
+            status = false
+            message = "Sorry! We can't seem to understand your time input of '#{end_time}'. Try something else"
+            data = nil
+        elsif Chronic.parse(end_time) - Chronic.parse(start_time) < 0
+            actions = [{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.timeFrom"},{action:"add_class",class:"errorFormInput",element:".modalView#makePlan .formElement.timeTo"}]
+            status = false
+            message = "End time can't be before start time! Try again"
             data = nil
         else
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil 
             result = plan.update_event(current_user,
                                         {   date:date,
-                                            time:time,
-                                            duration:duration,
+                                            start_time:start_time,
+                                            end_time:end_time,
                                             summary:summary,
                                             location:location,
                                             details:details,
@@ -157,7 +167,7 @@ class PlansController < ApplicationController
             status = result[:status]
             message= result[:message]
             data = {notifications:notifications}
-            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
+            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(100)"}]
         end
 
         respond_to do |format|
@@ -169,22 +179,29 @@ class PlansController < ApplicationController
 
     def cancel
         plan = Plan.find(params[:plan_id])
-        access_token = session ? session[:access_token] : nil
-        expires_at = session ? session[:expires_at] : nil 
-        result = plan.delete_event(params[:notify],access_token,expires_at)
-        if result[:access_token]
-            session[:access_token] = result[:access_token][:access_token]
-            session[:expires_at] = result[:access_token][:expires_at]
-        end
-        if plan.connection
-            Notification.create_upcoming_plan_notification(current_user,plan.connection) 
-        end
-        notifications = current_user.get_notifications(false)
-        status = result[:status]
-        message= result[:message]
-        data = {notifications:notifications}
-        actions = [{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
 
+        if plan.connection.email.blank? && notify
+            actions = [{action:"unhide",element:".modalView#makePlan .formElement.email"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"430"}}]
+            status = false
+            message ="Please enter an email for #{plan.connection.first_name} as we don't seem to have it"
+            data = nil
+        else
+            access_token = session ? session[:access_token] : nil
+            expires_at = session ? session[:expires_at] : nil 
+            result = plan.delete_event(params[:notify],access_token,expires_at)
+            if plan.connection
+                Notification.create_upcoming_plan_notification(current_user,plan.connection) 
+            end
+            if result[:access_token]
+                session[:access_token] = result[:access_token][:access_token]
+                session[:expires_at] = result[:access_token][:expires_at]
+            end
+            notifications = current_user.get_notifications(false)
+            status = result[:status]
+            message= result[:message]
+            data = {notifications:notifications}
+            actions = [{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
+        end
         respond_to do |format|
           format.json {
             render json: {status:status, message:message,actions:actions,data:data}

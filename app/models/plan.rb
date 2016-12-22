@@ -5,8 +5,8 @@ class Plan < ActiveRecord::Base
 
     def self.create_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,calendar_id="primary")
         date = event_parameters[:date]
-        time = event_parameters[:time]
-        duration = event_parameters[:duration].to_f
+        start_time_only = event_parameters[:start_time]
+        end_time_only = event_parameters[:end_time]
         summary = event_parameters[:summary]
         location = event_parameters[:location]
         details = event_parameters[:details]
@@ -33,11 +33,15 @@ class Plan < ActiveRecord::Base
             # Calculate start time
             Time.zone = calendar.time_zone
             Chronic.time_class = Time.zone
-            start_time = Chronic.parse("#{date} #{time}")
+            start_time = Chronic.parse("#{date} #{start_time_only}")
+            end_time = Chronic.parse("#{date} #{end_time_only}")
 
             if start_time.blank?
                 status = false
-                message = "Our robots can't seem to understand your time input '#{time}'. Try something else? (e.g. 4:30pm, 15:00)"
+                message = "We can't seem to understand your time input '#{start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+            elsif end_time.blank?
+                status = false
+                message = "We can't seem to understand your time input '#{end_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
             else
                 # Create Google Calendar events
 
@@ -48,7 +52,7 @@ class Plan < ActiveRecord::Base
                             location:location,
                             description:details,
                             start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
-                            end: {date_time:(start_time+duration.hours).strftime("%Y-%m-%dT%H:%M:%S%z")},
+                            end: {date_time:end_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
                             attendees: [{email: connection_email}],
                             reminders: {use_default:true}
                             })
@@ -58,7 +62,7 @@ class Plan < ActiveRecord::Base
                             location:location,
                             description:details,
                             start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
-                            end: {date_time:(start_time+duration.hours).strftime("%Y-%m-%dT%H:%M:%S%z")},
+                            end: {date_time:end_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
                             reminders: {use_default:true}
                             })
                     end
@@ -72,6 +76,7 @@ class Plan < ActiveRecord::Base
                             connection_id:connection.id,
                             date:start_time.to_date,
                             date_time:start_time,
+                            end_date_time: end_time,
                             timezone:calendar.time_zone,
                             name:summary,
                             location:location,
@@ -79,7 +84,6 @@ class Plan < ActiveRecord::Base
                             calendar_id:calendar.id,
                             calendar_event_id:result.id,
                             invite_sent:notify,
-                            length:duration,
                             details:details
                             )
                     status = true
@@ -92,8 +96,8 @@ class Plan < ActiveRecord::Base
 
     def update_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil)
         new_date = event_parameters[:date]
-        new_time = event_parameters[:time]
-        new_duration = event_parameters[:duration].to_f
+        new_start_time_only = event_parameters[:start_time]
+        new_end_time_only = event_parameters[:end_time]
         new_summary = event_parameters[:summary]
         new_location = event_parameters[:location]
         new_details = event_parameters[:details]
@@ -101,15 +105,14 @@ class Plan < ActiveRecord::Base
 
         new_connection_email = !connection_email_override.blank? ? connection_email_override : connection.email
 
-        # Check to see if there's an existing valid access token we can use without making a server request
-        if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
-          token_object = user.authorizations.where(provider:'google').take.refresh_token!  
-        else
-          token_object = {access_token:access_token,expires_at:expires_at}
-        end
-
         # Authenticate with Google and retrieve primary calendar
         begin
+            # Check to see if there's an existing valid access token we can use without making a server request
+            if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
+              token_object = user.authorizations.where(provider:'google').take.refresh_token!  
+            else
+              token_object = {access_token:access_token,expires_at:expires_at}
+            end
             service = Google::Apis::CalendarV3::CalendarService.new
             access_token = AccessToken.new(token_object[:access_token])
             service.authorization = access_token
@@ -121,22 +124,24 @@ class Plan < ActiveRecord::Base
             # Calculate start time
             Time.zone = timezone
             Chronic.time_class = Time.zone
-            new_start_time = Chronic.parse("#{new_date} #{new_time}")
-            if new_start_time.blank?
+            new_start_time = Chronic.parse("#{new_date} #{new_start_time_only}")
+            new_end_time = Chronic.parse("#{new_date} #{new_end_time_only}")
+            if new_start_time_only.blank?
                 status = false
-                message = "Our robots can't seem to understand your time input '#{new_time}'. Try something else? (e.g. 4:30pm, 15:00)"
+                message = "We can't seem to understand your time input '#{new_start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+            elsif new_end_time_only.blank?
+                status = false
+                message = "We can't seem to understand your time input '#{new_end_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
             else
-                old_date_time = date_time
                 if new_start_time != date_time
                     event.start.date_time = new_start_time.strftime("%Y-%m-%dT%H:%M:%S%z")
                     self.date = new_start_time.to_date
                     self.date_time = new_start_time
                     update_notification = true
                 end
-                if new_start_time+new_duration.hours != old_date_time+length.hours
-
-                    event.end.date_time = (new_start_time+new_duration.hours).strftime("%Y-%m-%dT%H:%M:%S%z")
-                    self.length = new_duration
+                if new_end_time != end_date_time
+                    event.end.date_time = new_end_time.strftime("%Y-%m-%dT%H:%M:%S%z")
+                    self.end_date_time = new_end_time
                 end
                 if new_summary != name
                     event.summary = new_summary
@@ -206,13 +211,23 @@ class Plan < ActiveRecord::Base
         {status:status,message:message,access_token:token_object}
     end
 
-    def date_time_in_zone(part=nil)
-        if part == "date"
-            date_time.in_time_zone(timezone).to_date
-        elsif part == "time"
-            date_time.in_time_zone(timezone).strftime("%l:%M%p")
-        else
-            date_time.in_time_zone(timezone)
+    def date_time_in_zone(which_time,part=nil)
+        if which_time == "start_time"
+            if part == "date"
+                date_time ? date_time.in_time_zone(timezone).to_date : nil
+            elsif part == "time"
+                date_time ? date_time.in_time_zone(timezone).strftime("%l:%M%p") : nil
+            else
+                date_time ? date_time.in_time_zone(timezone) : nil
+            end
+        elsif which_time == "end_time"
+            if part == "date"
+                end_date_time ? end_date_time.in_time_zone(timezone).to_date : nil
+            elsif part == "time"
+                end_date_time ? end_date_time.in_time_zone(timezone).strftime("%l:%M%p") : nil
+            else
+                end_date_time ? end_date_time.in_time_zone(timezone) : nil
+            end
         end
     end
 

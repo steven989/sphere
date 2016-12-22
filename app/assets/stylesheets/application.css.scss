@@ -754,7 +754,7 @@ label[for=photoUploader]:hover {
     text-align: center;
 }
 
-.modalView#editConnection form div.btn-group{
+form div.btn-group{
     margin-top:10px;
     width: 100%;
     border: 1px solid #E9E9E9;
@@ -763,21 +763,21 @@ label[for=photoUploader]:hover {
 }
 
 
-.modalView#editConnection form div.btn-group .btn{
+form div.btn-group .btn{
     background-color: #FAFAFA;
 }
 
-.modalView#editConnection form div.btn-group .btn:hover{
+form div.btn-group .btn:hover{
     background-color: #F1F1F1;
 }
 
 
-.modalView#editConnection form div.btn-group .btn.active {
+form div.btn-group .btn.active {
     background-color: #34BF49;
     color: #FFFFFF;
 }
 
-.modalView#editConnection form div.btn-group .btn.active:hover{
+form div.btn-group .btn.active:hover{
     background-color: #2CAF40;
 }
 
@@ -823,6 +823,29 @@ label[for=photoUploader]:hover {
 .modalView#detailedCheckIn ul li:hover {
     background-color: gray;
 }
+
+/* Event scheduling screen */
+.modalView#makePlan .formElement {
+    padding: 0px;
+    height: 33px;
+    overflow: hidden;
+}
+.modalView#makePlan .icon {
+    float:left;
+    width: 50px;
+}
+
+.modalView#makePlan .field {
+    float:left;
+    height: 33px;   
+    width: calc(100% - 50px);
+    margin-bottom: 0px;
+    margin-top: 0px;
+    border:none !important;
+    background: none;
+}
+
+
 
 /* Challenges, Progress, Achievements UI*/
 

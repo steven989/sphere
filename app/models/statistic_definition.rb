@@ -43,6 +43,7 @@ class StatisticDefinition < ActiveRecord::Base
                 begin
                     user_id = current_user.id
                     statistic_definition_id = statistic.id
+                    data_type = statistic.start_value_type
                     command = statistic.definition
                     eval(command)
                 rescue => error

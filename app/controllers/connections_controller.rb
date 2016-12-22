@@ -249,7 +249,7 @@ class ConnectionsController < ApplicationController
             data[:upcomingPlanString] = "#{activity} #{time}"
             data[:hasUpcomingPlan] = true
             data[:authorized_by_google_calendar] = current_user.authorized_by("google","calendar")
-            data[:planData] = {id:upcoming_plan.id,date:upcoming_plan.date_time_in_zone('date'),time:upcoming_plan.date_time_in_zone('time'),length:upcoming_plan.length,name:upcoming_plan.name_with_parentheses_removed,location:upcoming_plan.location,details:upcoming_plan.details}
+            data[:planData] = {id:upcoming_plan.id,date:upcoming_plan.date_time_in_zone('start_time','date'),start_time:upcoming_plan.date_time_in_zone('start_time','time'),end_time:upcoming_plan.date_time_in_zone('end_time','time'),name:upcoming_plan.name_with_parentheses_removed,location:upcoming_plan.location,details:upcoming_plan.details,notify:upcoming_plan.invite_sent}
         else
             data[:upcomingPlanString] = "No current plans :("
             data[:hasUpcomingPlan] = false

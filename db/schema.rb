@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161221192507) do
+ActiveRecord::Schema.define(version: 20161222171906) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -209,6 +209,7 @@ ActiveRecord::Schema.define(version: 20161221192507) do
     t.float    "length"
     t.string   "edit_time_url"
     t.text     "details"
+    t.datetime "end_date_time"
   end
 
   add_index "plans", ["connection_id"], name: "index_plans_on_connection_id", using: :btree
