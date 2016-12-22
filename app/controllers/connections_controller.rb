@@ -283,7 +283,7 @@ class ConnectionsController < ApplicationController
             data[:upcomingPlanString] = "No current plans :("
             data[:hasUpcomingPlan] = false
         end
-        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"}]
+        actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
         respond_to do |format|
           format.json {
             render json: {status:true, message:nil,actions:actions,data:data}

@@ -12,6 +12,8 @@ $(function(){
     test = bubblesData;
     var authorized_google_contacts = <%= @authorized_google_contacts %>;
     var authorized_google_calendar = <%= @authorized_google_calendar %>;
+    var openBubble;
+    var overLayHtml;
 
     // Search 
     var options = {
@@ -183,7 +185,8 @@ $(function(){
             // 3) Modal on clicking each bubble
             $(this).off("click").on("click",function(){
                 if (!$(this).hasClass('disabled')) {
-                    var overLayHtml = $(this).find('.overlayWithName span').html();
+                    overLayHtml = $(this).find('.overlayWithName span').html();
+                    openBubble = $(this);
                     $(this).find('.overlayWithName span').html('<%= fa_icon "spinner", class:"rotater" %>');
                     $(this).find('.overlayWithName').css({'opacity':'1'});
                     clockedRotate.start($(this).find('.overlayWithName span .rotater'),150,true);
@@ -250,15 +253,17 @@ $(function(){
                         })
                         resetModal($('[data-remodal-id=bubbleModal]'),3);
                         buttonAjax(_this,{});
-                        _this.find('.overlayWithName span').html(overLayHtml);
-                        _this.find('.overlayWithName').css({'opacity':''});
-                        clockedRotate.end();
                     } // if (_this.data('connection-id')=='0')
                 } //if (!button.hasClass('disabled'))
             }); // $(this).off("click").on("click")
         });
     }
 
+    function stopBubbleLoadingScreen() {
+        openBubble.find('.overlayWithName span').html(overLayHtml);
+        openBubble.find('.overlayWithName').css({'opacity':''});
+        clockedRotate.end();
+    }
 
     // open modal instance
     function initializeReModal(element,modifier,resetType) {
