@@ -34,7 +34,7 @@ class UsersController < ApplicationController
 
     def get_user_info
       data = {first_name:current_user.first_name,last_name:current_user.last_name,phone:current_user.phone}
-      actions = [{action:"function_call",function:"populateUserInfoForm()"},{action:"hide",element:".modalView#settingsSelect"},{action:"unhide",element:".modalView#userInfo"},{action:"function_call",function:"initializeReModal('[data-remodal-id=settingsModal]','standardModal',1)"}]
+      actions = [{action:"function_call",function:"populateUserInfoForm()"},{action:"hide",element:".modalView#settingsSelect"},{action:"unhide",element:".modalView#userInfo"},{action:"function_call",function:"initializeReModal('[data-remodal-id=settingsModal]','standardModal',1)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
       respond_to do |format|
         format.json {
           render json: {status:true, message:nil,actions:actions,data:data}

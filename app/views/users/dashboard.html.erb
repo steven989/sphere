@@ -194,9 +194,6 @@ $(function(){
                     if (_this.data('connection-id')=='0') {
                         resetModal($('[data-remodal-id=bubbleModal]'),1);
                         buttonAjax(_this,{});
-                        _this.find('.overlayWithName span').html(overLayHtml);
-                        _this.find('.overlayWithName').css({'opacity':''});
-                        clockedRotate.end();
                     } else {
                         $('[data-remodal-id=bubbleModal] .modalView').each(function(){
                             if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
