@@ -22,6 +22,7 @@ class User < ActiveRecord::Base
   has_many :plans
   has_one :user_setting, dependent: :destroy
   has_many :tags
+  has_many :penalties
 
   # Validations
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
@@ -38,16 +39,22 @@ class User < ActiveRecord::Base
     (first_name || last_name) ? first_name.to_s+last_name.to_s  : email.match(/(\S+)@/)[1]
   end
 
-  def get_raw_bubbles_data(connections_override=nil,json_or_not_json=false)
-    connections = connections_override ? connections_override : self.connections.active
-    result = connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name,:email,:photo_access_url).inject({}) {|accumulator,result| accumulator[result[0]] = {id:result[0],display:result[3].to_s+' '+result[4].to_s,size:result[1],distance:result[2],photo_url:result[6],email:result[5] }; accumulator }
-    tags_array = tags.where(taggable_type:"Connection").group_by(&:taggable_id)
-    tags_array.each do |key,value|
-      if current_hash = result[key]
-        current_hash[:tags] = value.map {|tagObj| tagObj.tag }
-        result[key] = current_hash
+  def get_raw_bubbles_data(connections_override=nil,json_or_not_json=false,active=true)
+    connections = connections_override ? connections_override : (active ? self.connections.active : self.connections.expired)
+    if active
+      result = connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name,:email,:photo_access_url).inject({}) {|accumulator,result| accumulator[result[0]] = {id:result[0],display:result[3].to_s+' '+result[4].to_s,size:result[1],distance:result[2],photo_url:result[6],email:result[5] }; accumulator }
+      tags_array = tags.where(taggable_type:"Connection").group_by(&:taggable_id)
+      tags_array.each do |key,value|
+        if current_hash = result[key]
+          current_hash[:tags] = value.map {|tagObj| tagObj.tag }
+          result[key] = current_hash
+        end
       end
+    else
+      revival_xp_requirements = connections.inject({}) {|accumulator,connection| accumulator[connection.id] = connection.calculate_revival_requirements.to_i; accumulator}
+      result = connections.joins{ connection_score.outer }.pluck(:id,:score_quality,:score_time,:first_name,:last_name,:email,:photo_access_url,:date_inactive).inject({}) {|accumulator,result| accumulator[result[0]] = {id:result[0],display:result[3].to_s+' '+result[4].to_s,size:result[1],distance:result[2],photo_url:result[6],email:result[5],date_inactive:(result[7] ? result[7].strftime("%b %-d, %Y") : ""),xp_requirements:revival_xp_requirements[result[0]]}; accumulator }
     end
+
     if json_or_not_json
       result.values.to_json
     else
@@ -201,7 +208,7 @@ class User < ActiveRecord::Base
       # 3) update status of expired connections
       if number_of_days_since_last_activity > target_contact_interval_in_days
         if connection.plans.where("date >= ?",Date.today).length == 0
-          connection.update_attributes(active:false)
+          connection.expire
         end
       end
       # 4) Update time score
@@ -210,11 +217,9 @@ class User < ActiveRecord::Base
   end
 
   def calculate_quality_score_for_active_connections
- 
       self.connections.active.each do |connection|
         connection.update_score
       end
-      
   end
 
 

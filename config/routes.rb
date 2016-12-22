@@ -32,6 +32,8 @@ Rails.application.routes.draw do
   put  'connections/destroy' => 'connections#destroy', as: 'destroy_connection'
   put  'connections/destroy' => 'connections#destroy_all', as: 'clear_connections'
   put 'connections/update_name' => 'connections#update_name', as: 'update_connection_name'
+  get 'connections/list_expired_connections' => 'connections#list_expired_connections', as: 'list_expired_connections'
+  put 'connections/revive_expired_connections' => 'connections#revive_expired_connections', as: 'revive_expired_connections'
 
   # Admins controller
   get 'admins/dashboard' => 'admins#dashboard', as: 'admin_dashboard'

@@ -73,6 +73,43 @@ class ConnectionsController < ApplicationController
         end
     end
 
+    def list_expired_connections
+        expired_connections = current_user.get_raw_bubbles_data(nil,false,false)
+        actions = [{action:"function_call",function:"populateExpiredConnections()"}]
+        respond_to do |format|
+          format.json {
+            render json: {status:true,message:nil,actions:actions,data:expired_connections}
+          } 
+        end        
+    end
+
+    def revive_expired_connections
+        connection = Connection.find(params[:connection_id])
+        result = connection.revive
+        status = result[:status]
+        message = result[:message]
+
+        if result[:status]
+            raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+            notifications = current_user.get_notifications(false)
+            bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+            data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+            actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+            if current_user.connections.expired.length == 0
+                actions.push({action:"function_call",function:"putWordsBackInIfNoExpiredConnection(610)"}) 
+                actions.push({action:"function_call",function:""})
+            end
+        else
+            actions = nil
+            data = nil
+        end
+        respond_to do |format|
+          format.json {
+            render json: {status:status,message:message,actions:actions,data:data}
+          } 
+        end
+    end
+
 
     def import
         provider = params[:provider]

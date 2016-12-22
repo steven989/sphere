@@ -1,5 +1,10 @@
 class StatisticDefinition < ActiveRecord::Base
     has_many :user_statistics
+    has_many :penalties
+
+    def self.search(stat_name)
+        StatisticDefinition.where(name:stat_name).take
+    end
 
     def start_value_in_type
         if self.start_value_type.blank?

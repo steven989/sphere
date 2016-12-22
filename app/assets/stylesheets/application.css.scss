@@ -352,6 +352,8 @@
     padding-top: 0px;
 }
 
+
+
 /*User dashboard*/
 
 body {
@@ -671,6 +673,72 @@ label[for=photoUploader]:hover {
 
 .sphereGreenBackground.hoverable:not(.disabled):hover {
     background-color: #37AF49;
+}
+
+
+/* Revive connections modal screen*/
+
+.modalView#expiredConnections .modalContentContainer {
+    height: 350px; 
+    overflow:scroll;
+}
+
+.modalView#expiredConnections .modalContentContainer .photo {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    border: none; 
+    display: block; 
+    margin: auto;    
+    background-size: cover; 
+    background-position: center center; 
+    background-repeat: no-repeat; 
+    background-color: rgb(239, 239, 239)
+}
+
+.modalView#expiredConnections .modalContentContainer .icon {
+    display:inline-block;
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    border:none;
+    font-size:100px;
+}
+
+.modalView#expiredConnections .modalContentContainer .detailsContainer {
+    text-align:left;
+    height:100px;
+    line-height:30px;
+}
+
+.modalView#expiredConnections .modalContentContainer .detailsContainer .row {
+    margin-top: 15px ;
+}
+
+
+.modalView#expiredConnections .modalContentContainer .detailsContainer .row .texts{
+    margin:auto;
+}
+
+.modalView#expiredConnections .modalContentContainer .detailsContainer .row .texts .name {
+    font-size:15px;
+    font-weight:bold;
+    text-align:left;
+}
+
+.modalView#expiredConnections .modalContentContainer .detailsContainer .row .texts .expiredAt {
+    text-align:left;
+    font-size: 12px;
+}
+
+.modalView#expiredConnections .modalContentContainer .detailsContainer .row .buttonContainer {
+    margin-top:10px;
+}
+
+.modalView#expiredConnections .modalContentContainer .detailsContainer .row .buttonContainer .button {
+    margin: auto;
+    font-size: 12px;
+    text-align: center;
 }
 
 
@@ -1056,6 +1124,20 @@ label[for=photoUploader]:hover {
         padding:0px !important;
         height: 100vh;
     }
+
+    /* Revive connection screen on mobile*/
+    .modalView#expiredConnections .modalContentContainer .detailsContainer {
+        line-height:20px;
+    }
+
+    .modalView#expiredConnections .modalContentContainer .detailsContainer .row {
+        margin-top: 8px ;
+    }
+
+    .modalView#expiredConnections .modalContentContainer .detailsContainer .row .buttonContainer {
+        margin-top:10px;
+    }
+
 
 }
 

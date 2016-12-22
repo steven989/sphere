@@ -12,12 +12,12 @@ class Connection < ActiveRecord::Base
     after_create :callbacks_after_create
     after_update :callbacks_after_update
     # Other stuff
-    scope :active, -> { where(active:true) } 
+    scope :active, -> { where(active:true) }
+    scope :expired, -> { where(active:false) }
     mount_uploader :photo, PhotoUploader
     # Validations
     validates :email, email: true, allow_blank: true
 
-    # Methods
     def name
         first_name.to_s+" "+last_name.to_s
     end
@@ -76,6 +76,13 @@ class Connection < ActiveRecord::Base
         target_contact_interval_in_days = self.target_contact_interval_in_days ||= SystemSetting.search("default_contact_interval").value_in_specified_type
         score = ((number_of_days_since_last_activity.to_f / target_contact_interval_in_days.to_f)*10000.00).round
         score
+    end
+
+    def calculate_revival_requirements
+        base_score = self.connection_score.score_quality * 0.05
+        minimum = self.user.stat("xp") * 0.002
+        maximum = self.user.stat("xp") * 0.015
+        [[base_score,maximum].min,minimum].max.to_i
     end
 
     def log_score(quality_score,time_score)
@@ -447,6 +454,31 @@ class Connection < ActiveRecord::Base
       if connection.photo && connection.photo.file
         connection.update_attributes(photo_access_url:connection.photo.url)
       end
+    end
+
+    def expire
+        self.update_attributes(active:false,date_inactive:Date.today)
+    end
+
+    def revive
+      penalty_amount = self.calculate_revival_requirements.to_i
+      if self.user.stat("xp") >= penalty_amount
+        self.user.penalties.create(
+          statistic_definition_id:StatisticDefinition.search("xp").id,
+          penalty_date:Date.today,
+          penalty_statistic:'xp',
+          penalty_type:"Reviving expired connection",
+          amount:penalty_amount
+          )
+        self.update_attributes(active:true,date_inactive:nil)
+        StatisticDefinition.triggers("individual","connection_revive",self.user) 
+        status = true
+        message = "Successfully added#{" "+self.first_name} back to your Sphere! XP -#{penalty_amount}"
+      else
+        status = false
+        message = "Your current XP is #{self.user.stat("xp")}, not enough for the #{penalty_amount} required to re-add#{" "+self.first_name}! Check in with your connections or complete challenges to earn more XP"
+      end
+      {status:status,message:message}
     end
 
     private

@@ -8,8 +8,10 @@ $(function(){
     var tokenInCreate;
     var userLevelNotifications = (<%= raw @notifications %>).user_level;
     var bubblesData = <%= raw @raw_bubbles_data %>;
+    test = bubblesData;
     var authorized_google_contacts = <%= @authorized_google_contacts %>;
     var authorized_google_calendar = <%= @authorized_google_calendar %>;
+
     // Search 
     var options = {
       shouldSort: true,
@@ -262,7 +264,7 @@ $(function(){
             closeModalTimer = setTimeout(function(){
                                 modalInstance.close();
 
-                              },timer);                    
+                              },timer);
         }
     }
 
@@ -557,7 +559,6 @@ $(function(){
     }
 
     // Importing contacts
-
     $('#importContactsGoogle').off("click").on("click",function(){
         _this = $(this);
         if (!authorized_google_contacts) {
@@ -624,11 +625,20 @@ $(function(){
 
     // Generic listener for ajax-enabled buttons
 
-    $('.ajaxButton').each(function(){
-        $(this).off("click").on("click",function(){
-            buttonAjax($(this),$(this).data('data-to-send'));
-        });
-    });
+    function ajaxButtonListener(element) {
+        if (element == null) {
+            $('.ajaxButton').each(function(){
+                $(this).off("click").on("click",function(){
+                    buttonAjax($(this),$(this).data('data-to-send'));
+                });
+            });
+        } else {
+            $(element).off("click").on("click",function(){
+                buttonAjax($(this),$(this).data('data-to-send'));
+            });
+        }
+    }
+    ajaxButtonListener(null);
 
     // Standard ajax call for buttons
     function buttonAjax(button,data) {
@@ -824,6 +834,27 @@ $(function(){
         initializeReModal("[data-remodal-id=settingsModal]","standardModal",1);
     }
 
+    function putWordsBackInIfNoExpiredConnection(timer) {
+            setTimeout(function(){
+                $('.modalView#expiredConnections .modalContentContainer').append("<span style='display:block;' class='textDarkGray m-b-md'>No expired connections. Keep it up!</span>");},timer);
+        
+    }
+
+    function populateExpiredConnections() {
+        var expiredConnections = returnedData;
+        $('.modalView#expiredConnections .modalContentContainer').html("<span style='display:block;' class='textDarkGray m-b-md'>Lost Connections</span>");
+        if (expiredConnections.length == 0) {
+            putWordsBackInIfNoExpiredConnection(0);
+        } else {
+            expiredConnections.forEach(function(connection){
+                $('.modalView#expiredConnections .modalContentContainer').append('<div class="row m-b-md" id="expiredConnectionRow'+connection.id+'"><div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">'+(connection.photo_url ? ('<div class="photo" style="background-image: url("'+connection.photo_url+'");"></div>') : ('<div class="icon textLightGray"><%= fa_icon "user-circle" %></div>'))+'</div><div class="col-lg-9 col-md-9 col-sm-9 col-xs-8 detailsContainer"><div class="row"><div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 texts"><span class="name textDarkGray">'+connection.display+'</span><br><span class="expiredAt textDarkGray">Expired on '+connection.date_inactive+'</span></div><div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 buttonContainer"><div class="formElement button textDarkGray ajaxButton disableWhileProcessed" href="<%= revive_expired_connections_path %>" data-method="PUT" id="revive'+connection.id+'" data-data-to-send="({connection_id:'+connection.id+'})" >RESTORE ('+connection.xp_requirements+' XP PENALTY)</div></div></div></div></div>');
+                    ajaxButtonListener('.ajaxButton#revive'+connection.id);
+            });
+        }
+
+        transition($('.modalView#mainImportView'),$('.modalView#expiredConnections'));
+    }
+
     // Predefined set of actions can be called by passing an array of actions into this function. Useful for Rails to call specific follow up actions
     function performActions(actionsArray) {
         actionsArray.forEach(function(actionObject){
@@ -848,10 +879,13 @@ $(function(){
                 $(actionObject.element).removeClass(actionObject.class).addClass(actionObject.class);
             } else if (actionObject.action == "remove_class") {
                 $(actionObject.element).removeClass(actionObject.class);
+            } else if (actionObject.action == "fadeDelete") {
+                $(actionObject.element).fadeOut(actionObject.fadeoutTime,function(){
+                    $(this).remove();
+                });
             }
         });
     }
-
     // Toggle check in button status
 
     function checkInButtons(state,options) {
@@ -1186,14 +1220,15 @@ $(function(){
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
                 <div class="formElement button textDarkGray disableWhileProcessed" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
+                <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
-                        <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-md inputData" name="name" type="text" placeholder="name" required>
-                        <input class="formElement m-b-md inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
+                        <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="name" required>
+                        <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
                         <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
-                        <label for="photoUploaderInCreate" class="textDarkGray m-b-md formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
+                        <label for="photoUploaderInCreate" class="textDarkGray m-b-xs formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                             <%= fa_icon 'id-badge' %>
                             Upload Photo
                         </label>                        
@@ -1211,7 +1246,8 @@ $(function(){
             </div>
         </div>
     </div>
-    <div class="modalView" id="listSelect">
+
+    <div class="modalView hidden" id="listSelect">
         <div class="modalContentContainer p-h-xxlg">
             <div id="importContacts">
                 <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;position:absolute;top:0px;left:0px;"></div>
@@ -1236,6 +1272,20 @@ $(function(){
             <div class="modalBottomRightButton sphereBlueBackground hoverable  disableWhileProcessed" href="<%= create_from_import_path %>" data-method="POST">ADD TO SPHERE</div>
         </div>
     </div>
+
+
+    <div class="modalView hidden" id="expiredConnections">
+        <div class="modalContentContainer p-h-xxlg">
+
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereRedBackground hoverable transitionButton" data-current=".modalView#expiredConnections" data-target=".modalView#mainImportView">
+                <span>BACK</span>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 <div data-remodal-id="settingsModal" data-default-css="([{'attribute':'height','value':'400px'}])">

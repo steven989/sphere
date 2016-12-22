@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161217152750) do
+ActiveRecord::Schema.define(version: 20161221192507) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -141,6 +141,7 @@ ActiveRecord::Schema.define(version: 20161217152750) do
     t.string   "contact_id_at_provider"
     t.string   "frequency_word"
     t.text     "notes"
+    t.date     "date_inactive"
   end
 
   add_index "connections", ["user_id"], name: "index_connections_on_user_id", using: :btree
@@ -176,6 +177,20 @@ ActiveRecord::Schema.define(version: 20161217152750) do
 
   add_index "notifications", ["notifiable_id", "notifiable_type"], name: "index_notifications_on_notifiable_id_and_notifiable_type", using: :btree
   add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
+
+  create_table "penalties", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "statistic_definition_id"
+    t.date     "penalty_date"
+    t.string   "penalty_statistic"
+    t.string   "penalty_type"
+    t.float    "amount"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "penalties", ["statistic_definition_id"], name: "index_penalties_on_statistic_definition_id", using: :btree
+  add_index "penalties", ["user_id"], name: "index_penalties_on_user_id", using: :btree
 
   create_table "plans", force: :cascade do |t|
     t.integer  "user_id"
