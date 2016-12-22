@@ -229,6 +229,9 @@ $(function(){
                                         toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                                     }
                                 }
+                                if (data.data != undefined) {
+                                    returnedData = data.data;
+                                }
                                 if (data.actions != undefined && data.actions.length > 0) {
                                     performActions(data.actions);    
                                 }

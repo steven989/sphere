@@ -59,16 +59,25 @@ class ConnectionsController < ApplicationController
                 status = true
                 message = "Awesome. We updated #{connection.first_name}'s info for you!"
                 actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(100)"}]
-                
+                data = nil
+                if photo_uploaded
+                  raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+                  notifications = current_user.get_notifications(false)
+                  bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+                  data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+                  actions.push({action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"})
+                end
             else
                 status = false
                 message = "Oops. Our robots ran into some issues: #{connection.errors.full_messages.join(', ')}"
-                actions = []
+                actions = nil
+                data = nil
             end
         end
+
         respond_to do |format|
           format.json {
-            render json: {status:status,message:message,actions:actions}
+            render json: {status:status,message:message,actions:actions,data:data}
           } 
         end
     end
