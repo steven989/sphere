@@ -16,7 +16,9 @@ namespace :system do
         User.app_users.each do |user|
             # 1) Find badges
             user.find_badges
-            # 2) daily_connection_tasks
+            # 2) Update nightly stats
+            StatisticDefinition.triggers("individual","nightly",user)
+            # 3) daily_connection_tasks
             user.daily_connection_tasks
         end
     end 
