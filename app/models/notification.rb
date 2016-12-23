@@ -68,7 +68,7 @@ class Notification < ActiveRecord::Base
           expiry_date:expiry_date,
           data_type:"hash",
           value:"{remaining_days_until_expiry:#{remaining_days_until_expiry}}",
-          priority: 3
+          priority: 2
           )
     end
 
@@ -83,7 +83,7 @@ class Notification < ActiveRecord::Base
           notification_type:"checked_in",
           notification_date:date,
           expiry_date:date+expiry_days.days,
-          priority: 2
+          priority: 3
           )
     end
 
