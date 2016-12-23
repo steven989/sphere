@@ -8,7 +8,8 @@ class ConnectionsController < ApplicationController
 
     def update_name
         connection_id = params[:id]
-        if name = params[:value] && !name.blank?
+        if !params[:value].blank?
+            name = params[:value]
             first_name = Connection.parse_first_name(name)
             last_name = Connection.parse_last_name(name)
             connection = Connection.find(connection_id)
