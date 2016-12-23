@@ -169,7 +169,7 @@ class Connection < ActiveRecord::Base
             else
               primary_email_to_update = nil
               matched_connection_email.gsub!(" ","")
-              additional_emails_to_merge = unified_email_array.delete_if {|email| email == matched_connection_email}
+              additional_emails_to_merge = unified_email_array ? unified_email_array.delete_if {|email| email == matched_connection_email} : []
               updated_additional_emails_array = (matched_connection_other_emails + additional_emails_to_merge).uniq
               updated_additional_emails_string = updated_additional_emails_array.to_s
             end
