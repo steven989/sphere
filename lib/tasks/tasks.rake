@@ -9,7 +9,9 @@ namespace :system do
     desc 'Daily system level tasks'
     task :daily_system_level_tasks => [:environment] do |t, args|
         Notification.destroy_expired_notifications
+        UserChallenge.expire_uncompleted_challenges
     end
+
 
     desc 'Daily user and connection level tasks'
     task :daily_user_and_connection_level_tasks => [:environment] do |t, args|

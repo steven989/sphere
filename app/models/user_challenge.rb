@@ -37,4 +37,10 @@ class UserChallenge < ActiveRecord::Base
         {status:status,message:message,reward:reward}
     end
 
+    def self.expire_uncompleted_challenges
+        UserChallenge.where("? > date_to_be_completed", Date.today).each do |user_challenge| 
+            user_challenge.complete_challenge("expired")
+        end
+    end
+
 end
