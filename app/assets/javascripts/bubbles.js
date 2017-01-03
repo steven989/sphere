@@ -55,13 +55,8 @@
 
             // 4) loop through the reordered bubblesArray
             scaledBubblesArray.forEach(function(scaledBubble){
-                 console.log(scaledBubble.display);
-                 console.log(scaledBubble.radius);
                 //3.1) generate the next alpha value
                 var alpha = generateNextAlpha(scaledBubble.id_rank);
-                console.log(scaledBubble.id_rank);
-                console.log(alpha);
-                console.log("------------------------");
                 //3.2) generate r - distance between center bubble and this bubble to place
                 var r = Math.max(centerBubble.radius + sizeOfGapBetweenBubbles + scaledBubble.radius, scaledBubble.distance)
                 //3.3) determine (x,y) of this bubble given the alpha value and r
