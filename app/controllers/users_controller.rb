@@ -129,6 +129,7 @@ class UsersController < ApplicationController
           email = params[:email]
           photo = photo_uploaded ? params[:photoUploaderInCreate] : nil
           tags = tags_inputted ? JSON.parse(params[:tags]) : nil
+          tags.reject! {|tag| tag == "$add$tag$"}
           notes = params[:notes]
           result = Connection.insert_contact(current_user,name,email,nil,nil,nil,photo,tags,notes)
           if result[:status]
