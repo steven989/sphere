@@ -1216,10 +1216,10 @@ $(function(){
 <div data-remodal-id="bubbleModal" data-default-css="([{'attribute':'height','value':'400px'}])">
     <div class="modalView" id="plans">
         <div class="modalContentContainer">
-            <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;"></div>
-            <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:80%; border-radius:10px;"></div>
-            <div style="color:#656268; margin-top: 0px; font-size:15px;font-weight:lighter"><span class="lastHangout"></span></div>
-            <div style="height:140px;margin-top:25px;">
+            <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
+            <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:80%; border-radius:10px;font-size:15px;font-weight:300;"></div>
+            <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
+            <div style="height:135px;margin-top:20px;">
                 <div class="photo transitionButton" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none; display:block; margin:auto;"></div>
                 <div class="icon transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
                     <%= fa_icon 'user-circle' %>
@@ -1254,7 +1254,7 @@ $(function(){
     <% end %>
     <div class="modalView hidden" id="makePlan">
         <div class="modalContentContainer p-h-xxlg">
-            <span class="textDarkGray">Choose Activity and Date</span>
+            <span class="textDarkGray" style="font-size:17px;">Choose Activity and Date</span>
             <form action="<%= plans_path %>" method="POST" >
                 <div class="btn-group buttonGroupWithOther chooseActivity" style="height:50px;"  role="group">
                     <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', width: 33 %></button>

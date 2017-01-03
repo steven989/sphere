@@ -23,6 +23,14 @@ h1,h2,h3,h4,h5,h6,p,div,span,body {
   font-family: 'brandon-grotesque' !important;
 }
 
+div, p {
+    font-size:17px;
+}
+
+table {
+    font-size:15px;   
+}
+
 .glowBlue {
     box-shadow: 0px 0px 47px 3px rgba(25,230,203,1);
 }
@@ -76,6 +84,8 @@ h1,h2,h3,h4,h5,h6,p,div,span,body {
 
 .formElement.button {
     cursor: pointer;
+    font-size:15px;
+    text-align: center;
 }
 
 .formElement:hover {
@@ -460,6 +470,7 @@ body {
     border: none !important;
     width: 25%;
     height: 100%;
+    font-weight:500;
 }
 
 #photoUploader, #photoUploaderInCreate, #photoUploaderInUserInfo { display: none; }
@@ -754,6 +765,7 @@ label[for=photoUploader]:hover {
     display: block;
     width: 100%;
     text-align: center;
+    font-size:17px;
 }
 
 form div.btn-group{
@@ -864,6 +876,7 @@ form div.btn-group .btn.active:hover{
 
 #challenges > .title h1, #progress > .title h1, #achievements > .title h1 {
     font-size: 25px;
+    font-weight:400;
 } 
 
 /*Progress-specific*/
@@ -888,6 +901,7 @@ form div.btn-group .btn.active:hover{
 
 #progress #levelDisplay .content h2 {
     font-size:20px;
+    font-weight:400;
 }
 
 
@@ -913,11 +927,11 @@ form div.btn-group .btn.active:hover{
 .card .title {
     padding: 5px 0px;
     text-align: center;
-
 }
 
 .card .title h2 {
     font-size: 20px;
+    font-weight: 400;
 }
 
 
@@ -974,6 +988,7 @@ form div.btn-group .btn.active:hover{
     padding: 0px 20px;
     text-align: center;
     line-height: 25px;
+    font-size:16px;
 }
 
 /*Achievement-specific*/
