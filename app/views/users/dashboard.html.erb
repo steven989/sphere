@@ -328,15 +328,17 @@ $(function(){
         });
 
         $('.modalView#mainImportView .modalTokenBox li.TokenSearch input').off('focusout').on('focusout',function(){
-
-            if (tokenInCreate.toArray().length == 0) {
-                tokenInCreate.tokenAdd("$add$tag$","+ Add Tags");
-                $('.modalView#mainImportView .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('span').css("margin-right","10px");
-                $('.modalView#mainImportView .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('a').remove();                
-            }
+            setTimeout(function(){
+                if (tokenInCreate.toArray().length == 0) {
+                    tokenInCreate.tokenAdd("$add$tag$","+ Add Tags");
+                    $('.modalView#mainImportView .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('span').css("margin-right","10px");
+                    $('.modalView#mainImportView .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('a').remove();                
+                }
+            },100);
         });
         tokenizeTagInCreateContactSelectionField();
     }
+
     
     function tokenizeTagInCreateContactSelectionField() {
         $('.modalView#mainImportView #tokenizeInCreate').html("");
@@ -802,12 +804,13 @@ $(function(){
             token.tokenRemove("$add$tag$");
         });
         $('.modalView#plans .modalTokenBox li.TokenSearch input').off('focusout').on('focusout',function(){
-
-            if (token.toArray().length == 0) {
-                token.tokenAdd("$add$tag$","+ Add Tags");
-                $('.modalView#plans .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('span').css("margin-right","10px");
-                $('.modalView#plans .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('a').remove();                
-            }
+                setTimeout(function(){
+                            if (token.toArray().length == 0) {
+                                token.tokenAdd("$add$tag$","+ Add Tags");
+                                $('.modalView#plans .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('span').css("margin-right","10px");
+                                $('.modalView#plans .modalTokenBox li').filter(function(){return $(this).data('value') == "$add$tag$"}).find('a').remove();                
+                            }
+                        },100);
         })
         
         if (connectionTags.length == 0) {
