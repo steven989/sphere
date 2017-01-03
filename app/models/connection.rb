@@ -471,6 +471,7 @@ class Connection < ActiveRecord::Base
           amount:penalty_amount
           )
         self.update_attributes(active:true,date_inactive:nil)
+        Activity.create(user:self.user,connection_id:self.id,activity:"Returned from expired connections",date:Date.today,initiator:0,activity_description:"No points")
         StatisticDefinition.triggers("individual","connection_revive",self.user) 
         status = true
         message = "Successfully added#{" "+self.first_name} back to your Sphere! XP -#{penalty_amount}"
