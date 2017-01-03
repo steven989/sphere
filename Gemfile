@@ -70,6 +70,9 @@ gem 'seed_dump'
 gem 'newrelic_rpm'
 # Email validation
 gem 'email_validator'
+#Impersonation
+gem 'pretender'
+
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

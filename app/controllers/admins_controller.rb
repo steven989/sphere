@@ -1,6 +1,7 @@
 class AdminsController < ApplicationController
 
     def dashboard
+        @users = User.app_users.order(id: :asc)
         # View, create, edit levels
         
         # View, create, edit challenges
@@ -27,6 +28,12 @@ class AdminsController < ApplicationController
             render partial: "#{model_name}_input"
           }      
         end
+    end
+
+    def impersonate
+        user = User.find(params[:id])
+        impersonate_user(user)
+        redirect_to root_path
     end
 
     def upload_graphics

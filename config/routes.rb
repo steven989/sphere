@@ -45,7 +45,7 @@ Rails.application.routes.draw do
   put  'admins/update_activity_definitions' => 'admins#update_activity_definitions', as: 'update_activity_definitions'
   put  'admins/update_system_settings' => 'admins#update_system_settings', as: 'update_system_settings'
   put  'admins/upload_graphics' => 'admins#upload_graphics', as: 'upload_graphics'
-
+  get 'admins/impersonate_user/:id' => 'admins#impersonate', as: 'impersonate_user'
 
   # Plans controller
   post 'plans' => 'plans#create', as: 'plans'

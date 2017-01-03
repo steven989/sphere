@@ -269,7 +269,20 @@ $(function(){
                   </div>
                   <div id="users">
                     <h2>Users</h2>
-                    <!-- content -->
+                    <table>
+                        <thead>
+                            <th>Email</th>
+                            <th>Login As</th>
+                        </thead>
+                        <tbody>
+                            <% @users.each do |user| %>
+                                <tr>
+                                    <td><%= user.email %></td>
+                                    <td><%= link_to 'login', impersonate_user_path(user) %></td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
                   </div>
                   <div id="system_settings">
                     <h2>System Settings</h2>
