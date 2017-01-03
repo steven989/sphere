@@ -1133,6 +1133,9 @@ $(function(){
                                 <div class="title">
                                     <h2 class="textDarkGray"><%= user_challenge.challenge.name %></h2>
                                 </div>
+                                <div class="reward textDarkGray" style="text-align:center;">
+                                    <i><p>+<%= user_challenge.challenge.reward %>XP</p></i>
+                                </div>
                                 <div class="graphic">
                                     <div class="graphicWrapper">
                                         <%= user_challenge.challenge.graphic.blank? ? "" : (image_tag user_challenge.challenge.graphic, alt:"Challenge Graphics") %>
