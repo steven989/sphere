@@ -939,7 +939,7 @@ $(function(){
             });
         }
 
-        transition($('.modalView#mainImportView'),$('.modalView#expiredConnections'));
+        transition($('.modalView#settingsSelect'),$('.modalView#expiredConnections'));
     }
 
     // Predefined set of actions can be called by passing an array of actions into this function. Useful for Rails to call specific follow up actions
@@ -1336,7 +1336,6 @@ $(function(){
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
                 <div class="formElement button textDarkGray disableWhileProcessed" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
-                <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
                 <form action="<%= create_connection_path %>" method="POST">
@@ -1390,18 +1389,6 @@ $(function(){
     </div>
 
 
-    <div class="modalView hidden" id="expiredConnections">
-        <div class="modalContentContainer p-h-xxlg">
-
-        </div>
-        <div class="modalButtonContainer">
-            <div class="modalBottomFullButton sphereRedBackground hoverable transitionButton" data-current=".modalView#expiredConnections" data-target=".modalView#mainImportView">
-                <span>BACK</span>
-            </div>
-        </div>
-    </div>
-
-
 </div>
 
 <div data-remodal-id="settingsModal" data-default-css="([{'attribute':'height','value':'400px'}])">
@@ -1420,6 +1407,7 @@ $(function(){
                     <div id="default_contact_interval_in_days_title"></div>
                     <div><input type='number' class="settingInput settingInput formElement standardHeight inputData" name='default_contact_interval_in_days' id='default_contact_interval_in_days_value'></div>
                 </div>
+                <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <a href="<%= clear_connections_path %>">Clear contacts (testing button)</a>
 <!--                 <div class="m-b-md">
                     <div id="event_add_granularity_title"></div>
@@ -1438,7 +1426,16 @@ $(function(){
         </div>
     </div>
 
+    <div class="modalView hidden" id="expiredConnections">
+        <div class="modalContentContainer p-h-xxlg">
 
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereRedBackground hoverable transitionButton" data-current=".modalView#expiredConnections" data-target=".modalView#settingsSelect">
+                <span>BACK</span>
+            </div>
+        </div>
+    </div>
 
     <div class="modalView" id="userInfo">
         <div class="modalContentContainer p-h-xxlg">
