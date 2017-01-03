@@ -14,8 +14,11 @@
 //= require jquery_ujs
 //= require jquery-ui
 //= require turbolinks
+//= require typekit
 //= require_tree .
+//= require typekit
 //= require_tree ../../../vendor/assets/javascripts/priority/.
+//= require typekit
 //= require_tree ../../../vendor/assets/javascripts/.
 
 // Shared utilities
