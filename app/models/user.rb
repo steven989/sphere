@@ -67,7 +67,7 @@ class User < ActiveRecord::Base
       result = self.notifications.inject({}) do |accumulator,notification|
                   accumulator[:connection_level] = {} unless accumulator[:connection_level]
                   accumulator[:user_level] = [] unless accumulator[:user_level]
-                  if notification.notification_date && notification.expiry_date && Date.today >= notification.notification_date && Date.today < notification.expiry_date
+                  if notification.notification_date && notification.expiry_date && Date.today >= notification.notification_date && Date.today <= notification.expiry_date
                     if notification.notifiable_type == "Connection"
                       if accumulator[:connection_level][notification.notifiable_id]
                         accumulator[:connection_level][notification.notifiable_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority} if (notification.priority < accumulator[:connection_level][notification.notifiable_id][:priority])
