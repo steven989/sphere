@@ -47,17 +47,16 @@
             // 0) clear the existing array and scale the raw bubble data
             clearExistingBubbles();
             scaledBubblesArray = scaleRawArray(bubblesArray,minDistance,maxDistance,minBubbleSize,maxBubbleSize);
-
             // 2) add the center bubble
             positionedBubblesArray.push({id:0,x:centerBubble.x,y:centerBubble.y,radius:centerBubble.radius,display:centerBubble.display,photo_url:centerBubble.photo_url});
 
-            // 3) order bubblesArray using size from the closest to the farthest
-            scaledBubblesArray = scaledBubblesArray.sort(function(a,b){return a.distance > b.distance});
+            // 3) order bubblesArray using size from biggest to smallest
+            scaledBubblesArray = scaledBubblesArray.sort(function(a,b){return b.radius - a.radius});
 
             // 4) loop through the reordered bubblesArray
             scaledBubblesArray.forEach(function(scaledBubble){
                 //3.1) generate the next alpha value
-                var alpha = generateNextAlpha();
+                var alpha = generateNextAlpha(scaledBubble.id_rank);
                 //3.2) generate r - distance between center bubble and this bubble to place
                 var r = Math.max(centerBubble.radius + sizeOfGapBetweenBubbles + scaledBubble.radius, scaledBubble.distance)
                 //3.3) determine (x,y) of this bubble given the alpha value and r
@@ -127,10 +126,18 @@
             }
         }
 
-        function generateNextAlpha() { //alpha is the angle relative to the center to place the bubble
-            var valueToReturn = quarterTopAnglesArray[quarterCounter] + cycleOffsetLookup[cycleCounter];
-                quarterCounter = cycleCounter >= 3 ? (quarterCounter >= quarterTopAnglesArray.length-1 ? 0 : quarterCounter+1) : quarterCounter;
-                cycleCounter = cycleCounter >= 3 ? 0 : cycleCounter+1;
+        // function generateNextAlpha() { //alpha is the angle relative to the center to place the bubble
+        //     var valueToReturn = quarterTopAnglesArray[quarterCounter] + cycleOffsetLookup[cycleCounter];
+        //         quarterCounter = cycleCounter >= 3 ? (quarterCounter >= quarterTopAnglesArray.length-1 ? 0 : quarterCounter+1) : quarterCounter;
+        //         cycleCounter = cycleCounter >= 3 ? 0 : cycleCounter+1;
+        //     return valueToReturn
+        // }
+
+        function generateNextAlpha(id_rank) { //alpha is the angle relative to the center to place the bubble
+            var quarterCounterInner = Math.floor(id_rank/4)%quarterTopAnglesArray.length;
+            var cycleCounterInner = id_rank%4;
+
+            var valueToReturn = quarterTopAnglesArray[quarterCounterInner] + cycleOffsetLookup[cycleCounterInner];
             return valueToReturn
         }
 
@@ -158,12 +165,13 @@
             var mappedSizes = rawDataArray.map(function(bubbleDataObject){
                 return bubbleDataObject.size;
             });
-            // var minmaxDistance = [Math.min.apply(null, mappedDistances),Math.max.apply(null, mappedDistances)];
+            var minmaxDistance = [Math.min.apply(null, mappedDistances),Math.max.apply(null, mappedDistances)];
             var minmaxSize = [Math.min.apply(null, mappedSizes),Math.max.apply(null, mappedSizes)];
             return rawDataArray.map(function(bubbleDataObject){
                 return {
                     id:bubbleDataObject.id,
-                    distance:Math.round(scale(bubbleDataObject.distance,0,10000,minDistance,maxDistance)*100.00)/100.00,
+                    id_rank:bubbleDataObject.id_rank,
+                    distance:Math.round(scale(bubbleDataObject.distance,minmaxDistance[0],minmaxDistance[1],minDistance,maxDistance)*100.00)/100.00,
                     radius:Math.round(scale(bubbleDataObject.size,minmaxSize[0],minmaxSize[1],minBubbleSize,maxBubbleSize)*100.00)/100.00,
                     display:bubbleDataObject.display,
                     photo_url:bubbleDataObject.photo_url
@@ -177,7 +185,7 @@
             } else {
                 var m = (desiredMax-desiredMin)*1.0/(actualMax-actualMin)*1.0; // m = (y2-y1)/(x2-x1)
                 var b = desiredMax - m*actualMax; // b=y-mx
-                return m*numberToScale + b;            
+                return m*numberToScale + b;
             }
         }
 
