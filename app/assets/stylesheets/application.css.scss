@@ -944,7 +944,7 @@ form div.btn-group .btn.active:hover{
     margin: auto;
     height: 150px;
     width:150px;
-    border-radius: 50%;
+    /*border-radius: 50%;*/
     overflow: hidden;
 }
 
@@ -955,6 +955,17 @@ form div.btn-group .btn.active:hover{
     height: 134px;
     width: 134px;
 }
+
+.card.challengeCard .daysRemaining {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width:27px;
+    height:27px;
+    font-size: 12px;
+    padding-top: 3px;
+}
+
 
 
 .card.challengeCard .subtitle {

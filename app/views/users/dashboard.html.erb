@@ -9,7 +9,6 @@ $(function(){
     var tokenInCreate;
     var userLevelNotifications = (<%= raw @notifications %>).user_level;
     var bubblesData = <%= raw @raw_bubbles_data %>;
-    test = bubblesData;
     var authorized_google_contacts = <%= @authorized_google_contacts %>;
     var authorized_google_calendar = <%= @authorized_google_calendar %>;
     var openBubble;
@@ -560,6 +559,7 @@ $(function(){
             var color = remainingPercent > 0.75 ? '#34BF49' : (remainingPercent > 0.3 ?  '#FFB224' : '#ED1C24');
             var animationStartValue = remainingPercent > 0.95 ? 0 : 1;
             paintProgressBar(graphicWrapper,animationStartValue,color,remainingPercent);
+            graphicWrapper.append('<div class="daysRemaining badge" style="background-color:'+color+'">'+remainingDays+'d</div>');
         }
     }
 
