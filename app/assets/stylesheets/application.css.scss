@@ -51,10 +51,11 @@ table {
     width: 100%;
     transition:color 0.2s ease;  
     transition:background 0.2s ease; 
-    min-height: 30px; 
+    height: 30px; 
     line-height: 30px;
     padding: 0px 15px;
 }
+
 
 .formElement.disabled {
     background-color:#E9E9E9;
@@ -84,7 +85,6 @@ table {
     line-height: 28px;
     font-size: 15px;
 }
-
 
 .formElement.button {
     cursor: pointer;
