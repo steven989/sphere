@@ -1,6 +1,7 @@
 <script>
 var test;
 var cropVarInEditConnection;
+var cropVarInCreateConnection;
 
 $(function(){
     // A series of variables that need to be used across functions
@@ -387,7 +388,6 @@ $(function(){
                     _this.css(cssReset.attribute,cssReset.value);
                 });
             });
-
             // Reset the fields that should be hidden by default
             modal.find('.default_hidden').each(function(){
                 $(this).removeClass('hidden').addClass('hidden');
@@ -452,6 +452,7 @@ $(function(){
     // General modal ajax submission function
     function modalAjaxFormSubmission(form,submissionButton) {
         var button = submissionButton;
+        var promiseReady = true;
         if (!button.hasClass('disabled')) {
             var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);
             var formData = new FormData();
@@ -459,7 +460,20 @@ $(function(){
                 if ($(this).prop('type') == 'checkbox') {
                     formData.append($(this).prop('name'),$(this).prop('checked'));
                 } else if ($(this).prop('type') == 'file') {
-                    formData.append($(this).prop('name'),$(this).prop("files")[0]);
+                    if ($(this).data('uploader-crop-var') != undefined ) {
+                        promiseReady = false;
+                        _this = $(this);
+                        eval($(this).data('uploader-crop-var')).croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
+                                if (croppedImageData == null) {
+                                    formData.append(_this.prop('name'),_this.prop("files")[0]);
+                                } else {
+                                    formData.append("photo", croppedImageData);
+                                }
+                            promiseReady = true;
+                            });
+                    } else {
+                        formData.append($(this).prop('name'),$(this).prop("files")[0]);
+                    }
                 } else if ($(this).prop('tagName') == 'SELECT') {
                     if($(this).hasClass('tokenized')) {
                         var tokenVariable = eval($(this).data('token-variable')).toArray();
@@ -472,34 +486,43 @@ $(function(){
                 }
             });
 
-          $.ajax({
-            url: form.attr('action'),
-            type: form.attr('method'),
-            processData: false,
-            contentType: false,
-            data: formData,
-            dataType: 'JSON'
-          }).done(function(data){
-                resetModal(form.closest('.remodal'),1);
-                if (data.status) {
-                        if(data.message != undefined /* && alertElement.length > 0 */ ) {
-                            toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
+          var check = setInterval(function(){
+
+            if (promiseReady) {
+                  promiseReady = false;
+                  clearInterval(check);
+                  
+                  $.ajax({
+                    url: form.attr('action'),
+                    type: form.attr('method'),
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    dataType: 'JSON'
+                  }).done(function(data){
+                        resetModal(form.closest('.remodal'),1);
+                        if (data.status) {
+                                if(data.message != undefined /* && alertElement.length > 0 */ ) {
+                                    toastr.success(data.message,null, {timeOut: 5000,closeButton:false});
+                                }
+                        } else {
+                                toastr.options.closeButton = true;
+                                if(data.message != undefined /* && alertElement.length > 0 */) {
+                                    toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                                }
                         }
-                } else {
-                        toastr.options.closeButton = true;
-                        if(data.message != undefined /* && alertElement.length > 0 */) {
-                            toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                        if (data.data != undefined) {
+                            returnedData = data.data;
                         }
-                }
-                if (data.data != undefined) {
-                    returnedData = data.data;
-                }
-                if (data.actions != undefined && data.actions.length > 0) {
-                    performActions(data.actions);
-                }
-                reEnableButton(disabledButtonObject);
-              });
-        }   
+                        if (data.actions != undefined && data.actions.length > 0) {
+                            performActions(data.actions);
+                        }
+                        reEnableButton(disabledButtonObject);
+                    });
+                } 
+
+            },1)
+          };  
     }
 
     // General listener for submit buttons
@@ -510,7 +533,7 @@ $(function(){
                 var form = $($(this).data('submit-form'));
                 modalAjaxFormSubmission(form,button);
             });
-        });        
+        });
     }
     submitButtonListener();
 
@@ -814,43 +837,46 @@ $(function(){
         $('#putOnGoogle').off("change").on("change",function(){
             toggleAnotherEnableDisableCheckbox($(this),$('#notify'));
         });
+
         // this is related to the image cropping area
-        if (cropVarInEditConnection) {cropVarInEditConnection.croppie('destroy');}
-        cropInEditConnection();
-        function cropInEditConnection() {
-            function readFile(input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        $('#cropInEditConnection').addClass('ready');
-                        cropVarInEditConnection.croppie('bind', {
-                            url: e.target.result
-                        });
+         //Edit connection
+            if (cropVarInEditConnection) {cropVarInEditConnection.croppie('destroy');}
+            cropInEditConnection();
+            function cropInEditConnection() {
+                function readFile(input) {
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#cropInEditConnection').addClass('ready');
+                            cropVarInEditConnection.croppie('bind', {
+                                url: e.target.result
+                            });
+                        }
+                        reader.readAsDataURL(input.files[0]);
                     }
-                    reader.readAsDataURL(input.files[0]);
+                    else {
+                        toastr.error("Your browser doesn't support the FileReader API, so we cannot edit the photo for you",null, {timeOut: 10000,closeButton:true});
+                    }
                 }
-                else {
-                    toastr.error("Your browser doesn't support the FileReader API, so we cannot edit the photo for you",null, {timeOut: 10000,closeButton:true});
-                }
-            }
-            cropVarInEditConnection = $('#cropInEditConnection').croppie({
-                viewport: {
-                    width: 200,
-                    height: 200,
-                    type: 'circle'
-                },
-                enableExif: true
-            });
-            $('#photoUploader').on('change', function () { 
-                $('.modalView#editConnection .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','410px');
-                $('.modalView#plans .photo, .modalView#plans .icon').each(function(){
-                    $(this).data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','700px');
+                cropVarInEditConnection = $('#cropInEditConnection').croppie({
+                    viewport: {
+                        width: 200,
+                        height: 200,
+                        type: 'circle'
+                    },
+                    enableExif: true
                 });
-                $('#cropInEditConnection').removeClass('hidden');
-                $('.remodal[data-remodal-id=bubbleModal]').animate({height:"700px"})
-                readFile(this);
-            });
-        }    
+                $('#photoUploader').on('change', function () { 
+                    $('.modalView#editConnection .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','410px');
+                    $('.modalView#plans .photo, .modalView#plans .icon').each(function(){
+                        $(this).data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','700px');
+                    });
+                    $('#cropInEditConnection').removeClass('hidden');
+                    $('.remodal[data-remodal-id=bubbleModal]').animate({height:"700px"})
+                    readFile(this);
+                });
+            } 
+
         // Remove the modal-stretching data attributes attached as the result of uploading images
         $('.modalView#plans .photo, .modalView#plans .icon').each(function(){
             $(this).removeData('height-adjust-element').removeData('height-adjust-value');
@@ -1033,6 +1059,39 @@ $(function(){
 
         transition($('.modalView#settingsSelect'),$('.modalView#expiredConnections'));
     }
+
+    //Photo cropping area in create connection modal
+    cropInCreateConnection();
+    function cropInCreateConnection() {
+        function readFile(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#cropInCreateConnection').addClass('ready');
+                    cropVarInCreateConnection.croppie('bind', {
+                        url: e.target.result
+                    });
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+            else {
+                toastr.error("Your browser doesn't support the FileReader API, so we cannot edit the photo for you",null, {timeOut: 10000,closeButton:true});
+            }
+        }
+        cropVarInCreateConnection = $('#cropInCreateConnection').croppie({
+            viewport: {
+                width: 200,
+                height: 200,
+                type: 'circle'
+            },
+            enableExif: true
+        });
+        $('#photoUploaderInCreate').on('change', function () { 
+            $('#cropInCreateConnection').removeClass('hidden');
+            $('.remodal[data-remodal-id=importModal]').animate({height:"700px"})
+            readFile(this);
+        });
+    } 
 
     // Predefined set of actions can be called by passing an array of actions into this function. Useful for Rails to call specific follow up actions
     function performActions(actionsArray) {
@@ -1451,7 +1510,8 @@ $(function(){
                     <div class="vex-custom-field-wrapper">
                         <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="name" required>
                         <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
-                        <input name="photoUploaderInCreate" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
+                        <div id="cropInCreateConnection" class='hidden default_hidden'></div>
+                        <input name="photoUploaderInCreate" data-uploader-crop-var="cropVarInCreateConnection" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
                         <label for="photoUploaderInCreate" class="textDarkGray m-b-xs formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                             <%= fa_icon 'id-badge' %>
                             Upload Photo
@@ -1460,7 +1520,6 @@ $(function(){
                         <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox inputData tokenized clearInputAfterUpdate" data-token-variable="tokenInCreate">
                         </select>
                     </div>
-                    <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;"></div>
                 </form>
             </div>
         </div>

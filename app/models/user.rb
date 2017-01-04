@@ -64,9 +64,13 @@ class User < ActiveRecord::Base
   end
 
   def level_up
-    level = Level.find_level_for(self)
-    stat = user_statistics.find_statistic("level").take
-    stat.update_attributes(value:level)
+    current_level = self.stat("level")
+    new_level = Level.find_level_for(self)
+    if new_level > current_level
+      stat = user_statistics.find_statistic("level").take
+      stat.update_attributes(value:level)
+      Notification.create_new_level_notification(self,current_level,new_level,1)
+    end
   end
 
   def get_notifications(json_or_not_json=false)

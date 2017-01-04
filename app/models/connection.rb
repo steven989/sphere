@@ -163,8 +163,8 @@ class Connection < ActiveRecord::Base
             matched_connection_email = matched_connection.email
             matched_connection_other_emails = eval((matched_connection.additional_emails.blank? ? "[]" : matched_connection.additional_emails)) #will return either [] or ["some_values"]
             if matched_connection_email.blank?
-              primary_email_to_update_string = unified_email_array.length == 0 ? nil : unified_email_array.slice!(0)
-              updated_additional_emails_array = unified_email_array.length == 0 ? nil : unified_email_array
+              primary_email_to_update_string = unified_email_array.nil? || unified_email_array.length == 0 ? nil : unified_email_array.slice!(0)
+              updated_additional_emails_array = unified_email_array.nil? || unified_email_array.length == 0 ? nil : unified_email_array
               updated_additional_emails_string = updated_additional_emails_array.blank? ? nil : updated_additional_emails_array.to_s
             else
               primary_email_to_update = nil

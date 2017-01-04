@@ -117,8 +117,9 @@ class UsersController < ApplicationController
     end
 
     def create_connection
-      photo_uploaded = !((params[:photoUploaderInCreate] == "undefined") || (params[:photoUploaderInCreate] == "null") || params[:photoUploaderInCreate].blank?)
+      photo_uploaded = !((params[:photo] == "undefined") || (params[:photo] == "null") || params[:photo].blank?)
       tags_inputted = !((params[:tags] == "undefined") || (params[:tags] == "null") || params[:tags].blank?)
+
 
         if params[:name].blank?
               status = false
@@ -127,7 +128,7 @@ class UsersController < ApplicationController
         else
           name = params[:name]
           email = params[:email]
-          photo = photo_uploaded ? params[:photoUploaderInCreate] : nil
+          photo = photo_uploaded ? params[:photo] : nil
           tags = tags_inputted ? JSON.parse(params[:tags]) : nil
           tags.reject! {|tag| tag == "$add$tag$"}
           notes = params[:notes]
@@ -140,6 +141,7 @@ class UsersController < ApplicationController
               status = true
               message = "#{connection.first_name} added to your Sphere!"
               actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+              
               data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
           else
               status = false

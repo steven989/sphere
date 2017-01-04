@@ -13,6 +13,7 @@ class Activity < ActiveRecord::Base
             connection.update_attributes(active:true)
             StatisticDefinition.triggers("individual","create_activity",user)
             new_level = user.user_statistics.find_statistic('level')
+            user.level_up
             Notification.create_checked_in_notification(user,connection)
             connection.notifications.where(notification_type:"connection_expiration").destroy_all
             if new_level.take.value > current_level.take.value
