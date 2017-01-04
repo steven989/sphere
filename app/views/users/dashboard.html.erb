@@ -739,6 +739,12 @@ $(function(){
         $('.modalView#makePlan input[name=notify]').prop('checked',<%= @settings[:send_event_booking_notification_by_default] %>);
 
 
+        // update the scheduling TO time selector to make all time slots visible
+        $('#scheduleTimeTo').timepicker('option',{
+            'scrollDefault':'7:00am',
+            'disableTimeRanges': [['12:00am','12:00am']]
+        });
+
         $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
         if (returnedData.hasUpcomingPlan) {
             $('.modalView#makePlan input[name=date]').val(returnedData.planData.date);
@@ -880,11 +886,12 @@ $(function(){
         });
 
         $('#scheduleTimeFrom').timepicker({'scrollDefault':'7:00am'});
-        $('#scheduleTimeFrom').on('changeTime',function(){
+        $('#scheduleTimeTo').timepicker({'scrollDefault':'7:00am'});
+        $('#scheduleTimeFrom').off('changeTime').on('changeTime',function(){
             $('#scheduleTimeTo').val($(this).val());
-            $('#scheduleTimeTo').timepicker({
+            $('#scheduleTimeTo').timepicker('option',{
                 'scrollDefault':'7:00am',
-                'disableTimeRanges': [['12am',$(this).val()]]
+                'disableTimeRanges': [['12:00am',$(this).val()]]
             });
             $('#scheduleTimeTo').focus();
 
