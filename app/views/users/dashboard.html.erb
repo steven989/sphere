@@ -1,7 +1,8 @@
 <script>
 var test;
 $(function(){
-    $('[data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});;
+    // A series of variables that need to be used across functions
+    $('[data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
     var returnedData;
     var modalInstance;
     var closeModalTimer;    
@@ -13,6 +14,7 @@ $(function(){
     var authorized_google_calendar = <%= @authorized_google_calendar %>;
     var openBubble;
     var overLayHtml;
+    var cropVarInEditConnection;
 
     // Search 
     var options = {
@@ -803,6 +805,51 @@ $(function(){
         $('#putOnGoogle').off("change").on("change",function(){
             toggleAnotherEnableDisableCheckbox($(this),$('#notify'));
         });
+        // this is related to the image cropping area
+        if (cropVarInEditConnection) {cropVarInEditConnection.croppie('destroy');}
+        cropInEditConnection();
+        function cropInEditConnection() {
+            function readFile(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#cropInEditConnection').addClass('ready');
+                        cropVarInEditConnection.croppie('bind', {
+                            url: e.target.result
+                        });
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+                else {
+                    swal("Sorry - you're browser doesn't support the FileReader API");
+                }
+            }
+            cropVarInEditConnection = $('#cropInEditConnection').croppie({
+                viewport: {
+                    width: 200,
+                    height: 200,
+                    type: 'circle'
+                },
+                enableExif: true
+            });
+            $('#photoUploader').on('change', function () { 
+                $('.modalView#editConnection .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','410px');
+                $('.modalView#plans .photo, .modalView#plans .icon').each(function(){
+                    $(this).data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','700px');
+                });
+                $('#cropInEditConnection').removeClass('hidden');
+                $('.remodal[data-remodal-id=bubbleModal]').animate({height:"700px"})
+                readFile(this);
+            });
+        }    
+        // Remove the modal-stretching data attributes attached as the result of uploading images
+        $('.modalView#plans .photo, .modalView#plans .icon').each(function(){
+            $(this).removeData('height-adjust-element').removeData('height-adjust-value');
+        });
+        // Hide the photo cropping preview area
+        $('#cropInEditConnection').addClass('hidden');
+        // reset the photo upload label
+        $('label[for=photoUploader]').html('<%= fa_icon "id-badge" %> Upload Photo');
 
         // Related to the tagging field in the modal. Used jQuery Tokenize plugin, but made slight modifications to the plugin so that upon clearing all tokens it doesn't trigger the callbacks that is triggered for one-by-one removing token
          if ((typeof token == "undefined")) {
@@ -1367,6 +1414,7 @@ $(function(){
                     Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
                 </div>
 
+                <div id="cropInEditConnection" class='hidden'></div>
                 <input name="photoUploader" class="hiddenUploader" id="photoUploader" type="file" accept="image/*">
                 <label for="photoUploader" class="textDarkGray" style="margin-top: 20px;">
                     <%= fa_icon 'id-badge' %>
