@@ -460,6 +460,16 @@ class Connection < ActiveRecord::Base
         self.update_attributes(active:false,date_inactive:Date.today)
     end
 
+    def check_if_conection_is_expiring_and_if_so_create_notification(user,expiring_connection_notification_period_in_days)
+        target_contact_interval_in_days = self.target_contact_interval_in_days
+        date_of_last_activity = self.activities.where("date is not null").order(date: :desc).first.date
+        number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
+        remaining_days_until_expiry = [target_contact_interval_in_days - number_of_days_since_last_activity,0].max
+        if remaining_days_until_expiry <= expiring_connection_notification_period_in_days
+          Notification.create_expiry_notification(user,self,date_of_last_activity+target_contact_interval_in_days.days,remaining_days_until_expiry)
+        end
+    end
+
     def revive
       penalty_amount = self.calculate_revival_requirements.to_i
       if self.user.stat("xp") >= penalty_amount
@@ -471,6 +481,8 @@ class Connection < ActiveRecord::Base
           amount:penalty_amount
           )
         self.update_attributes(active:true,date_inactive:nil)
+        expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
+        self.check_if_conection_is_expiring_and_if_so_create_notification(self.user,expiring_connection_notification_period_in_days)
         Activity.create(user:self.user,connection_id:self.id,activity:"Returned from expired connections",date:Date.today,initiator:0,activity_description:"No points")
         StatisticDefinition.triggers("individual","connection_revive",self.user) 
         status = true
