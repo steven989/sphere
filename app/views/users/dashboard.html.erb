@@ -544,6 +544,7 @@ $(function(){
 
     $('#addConnection').off('click').on('click',function(){
         initializeReModal('[data-remodal-id=importModal]','standardModal',1);
+        $('label[for=photoUploaderInCreate]').html('<%= fa_icon "id-badge" %> Upload Photo');
     });
 
     $('#navigation-tabs-container').easytabs({
