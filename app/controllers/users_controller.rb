@@ -34,7 +34,7 @@ class UsersController < ApplicationController
 
     def get_user_info
       data = {first_name:current_user.first_name,last_name:current_user.last_name,phone:current_user.phone}
-      actions = [{action:"function_call",function:"populateUserInfoForm()"},{action:"hide",element:".modalView#settingsSelect"},{action:"unhide",element:".modalView#userInfo"},{action:"function_call",function:"initializeReModal('[data-remodal-id=settingsModal]','standardModal',1)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
+      actions = [{action:"function_call",function:"populateUserInfoForm()"},{action:"hide",element:".modalView#settingsSelect"},{action:"unhide",element:".modalView#userInfo"},{action:"function_call",function:"initializeReModal('[data-remodal-id=settingsModal]','standardModal',0)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
       respond_to do |format|
         format.json {
           render json: {status:true, message:nil,actions:actions,data:data}
@@ -117,7 +117,7 @@ class UsersController < ApplicationController
     end
 
     def create_connection
-      photo_uploaded = !((params[:photo] == "undefined") || (params[:photo] == "null") || params[:photo].blank?)
+      photo_uploaded = !((params[:photoUploaderInCreate] == "undefined") || (params[:photoUploaderInCreate] == "null") || params[:photoUploaderInCreate].blank?)
       tags_inputted = !((params[:tags] == "undefined") || (params[:tags] == "null") || params[:tags].blank?)
 
 
@@ -128,7 +128,7 @@ class UsersController < ApplicationController
         else
           name = params[:name]
           email = params[:email]
-          photo = photo_uploaded ? params[:photo] : nil
+          photo = photo_uploaded ? params[:photoUploaderInCreate] : nil
           tags = tags_inputted ? JSON.parse(params[:tags]) : nil
           tags.reject! {|tag| tag == "$add$tag$"}
           notes = params[:notes]
@@ -206,7 +206,7 @@ class UsersController < ApplicationController
                               }
         respond_to do |format|
           format.json {
-            render json: {status:true,data:formattedSettingsHash,actions:[{action:"function_call",function:"populateSettingsForm()"},{action:"hide",element:".modalView#userInfo"},{action:"unhide",element:".modalView#settingsSelect"}]}
+            render json: {status:true,data:formattedSettingsHash,actions:[{action:"function_call",function:"populateSettingsForm()"},{action:"function_call",function:"$('[data-remodal-id=settingsModal]').animate({height:'400px'})"},{action:"hide",element:".modalView#userInfo"},{action:"unhide",element:".modalView#settingsSelect"}]}
           } 
         end
     end
