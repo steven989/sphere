@@ -36,7 +36,7 @@ class User < ActiveRecord::Base
 
 
   def display_name
-    (first_name || last_name) ? first_name.to_s+last_name.to_s  : email.match(/(\S+)@/)[1]
+    (first_name || last_name) ? first_name.to_s+" "+last_name.to_s  : email.match(/(\S+)@/)[1]
   end
 
   def get_raw_bubbles_data(connections_override=nil,json_or_not_json=false,active=true)

@@ -120,7 +120,6 @@ class UsersController < ApplicationController
       photo_uploaded = !((params[:photoUploaderInCreate] == "undefined") || (params[:photoUploaderInCreate] == "null") || params[:photoUploaderInCreate].blank?)
       tags_inputted = !((params[:tags] == "undefined") || (params[:tags] == "null") || params[:tags].blank?)
 
-
         if params[:name].blank?
               status = false
               message = "Please fill in required fields"
