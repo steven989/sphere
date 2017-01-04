@@ -7,6 +7,7 @@ class PlansController < ApplicationController
         summary = params[:name]
         location = params[:location]
         details = params[:details]
+        put_on_google = params[:putOnGoogle].blank? ? false : (params[:putOnGoogle] == "true"? true : false)
         notify = params[:notify].blank? ? false : (params[:notify] == "true"? true : false)
         connection_email = params[:connection_email]
 
@@ -19,7 +20,7 @@ class PlansController < ApplicationController
             connection.update_attributes(email:connection_email)
         end
 
-        if connection.email.blank? && notify
+        if connection.email.blank? && notify && put_on_google
             actions = [{action:"unhide",element:".modalView#makePlan .formElement.email"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"430"}}]
             status = false
             message ="Please enter an email for #{connection.first_name} as we don't seem to have it"
@@ -60,7 +61,8 @@ class PlansController < ApplicationController
                                        connection_email,
                                        access_token,
                                        expires_at,
-                                       "primary"
+                                       "primary",
+                                       put_on_google
                                     )
 
             status = result[:status]
@@ -101,6 +103,7 @@ class PlansController < ApplicationController
         summary = params[:name]
         location = params[:location]
         details = params[:details]
+        put_on_google = params[:putOnGoogle].blank? ? false : (params[:putOnGoogle] == "true"? true : false)
         notify = params[:notify].blank? ? false : (params[:notify] == "true"? true : false)
         connection_email = params[:connection_email]
 
@@ -115,7 +118,7 @@ class PlansController < ApplicationController
             summary+=" (with #{connection.name})"
         end
 
-        if connection.email.blank? && notify
+        if connection.email.blank? && notify && put_on_google
             actions = [{action:"unhide",element:".modalView#makePlan .formElement.email"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"430"}}]
             status = false
             message ="Please enter an email for #{connection.first_name} as we don't seem to have it"
@@ -155,19 +158,35 @@ class PlansController < ApplicationController
                                        connection,
                                        connection_email,
                                        access_token,
-                                       expires_at
+                                       expires_at,
+                                       put_on_google
                                     )
 
-            if result[:access_token]
-                session[:access_token] = result[:access_token][:access_token]
-                session[:expires_at] = result[:access_token][:expires_at]
-            end
-            Notification.create_upcoming_plan_notification(current_user,connection)
-            notifications = current_user.get_notifications(false)
+
             status = result[:status]
             message= result[:message]
-            data = {notifications:notifications}
-            actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(100)"}]
+
+            if status
+                if result[:access_token]
+                    session[:access_token] = result[:access_token][:access_token]
+                    session[:expires_at] = result[:access_token][:expires_at]
+                end
+                Notification.create_upcoming_plan_notification(current_user,connection)
+                notifications = current_user.get_notifications(false)
+                data = {notifications:notifications}
+                message= result[:message]
+                actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(100)"}]
+            elsif !status && result[:message].include?("Unauthorize")
+                message = "Hmm looks like we don't have access to your Google calendar. Click on the import button again to connect your Google account!"
+                scope = current_user.authorizations.where(provider:'google').take.scope_value
+                scope.reject! {|s| s == "calendar"}
+                current_user.authorizations.where(provider:'google').take.update_scope(scope)
+                session[:access_token] = nil
+                session[:expires_at] = nil
+                actions = [{action:"function_call",function:"changeVariableValue('authorized_google_calendar',false)"}]
+            else
+                message = "Uh oh. There seems to be some issues: #{result[:message]}"
+            end            
         end
 
         respond_to do |format|
@@ -188,7 +207,7 @@ class PlansController < ApplicationController
         else
             access_token = session ? session[:access_token] : nil
             expires_at = session ? session[:expires_at] : nil 
-            result = plan.delete_event(params[:notify],access_token,expires_at)
+            result = plan.delete_event(params[:notify],access_token,expires_at,true)
             if plan.connection
                 Notification.create_upcoming_plan_notification(current_user,plan.connection) 
             end

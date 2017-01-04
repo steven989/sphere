@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161222171906) do
+ActiveRecord::Schema.define(version: 20170104094001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -203,13 +203,14 @@ ActiveRecord::Schema.define(version: 20161222171906) do
     t.string   "calendar_id"
     t.string   "calendar_event_id"
     t.boolean  "invite_sent"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.datetime "date_time"
     t.float    "length"
     t.string   "edit_time_url"
     t.text     "details"
     t.datetime "end_date_time"
+    t.boolean  "put_on_calendar",   default: false
   end
 
   add_index "plans", ["connection_id"], name: "index_plans_on_connection_id", using: :btree

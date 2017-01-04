@@ -31,6 +31,10 @@ table {
     font-size:15px;   
 }
 
+.tooltip-inner {
+    font-size: 12px;
+}
+
 .glowBlue {
     box-shadow: 0px 0px 47px 3px rgba(25,230,203,1);
 }
@@ -604,7 +608,7 @@ label[for=photoUploader]:hover {
 .remodal.standardModal {
     border-radius: 8px;
     padding:0px;
-    height: 400px;
+    height: 410px;
     max-height: 100%;
     width: 95%;
     margin: auto;

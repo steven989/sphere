@@ -101,6 +101,15 @@ $(function(){
     }
     inPlaceUpdate();
 
+    // function to toggle another element based on events on one element
+    function toggleAnotherEnableDisableCheckbox(checkElement,affectedElement) {
+        if (checkElement.prop("checked")) {
+            affectedElement.removeProp("disabled");
+        } else {
+            affectedElement.prop("disabled","disabled");
+        }
+    }
+
     // User-level notifications
     function showUserLevelNotifications() {
         if (userLevelNotifications != undefined && userLevelNotifications instanceof Array && userLevelNotifications.length > 0) {
@@ -728,6 +737,8 @@ $(function(){
 
         $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
         $('.modalView#makePlan input[name=notify]').prop('checked',<%= @settings[:send_event_booking_notification_by_default] %>);
+
+
         $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
         if (returnedData.hasUpcomingPlan) {
             $('.modalView#makePlan input[name=date]').val(returnedData.planData.date);
@@ -738,6 +749,7 @@ $(function(){
             $('.modalView#makePlan input[name=details]').val(returnedData.planData.details);
             $('.modalView#makePlan input[name=plan_id]').val(returnedData.planData.id);
             $('.modalView#makePlan input[name=notify]').prop('checked',returnedData.planData.notify);
+            $('.modalView#makePlan input[name=putOnGoogle]').prop('checked',returnedData.planData.put_on_google);
             // ----- this part adds the green selected highlight to the activities button group based on text //
             var selectedActivities = 0;
             $('.modalView#makePlan .chooseActivity button').each(function(){
@@ -771,9 +783,14 @@ $(function(){
             $('.modalView#makePlan div#deleteEvent').removeClass('hidden').addClass('hidden');
             $('.modalView#makePlan form').attr('action',"<%= plans_path %>").attr('method','POST');
             submitButtonListener();
-            $('.modalView#makePlan .modalBottomRightButton').html("PUT IN CALENDAR");
+            $('.modalView#makePlan .modalBottomRightButton').html("CREATE ACTIVITY");
             $('.modalView#plans .modalBottomLeftButton').html("MAKE PLANS");
         }
+
+        // schedule events checkboxes enable/disable toggle
+        $('#putOnGoogle').off("change").on("change",function(){
+            toggleAnotherEnableDisableCheckbox($(this),$('#notify'));
+        });
 
         // Related to the tagging field in the modal. Used jQuery Tokenize plugin, but made slight modifications to the plugin so that upon clearing all tokens it doesn't trigger the callbacks that is triggered for one-by-one removing token
          if ((typeof token == "undefined")) {
@@ -1213,7 +1230,7 @@ $(function(){
     </div>
 </div>
 
-<div data-remodal-id="bubbleModal" data-default-css="([{'attribute':'height','value':'400px'}])">
+<div data-remodal-id="bubbleModal" data-default-css="([{'attribute':'height','value':'410px'}])">
     <div class="modalView" id="plans">
         <div class="modalContentContainer">
             <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
@@ -1293,15 +1310,25 @@ $(function(){
                 </div>
                 <input type="hidden" class="inputData" name="connection_id">
                 <input type="hidden" class="inputData" name="plan_id">
-                <%= check_box_tag 'notify',true,@settings[:send_event_booking_notification_by_default], style:"display:inline-box;", class:'inputData' %>
-                <label for="notify" class="textDarkGray">Send invite?</label>
+                
+                <div class="row m-t-xs">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <%= check_box_tag 'putOnGoogle',true,true, style:"display:inline-box;", class:'inputData' %>
+                        <label for="putOnGoogle" class="textDarkGray">Put in Google Calendar?</label>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <%= check_box_tag 'notify',true,@settings[:send_event_booking_notification_by_default], style:"display:inline-box;", class:'inputData' %>
+                        <label for="notify" class="textDarkGray">Send invite?</label>
+                    </div>
+                </div>
+                
                     <div class="btn btn-red disableWhileProcessed" style="display:block;color:#FFF;width:150px;" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent">CANCEL</div>
             
             </form>
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed putInCalendar" data-submit-form=".modalView#makePlan form">PUT IN CALENDAR</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed putInCalendar" data-submit-form=".modalView#makePlan form">CREATE ACTIVITY</div>
         </div>
     </div>
     <div class="modalView hidden" id="editConnection">

@@ -3,7 +3,7 @@ class Plan < ActiveRecord::Base
     belongs_to :connection
     scope :upcoming, -> { where(status:"Planned") } 
 
-    def self.create_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,calendar_id="primary")
+    def self.create_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,calendar_id="primary",put_on_google=true)
         date = event_parameters[:date]
         start_time_only = event_parameters[:start_time]
         end_time_only = event_parameters[:end_time]
@@ -14,28 +14,89 @@ class Plan < ActiveRecord::Base
 
         connection_email = !connection_email_override.blank? ? connection_email_override : connection.email
 
-        # Authenticate with Google and retrieve primary calendar
-        begin
-            # Check to see if there's an existing valid access token we can use without making a server request
-            if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
-              token_object = user.authorizations.where(provider:'google').take.refresh_token!  
+        if put_on_google
+            # Authenticate with Google and retrieve primary calendar
+            begin
+                # Check to see if there's an existing valid access token we can use without making a server request
+                if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
+                  token_object = user.authorizations.where(provider:'google').take.refresh_token!  
+                else
+                  token_object = {access_token:access_token,expires_at:expires_at}
+                end
+                service = Google::Apis::CalendarV3::CalendarService.new
+                access_token = AccessToken.new(token_object[:access_token])
+                service.authorization = access_token
+                calendar = service.get_calendar(calendar_id)
+            rescue => error
+                status = false
+                message = error.message
             else
-              token_object = {access_token:access_token,expires_at:expires_at}
+                # Calculate start time
+                Time.zone = calendar.time_zone
+                Chronic.time_class = Time.zone
+                start_time = Chronic.parse("#{date} #{start_time_only}")
+                end_time = Chronic.parse("#{date} #{end_time_only}")
+
+                if start_time.blank?
+                    status = false
+                    message = "We can't seem to understand your time input '#{start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+                elsif end_time.blank?
+                    status = false
+                    message = "We can't seem to understand your time input '#{end_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+                else
+                    # Create Google Calendar events
+
+                    begin
+                        if notify
+                            event = Google::Apis::CalendarV3::Event.new({
+                                summary: summary,
+                                location:location,
+                                description:details,
+                                start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
+                                end: {date_time:end_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
+                                attendees: [{email: connection_email}],
+                                reminders: {use_default:true}
+                                })
+                        else
+                            event = Google::Apis::CalendarV3::Event.new({
+                                summary: summary,
+                                location:location,
+                                description:details,
+                                start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
+                                end: {date_time:end_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
+                                reminders: {use_default:true}
+                                })
+                        end
+                        result = service.insert_event(calendar.id,event,send_notifications:notify)
+                    rescue => error
+                        status = false
+                        message = error.message
+                    else
+                        plan = Plan.create(
+                                user_id:user.id,
+                                connection_id:connection.id,
+                                date:start_time.to_date,
+                                date_time:start_time,
+                                end_date_time: end_time,
+                                timezone:calendar.time_zone,
+                                name:summary,
+                                location:location,
+                                status:"Planned",
+                                calendar_id:calendar.id,
+                                calendar_event_id:result.id,
+                                invite_sent:notify,
+                                details:details,
+                                put_on_calendar: true
+                                )
+                        status = true
+                        message = "Activity created! We put it on your calendar for you"
+                    end
+                end
             end
-            service = Google::Apis::CalendarV3::CalendarService.new
-            access_token = AccessToken.new(token_object[:access_token])
-            service.authorization = access_token
-            calendar = service.get_calendar(calendar_id)
-        rescue => error
-            status = false
-            message = error.message
         else
-            # Calculate start time
-            Time.zone = calendar.time_zone
-            Chronic.time_class = Time.zone
+            token_object = nil
             start_time = Chronic.parse("#{date} #{start_time_only}")
             end_time = Chronic.parse("#{date} #{end_time_only}")
-
             if start_time.blank?
                 status = false
                 message = "We can't seem to understand your time input '#{start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
@@ -43,58 +104,30 @@ class Plan < ActiveRecord::Base
                 status = false
                 message = "We can't seem to understand your time input '#{end_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
             else
-                # Create Google Calendar events
-
-                begin
-                    if notify
-                        event = Google::Apis::CalendarV3::Event.new({
-                            summary: summary,
-                            location:location,
-                            description:details,
-                            start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
-                            end: {date_time:end_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
-                            attendees: [{email: connection_email}],
-                            reminders: {use_default:true}
-                            })
-                    else
-                        event = Google::Apis::CalendarV3::Event.new({
-                            summary: summary,
-                            location:location,
-                            description:details,
-                            start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
-                            end: {date_time:end_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
-                            reminders: {use_default:true}
-                            })
-                    end
-                    result = service.insert_event(calendar.id,event,send_notifications:notify)
-                rescue => error
-                    status = false
-                    message = error.message
-                else
-                    plan = Plan.create(
-                            user_id:user.id,
-                            connection_id:connection.id,
-                            date:start_time.to_date,
-                            date_time:start_time,
-                            end_date_time: end_time,
-                            timezone:calendar.time_zone,
-                            name:summary,
-                            location:location,
-                            status:"Planned",
-                            calendar_id:calendar.id,
-                            calendar_event_id:result.id,
-                            invite_sent:notify,
-                            details:details
-                            )
-                    status = true
-                    message = "Event created! We put it on your calendar for you"
-                end
+                plan = Plan.create(
+                        user_id:user.id,
+                        connection_id:connection.id,
+                        date:start_time.to_date,
+                        date_time:start_time,
+                        end_date_time: end_time,
+                        timezone:nil,
+                        name:summary,
+                        location:location,
+                        status:"Planned",
+                        calendar_id:nil,
+                        calendar_event_id:nil,
+                        invite_sent:false,
+                        details:details,
+                        put_on_calendar:false
+                        )
+                status = true
+                message = "Activity created!"
             end
         end
         {status:status,message:message,access_token:token_object,plan:plan}
     end
 
-    def update_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil)
+    def update_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,put_on_google_new=true)
         new_date = event_parameters[:date]
         new_start_time_only = event_parameters[:start_time]
         new_end_time_only = event_parameters[:end_time]
@@ -105,65 +138,133 @@ class Plan < ActiveRecord::Base
 
         new_connection_email = !connection_email_override.blank? ? connection_email_override : connection.email
 
-        # Authenticate with Google and retrieve primary calendar
-        begin
-            # Check to see if there's an existing valid access token we can use without making a server request
-            if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
-              token_object = user.authorizations.where(provider:'google').take.refresh_token!  
-            else
-              token_object = {access_token:access_token,expires_at:expires_at}
-            end
-            service = Google::Apis::CalendarV3::CalendarService.new
-            access_token = AccessToken.new(token_object[:access_token])
-            service.authorization = access_token
-            event = service.get_event(calendar_id,calendar_event_id)
-        rescue => error
-            status = false
-            message = error.message
-        else
-            # Calculate start time
-            Time.zone = timezone
-            Chronic.time_class = Time.zone
-            new_start_time = Chronic.parse("#{new_date} #{new_start_time_only}")
-            new_end_time = Chronic.parse("#{new_date} #{new_end_time_only}")
-            if new_start_time_only.blank?
-                status = false
-                message = "We can't seem to understand your time input '#{new_start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
-            elsif new_end_time_only.blank?
-                status = false
-                message = "We can't seem to understand your time input '#{new_end_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
-            else
-                if new_start_time != date_time
-                    event.start.date_time = new_start_time.strftime("%Y-%m-%dT%H:%M:%S%z")
-                    self.date = new_start_time.to_date
-                    self.date_time = new_start_time
-                    update_notification = true
-                end
-                if new_end_time != end_date_time
-                    event.end.date_time = new_end_time.strftime("%Y-%m-%dT%H:%M:%S%z")
-                    self.end_date_time = new_end_time
-                end
-                if new_summary != name
-                    event.summary = new_summary
-                    self.name = new_summary
-                end
-
-                if new_location != location
-                    event.location = new_location
-                    self.location = new_location
-                end
-
-                if new_details != details
-                    event.description = new_details
-                    self.details = new_details
-                end
-                # Create Google Calendar events
-                begin
-                    result = service.update_event(calendar_id,calendar_event_id,event,send_notifications:notify)
-                rescue => error
-                    status = false
-                    message = error.message
+        if put_on_google_new && self.put_on_calendar
+            # Authenticate with Google and retrieve primary calendar
+            begin
+                # Check to see if there's an existing valid access token we can use without making a server request
+                if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
+                  token_object = user.authorizations.where(provider:'google').take.refresh_token!  
                 else
+                  token_object = {access_token:access_token,expires_at:expires_at}
+                end
+                service = Google::Apis::CalendarV3::CalendarService.new
+                access_token = AccessToken.new(token_object[:access_token])
+                service.authorization = access_token
+                event = service.get_event(calendar_id,calendar_event_id)
+            rescue => error
+                status = false
+                message = error.message
+            else
+                # Calculate start time
+                Time.zone = timezone
+                Chronic.time_class = Time.zone
+                new_start_time = Chronic.parse("#{new_date} #{new_start_time_only}")
+                new_end_time = Chronic.parse("#{new_date} #{new_end_time_only}")
+                if new_start_time_only.blank?
+                    status = false
+                    message = "We can't seem to understand your time input '#{new_start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+                elsif new_end_time_only.blank?
+                    status = false
+                    message = "We can't seem to understand your time input '#{new_end_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+                else
+                    if new_start_time != date_time
+                        event.start.date_time = new_start_time.strftime("%Y-%m-%dT%H:%M:%S%z")
+                        self.date = new_start_time.to_date
+                        self.date_time = new_start_time
+                        update_notification = true
+                    end
+                    if new_end_time != end_date_time
+                        event.end.date_time = new_end_time.strftime("%Y-%m-%dT%H:%M:%S%z")
+                        self.end_date_time = new_end_time
+                    end
+                    if new_summary != name
+                        event.summary = new_summary
+                        self.name = new_summary
+                    end
+
+                    if new_location != location
+                        event.location = new_location
+                        self.location = new_location
+                    end
+
+                    if new_details != details
+                        event.description = new_details
+                        self.details = new_details
+                    end
+                    # Create Google Calendar events
+                    begin
+                        result = service.update_event(calendar_id,calendar_event_id,event,send_notifications:notify)
+                    rescue => error
+                        status = false
+                        message = error.message
+                    else
+                        self.save
+                        status = true
+                        message = "Event successfully updated"
+                        if update_notification 
+                            user.notifications.where(notification_type:"upcoming_plan").each { |notification|
+                                if notification.value_in_specified_type[:plan_id] == self.id
+                                    notification.assign_attributes(expiry_date:self.date_time)
+                                    notification.save
+                                end
+                            }
+                        end
+                    end
+                end
+            end
+        elsif put_on_google_new && !self.put_on_calendar #delete local event and create a whole new event
+            result = Plan.create_event(self.user,
+                                        {   date:new_date,
+                                            start_time:new_start_time_only,
+                                            end_time:new_end_time_only,
+                                            summary:new_summary,
+                                            location:new_location,
+                                            details:new_details,
+                                            notify:notify
+                                        },
+                                       connection,
+                                       connection_email_override,
+                                       access_token,
+                                       expires_at,
+                                       "primary",
+                                       put_on_google_new
+                                        )
+            status = result[:status]
+            message= result[:message]
+            access_token = result[:access_token]
+            if status
+                self.destroy
+            end           
+        else #update local event
+                new_start_time = Chronic.parse("#{new_date} #{new_start_time_only}")
+                new_end_time = Chronic.parse("#{new_date} #{new_end_time_only}")
+                if new_start_time_only.blank?
+                    status = false
+                    message = "We can't seem to understand your time input '#{new_start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+                elsif new_end_time_only.blank?
+                    status = false
+                    message = "We can't seem to understand your time input '#{new_end_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
+                else
+                    if new_start_time != date_time
+                        self.date = new_start_time.to_date
+                        self.date_time = new_start_time
+                        update_notification = true
+                    end
+                    if new_end_time != end_date_time
+                        self.end_date_time = new_end_time
+                    end
+                    if new_summary != name
+                        self.name = new_summary
+                    end
+
+                    if new_location != location
+                        self.location = new_location
+                    end
+
+                    if new_details != details
+                        self.details = new_details
+                    end
+
                     self.save
                     status = true
                     message = "Event successfully updated"
@@ -176,12 +277,13 @@ class Plan < ActiveRecord::Base
                         }
                     end
                 end
-            end
+                self.delete_event(false,nil,nil,false) if !put_on_google_new
         end
+        
         {status:status,message:message,access_token:token_object}        
     end
 
-    def delete_event(notify,access_token=nil,expires_at=nil)
+    def delete_event(notify,access_token=nil,expires_at=nil,delete_local=true)
         # Check to see if there's an existing valid access token we can use without making a server request
         if access_token.nil? || access_token.nil? || Time.now > (DateTime.parse(expires_at) - 1.minute)
           token_object = user.authorizations.where(provider:'google').take.refresh_token!  
@@ -199,12 +301,16 @@ class Plan < ActiveRecord::Base
             status = false
             message = error.message
         else
-            self.update_attributes(status:"Cancelled")
-            self.user.notifications.where(notification_type:"upcoming_plan").each { |notification|
-                if notification.value_in_specified_type[:plan_id] == self.id
-                    notification.destroy
-                end
-            }
+            if delete_local
+                self.update_attributes(status:"Cancelled")
+                self.user.notifications.where(notification_type:"upcoming_plan").each { |notification|
+                    if notification.value_in_specified_type[:plan_id] == self.id
+                        notification.destroy
+                    end
+                }
+            else
+                self.update_attributes(calendar_id:nil,calendar_event_id:nil,put_on_calendar:false)
+            end
             status = true
             message = "Event cancelled"
         end 
