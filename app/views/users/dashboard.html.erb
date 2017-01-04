@@ -609,7 +609,7 @@ $(function(){
     // Clicking on rows of the import contacts view
     $('#importContacts #importSelectionTable').off("click").on("click",'tr',function(){
         $(this).find('input.importCheck').prop('checked',!$(this).find('input.importCheck').prop('checked'));
-    })
+    });
 
     // Putting in calendar
     $('.putInCalendar').off("click").on("click",function(){
@@ -1080,7 +1080,10 @@ $(function(){
             buttonAjax($(this),{contactsToImport:contactListToSend,mergeName:$('#importContacts #mergeName').prop('checked')});
         });
 
-        
+        $('#importContacts #importSelectionTable .importCheck').off("click").on("click",function(){
+            event.stopPropagation();
+        });
+ 
     }
 
 
