@@ -198,6 +198,7 @@ class PlansController < ApplicationController
 
     def cancel
         plan = Plan.find(params[:plan_id])
+        notify = params[:notify].blank? ? false : (params[:notify] == "true"? true : false)
 
         if plan.connection.email.blank? && notify
             actions = [{action:"unhide",element:".modalView#makePlan .formElement.email"},{action:"change_css",element:".remodal.standardModal",css:{attribute:"height",value:"430"}}]
