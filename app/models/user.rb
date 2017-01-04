@@ -63,6 +63,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def level_up
+    level = Level.find_level_for(self)
+    stat = user_statistics.find_statistic("level").take
+    stat.update_attributes(value:level)
+  end
+
   def get_notifications(json_or_not_json=false)
       result = self.notifications.inject({}) do |accumulator,notification|
                   accumulator[:connection_level] = {} unless accumulator[:connection_level]
