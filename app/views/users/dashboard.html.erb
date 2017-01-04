@@ -1,5 +1,7 @@
 <script>
 var test;
+var cropVarInEditConnection;
+
 $(function(){
     // A series of variables that need to be used across functions
     $('[data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
@@ -14,7 +16,7 @@ $(function(){
     var authorized_google_calendar = <%= @authorized_google_calendar %>;
     var openBubble;
     var overLayHtml;
-    var cropVarInEditConnection;
+    
 
     // Search 
     var options = {
@@ -228,34 +230,41 @@ $(function(){
                                 formData.append("contact_frequency",frequency);
                                 formData.append("custom_frequency",custom_frequency);
                                 formData.append("notes",form.find('[name=notes]').val());
-                                formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
 
-                              $.ajax({
-                                url: '<%= update_connection_path %>',
-                                type: 'PUT',
-                                processData: false,
-                                contentType: false,
-                                data: formData,
-                                dataType: 'JSON'
-                              }).done(function(data){
-                                    if (data.status) {
-                                            if(data.message != undefined){
-                                                toastr.success(data.message,null,{timeOut: 5000,closeButton:false});                       
-                                            }
-                                    } else {
-                                        toastr.options.closeButton = true;
-                                        if(data.message != undefined /* && alertElement.length > 0 */) {
-                                            toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                                cropVarInEditConnection.croppie('result',{type:'blob',size:'original'}).then(function(croppedImageData){
+                                        if (croppedImageData == null) {
+                                            formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
+                                        } else {
+                                            formData.append("photo", croppedImageData);
                                         }
-                                    }
-                                    if (data.data != undefined) {
-                                        returnedData = data.data;
-                                    }
-                                    reEnableButton(disabledButtonObject);
-                                    if (data.actions != undefined && data.actions.length > 0) {
-                                        performActions(data.actions);    
-                                    }
-                                  });
+
+                                      $.ajax({
+                                        url: '<%= update_connection_path %>',
+                                        type: 'PUT',
+                                        processData: false,
+                                        contentType: false,
+                                        data: formData,
+                                        dataType: 'JSON'
+                                      }).done(function(data){
+                                            if (data.status) {
+                                                    if(data.message != undefined){
+                                                        toastr.success(data.message,null,{timeOut: 5000,closeButton:false});                       
+                                                    }
+                                            } else {
+                                                toastr.options.closeButton = true;
+                                                if(data.message != undefined /* && alertElement.length > 0 */) {
+                                                    toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                                                }
+                                            }
+                                            if (data.data != undefined) {
+                                                returnedData = data.data;
+                                            }
+                                            reEnableButton(disabledButtonObject);
+                                            if (data.actions != undefined && data.actions.length > 0) {
+                                                performActions(data.actions);    
+                                            }
+                                        });
+                                });
                             }
                         })
                         resetModal($('[data-remodal-id=bubbleModal]'),3);
@@ -821,7 +830,7 @@ $(function(){
                     reader.readAsDataURL(input.files[0]);
                 }
                 else {
-                    swal("Sorry - you're browser doesn't support the FileReader API");
+                    toastr.error("Your browser doesn't support the FileReader API, so we cannot edit the photo for you",null, {timeOut: 10000,closeButton:true});
                 }
             }
             cropVarInEditConnection = $('#cropInEditConnection').croppie({
