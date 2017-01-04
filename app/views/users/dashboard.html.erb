@@ -761,26 +761,30 @@ $(function(){
             $('.modalView#makePlan .chooseActivity button').each(function(){
                 if($(this).data('value')==returnedData.planData.name) {
                     $(this).removeClass('active').addClass('active');
+                    $('.modalView#plans .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
                     selectedActivities++;
                 } else {
                     $(this).removeClass('active');
                     if ($(this).data('value') == 'other' && selectedActivities == 0){
                         $(this).addClass('active');
                         $($(this).data('slide-down')).slideDown();
+                        $('.modalView#plans .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','460px');
                     }
                 }
             });
+
             // ------ Make the delete event button visible if there's already a plan
             $('.modalView#makePlan div#deleteEvent').removeClass('hidden');
             $('.modalView#makePlan div#deleteEvent').off('click').on('click',function(){
                 buttonAjax($(this),{plan_id:returnedData.planData.id,notify:$('.modalView#makePlan #notify').prop('checked')});
             });
             // ------ Update the label for the notify checkbox
-            $('.modalView#makePlan label[for=notify]').html("Send update to "+name.split(" ")[0]+"?");
+            $('.modalView#makePlan label[for=notify]').html("Send an update to "+name.split(" ")[0]+"?");
             // ------ Change the modal button properties
             $('.modalView#makePlan form').attr('action',"<%= modify_plan_path %>").attr('method','PUT');
             $('.modalView#makePlan .modalBottomRightButton').html("UPDATE");
             $('.modalView#plans .modalBottomLeftButton').html("RESCHEDULE");
+
             // ------ Update the google calendar authorization status
             var authorized_by_google_calendar = returnedData.authorized_by_google_calendar == "true" ? true : false;
             
@@ -915,8 +919,14 @@ $(function(){
                 })
                 if($(this).data('value') == "other") {
                     $($(this).data('slide-down')).slideDown();
+                    if($(this).data('height-adjust-element') != undefined) {
+                        $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-value')});
+                    }
                 } else {
                     $($(this).data('slide-down')).slideUp();
+                    if($(this).data('height-adjust-element') != undefined) {
+                        $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-original-value')});
+                    }
                 }
                 $(this).removeClass('active').addClass('active');
             })
@@ -1281,11 +1291,11 @@ $(function(){
             <span class="textDarkGray" style="font-size:17px;">Choose Activity and Date</span>
             <form action="<%= plans_path %>" method="POST" >
                 <div class="btn-group buttonGroupWithOther chooseActivity" style="height:50px;"  role="group">
-                    <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="420px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', width: 33 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Food"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Food"><%= image_tag 'food', width: 33 %></button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', width: 33 %></button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Catch up"  data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Catch up"><%= image_tag 'phone', width: 33 %></button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;font-size:30px;" data-value="other"  data-slide-down=".modalView#makePlan .activityName"><%= fa_icon 'plus' %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="420px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Catch up"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="420px" data-toggle="tooltip" data-placement="top" data-html="true" title="Catch up"><%= image_tag 'phone', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;font-size:30px;" data-value="other" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]" data-height-adjust-value="460px"  data-slide-down=".modalView#makePlan .activityName"><%= fa_icon 'plus' %></button>
                 </div>
                 <div class="formElement m-t-sm activityName" style="display:none;">
                     <span class="icon textDarkGray" ><%= fa_icon 'soccer-ball-o' %></span>
@@ -1334,7 +1344,7 @@ $(function(){
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]" data-height-adjust-value="420px" >BACK</div>
             <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed putInCalendar" data-submit-form=".modalView#makePlan form">CREATE ACTIVITY</div>
         </div>
     </div>
@@ -1366,7 +1376,6 @@ $(function(){
         </div>
     </div>
 </div>
-
 
 <div data-remodal-id="importModal" style="height:450px;" data-default-css="([{'attribute':'height','value':'450px'}])">
     <div class="modalView" id="mainImportView">

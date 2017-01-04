@@ -25,6 +25,9 @@ $(function(){
 // Transitioning mechanism of different views within the bubble popup modal
 $('.transitionButton').off('click').on('click',function(){
     transition($($(this).data('current')),$($(this).data('target')));
+    if($(this).data('height-adjust-element') != undefined) {
+        $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-value')});        
+    }
 });
   
 })
@@ -32,5 +35,5 @@ $('.transitionButton').off('click').on('click',function(){
 // This function implements the transition so that it can be used by other things
 function transition(from,to) {
     from.addClass('hidden');
-    to.removeClass('hidden');        
+    to.removeClass('hidden');
 }  
