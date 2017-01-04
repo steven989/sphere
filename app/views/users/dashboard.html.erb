@@ -231,7 +231,7 @@ $(function(){
                                 formData.append("custom_frequency",custom_frequency);
                                 formData.append("notes",form.find('[name=notes]').val());
 
-                                cropVarInEditConnection.croppie('result',{type:'blob',size:'original',format:'png'}).then(function(croppedImageData){
+                                cropVarInEditConnection.croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
                                         if (croppedImageData == null) {
                                             formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
                                         } else {
