@@ -220,8 +220,8 @@ class User < ActiveRecord::Base
       end
 
       # 3) update status of expired connections
-      target_contact_interval_in_days = self.target_contact_interval_in_days
-      date_of_last_activity = self.activities.where("date is not null").order(date: :desc).first.date
+      target_contact_interval_in_days = connection.target_contact_interval_in_days
+      date_of_last_activity = connection.activities.where("date is not null").order(date: :desc).first.date
       number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
       if number_of_days_since_last_activity > target_contact_interval_in_days
         if connection.plans.where("date >= ?",Date.today).length == 0
