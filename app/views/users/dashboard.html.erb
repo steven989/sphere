@@ -141,10 +141,7 @@ $(function(){
                 if (notification.notification_type == "level_up") {
                     var backgroundColor = "#ED1C24";
                     var content = '<%= fa_icon 'thumbs-up', style:'font-size:13px;color:#FFFFFF' %>';
-                } else if (notification.notification_type == "new_challenge") {
-                    var backgroundColor = "#ED1C24";
-                    var content = "<span style='font-size:13px;color:#FFFFFF'>"+notification.count+"</span>";
-                } else if (notification.notification_type == "new_badge") {
+                } else if (notification.notification_type == "my_sphere" || notification.notification_type == "new_challenge" || notification.notification_type == "new_badge") {
                     var backgroundColor = "#ED1C24";
                     var content = "<span style='font-size:13px;color:#FFFFFF'>"+notification.count+"</span>";
                 }

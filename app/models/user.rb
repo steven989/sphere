@@ -85,6 +85,14 @@ class User < ActiveRecord::Base
                       else
                         accumulator[:connection_level][notification.notifiable_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority}
                       end
+                      if notification.notification_type == "connection_expiration" #user-level notification accumulated from connection-level expiry counts
+                        existing_expiry_count = accumulator[:user_level].select {|notification_in_array| notification_in_array[:notification_type] == "my_sphere"}[0]
+                        if existing_expiry_count
+                          existing_expiry_count[:count] = existing_expiry_count[:count]+1
+                        else
+                          accumulator[:user_level].push({notification_type:"my_sphere",count:1})
+                        end
+                      end
                     else
                       existing_notification = accumulator[:user_level].select {|notification_in_array| notification_in_array[:notification_type] == notification.notification_type}[0]
                       if existing_notification
