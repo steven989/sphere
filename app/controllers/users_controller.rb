@@ -107,7 +107,14 @@ class UsersController < ApplicationController
             @level_num = @level_object.level
             @xp = current_user_stats[:xp]
             level_progress_lookup = Level.return_level_xps([@level_num,@level_num+1])
-            @level_progress_percent_string = (((@xp-level_progress_lookup[@level_num]).to_f/(level_progress_lookup[@level_num+1]-level_progress_lookup[@level_num]).to_f)*100.0).round.to_s+"%"
+            @points_gained_in_this_level = @xp-level_progress_lookup[@level_num]
+            @points_required_to_progress = level_progress_lookup[@level_num+1]-level_progress_lookup[@level_num]
+            @level_progress_percent_string = ((@points_gained_in_this_level.to_f/@points_required_to_progress.to_f)*100.0).round.to_s+"%"
+            @current_sphere_size = current_user_stats[:current_sphere_size] ? current_user_stats[:current_sphere_size].to_i : 0
+            @connections_added = current_user_stats[:connections_added] ? current_user_stats[:connections_added].to_i : 0
+            @events_booked = current_user_stats[:events_booked] ? current_user_stats[:events_booked].to_i : 0
+            @expired_connections_count = current_user_stats[:expired_connections_count] ? current_user_stats[:expired_connections_count].to_i : 0
+            @number_of_checkins = current_user_stats[:number_of_checkins] ? current_user_stats[:number_of_checkins].to_i : 0
           # -----
         end
     end

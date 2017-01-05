@@ -19,8 +19,44 @@
 
 /*Some standard components*/
 
+
 h1,h2,h3,h4,h5,h6,p,div,span,body {
   font-family: 'brandon-grotesque' !important;
+}
+
+/* 5 column definition a la bootstrap */
+
+.col-xs-15,
+.col-sm-15,
+.col-md-15,
+.col-lg-15 {
+    position: relative !important;
+    min-height: 1px !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+}
+
+.col-xs-15 {
+    width: 20% !important;
+    float: left !important;
+}
+@media (min-width: 768px) {
+.col-sm-15 {
+        width: 20% !important;
+        float: left !important;
+    }
+}
+@media (min-width: 992px) {
+    .col-md-15 {
+        width: 20% !important;
+        float: left !important;
+    }
+}
+@media (min-width: 1200px) {
+    .col-lg-15 {
+        width: 20% !important;
+        float: left !important;
+    }
 }
 
 div, p {
@@ -138,6 +174,14 @@ table {
 .p-h-xxlg {
     padding-left: 30px;
     padding-right: 30px;
+}
+
+.m-t-none {
+    margin-top: 0px;
+}
+
+.m-b-none {
+    margin-bottom: 0px;   
 }
 
 .m-t-xs {
@@ -954,6 +998,40 @@ form div.btn-group .btn.active:hover{
     overflow: hidden;
 }
 
+.smallCard {
+    height: 200px;
+    background: none;
+    width: 90%;
+    border-radius: 10px;
+    border: 2px solid #dcdcdc;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+
+.smallCard.stats {
+    padding-top:30px;
+    text-align: center;
+}
+
+.smallCard.stats .icon{
+    font-size: 40px;
+}
+
+.smallCard.stats .number{
+    font-size: 45px;
+    margin-top:25px;
+    font-weight:500;
+}
+
+.smallCard.stats .subtitle{
+    font-size: 25px;
+    margin-top:25px;
+    font-weight:300;
+}
+
+
+
 .card .title {
     padding: 5px 0px;
     text-align: center;
@@ -1117,6 +1195,11 @@ form div.btn-group .btn.active:hover{
     .hideOnMobile {
         display: none;
     }
+
+    .smallCard {
+        width: 100%;
+    }
+
 
     .userLevelNotificationDisplayElement .badge {
         right:-15px;

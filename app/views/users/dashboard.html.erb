@@ -1371,9 +1371,6 @@ $(function(){
             </div>
         </div>
         <div id="progress" style="display:none;">
-            <div class="title">
-                <h1 class="textDarkGray">How you're doing so far</h1>
-            </div>
             <div id="levelDisplay">
                 <div class="content">
                     <div class="graphic">
@@ -1381,18 +1378,89 @@ $(function(){
                     </div>
                     <div class="details">
                         <div class="level">
-                            <h2 class="textDarkGray">Level <%= @level_num %></h2>
+                            <h2 class="textDarkGray">Level <span class="statsToUpdate level"><%= @level_num %></span></h2>
                         </div>
-                        <div class="progress progressBar">
+                        <div class="progress progressBar" style="margin-bottom:5px;">
                             <div class="progress-bar bar-green" style="width:<%= @level_progress_percent_string %>"></div>
                         </div>
+                        <div class="textDarkGray" style="font-size:14px;"><span class="statsToUpdate pointsGainedSinceLevel"><%= @points_gained_in_this_level %></span> out of <span class="statsToUpdate pointsRequiredToLevel"><%= @points_required_to_progress %></span> points to next level</div>
                     </div>
                 </div>
+            </div>
+            <div class="container">
+                <div class="row m-t-lg">
+                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6">
+                        <div class="smallCard stats textDarkGray center-block">
+                            <div class="icon">
+                                <%= fa_icon 'users' %>
+                            </div>
+                            <div class="number">
+                                <span class="statsToUpdate current_sphere_size"><%= @current_sphere_size %></span>
+                            </div>
+                            <div class="subtitle">
+                               <p>Current Sphere Size</p>
+                            </div>
+                        </div> 
+                    </div>
 
-            </div>
-            <div class="details">
-                
-            </div>
+                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                        <div class="smallCard stats textDarkGray center-block">
+                            <div class="icon">
+                                <%= fa_icon 'user-plus' %>
+                            </div>
+                            <div class="number">
+                                <span class="statsToUpdate connections_added"><%= @connections_added %></span>
+                            </div>
+                            <div class="subtitle">
+                               <p>New Connections Added This Month</p>
+                            </div>
+                        </div> 
+                    </div>
+
+                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                        <div class="smallCard stats textDarkGray center-block">
+                            <div class="icon">
+                                <%= fa_icon 'calendar-plus-o' %>
+                            </div>
+                            <div class="number">
+                                <span class="statsToUpdate events_booked"><%= @events_booked %></span>
+                            </div>
+                            <div class="subtitle">
+                               <p>Hangouts Booked This Month</p>
+                            </div>
+                        </div> 
+                    </div>  
+
+                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                        <div class="smallCard stats textDarkGray center-block">
+                            <div class="icon">
+                                <%= fa_icon 'check-circle-o' %>
+                            </div>
+                            <div class="number">
+                                <span class="statsToUpdate number_of_checkins"><%= @number_of_checkins %></span>
+                            </div>
+                            <div class="subtitle">
+                               <p>Check-ins This Month</p>
+                            </div>
+                        </div> 
+                    </div>  
+
+                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                        <div class="smallCard stats textDarkGray center-block">
+                            <div class="icon">
+                                <%= fa_icon 'exclamation-circle' %>
+                            </div>
+                            <div class="number">
+                                <span class="statsToUpdate expired_connections_count"><%= @expired_connections_count %></span>
+                            </div>
+                            <div class="subtitle">
+                               <p>Expired Contacts</p>
+                            </div>
+                        </div> 
+                    </div>  
+
+                </div>
+            </div> 
         </div>
         <div id="achievements" style="display:none;">
             <div class="title">
