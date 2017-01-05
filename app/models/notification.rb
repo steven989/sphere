@@ -19,7 +19,7 @@ class Notification < ActiveRecord::Base
           notification_type:"level_up",
           notification_date:date,
           expiry_date:date+expiry_days.day,
-          data_type:"hash",
+          data_type:"float",
           value:"{old_level:old_level,new_level:new_level}"
           )
     end
