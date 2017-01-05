@@ -285,8 +285,22 @@ table {
   background-color: #FF9595 !important;
 }
 
-/* --------------   Corner Ribbons --------------  */
+/* --------------  User level notifications --------------  */
 /* line 259, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+.userLevelNotificationDisplayElement {
+  position: relative;
+}
+
+/* line 263, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+.userLevelNotificationDisplayElement .badge {
+  position: absolute;
+  right: -5px;
+  top: -25px;
+  padding-top: 0px;
+}
+
+/* --------------   Corner Ribbons --------------  */
+/* line 273, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon {
   width: 200px;
   background: #e43;
@@ -302,18 +316,18 @@ table {
 }
 
 /* Ribbon Custom styles */
-/* line 275, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 289, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.sticky {
   position: absolute;
 }
 
-/* line 279, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 293, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.shadow {
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Ribbon Different positions */
-/* line 285, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 299, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.top-left {
   top: 25px;
   left: -50px;
@@ -321,7 +335,7 @@ table {
   -webkit-transform: rotate(-45deg);
 }
 
-/* line 292, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 306, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.top-right {
   top: 15px;
   right: -75px;
@@ -330,7 +344,7 @@ table {
   -webkit-transform: rotate(45deg);
 }
 
-/* line 300, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 314, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.bottom-left {
   top: auto;
   bottom: 25px;
@@ -339,7 +353,7 @@ table {
   -webkit-transform: rotate(45deg);
 }
 
-/* line 308, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 322, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.bottom-right {
   top: auto;
   right: -50px;
@@ -350,53 +364,53 @@ table {
 }
 
 /* Ribbon Colors */
-/* line 319, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 333, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.white {
   background: #f0f0f0;
   color: #555;
 }
 
-/* line 320, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 334, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.black {
   background: #333;
 }
 
-/* line 321, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 335, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.grey {
   background: #999;
 }
 
-/* line 322, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 336, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.blue {
   background: #39d;
 }
 
-/* line 323, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 337, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.green {
   background: #2c7;
 }
 
-/* line 324, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 338, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.turquoise {
   background: #1b9;
 }
 
-/* line 325, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 339, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.purple {
   background: #95b;
 }
 
-/* line 326, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 340, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.red {
   background: #e43;
 }
 
-/* line 327, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 341, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.orange {
   background: #e82;
 }
 
-/* line 328, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 342, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .corner-ribbon.yellow {
   background: #ec0;
 }
@@ -404,7 +418,7 @@ table {
 /* --------------  End Corner Ribbons --------------  */
 /*Specific elements*/
 /* Login screen */
-/* line 336, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 350, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .fullViewportContainer {
   width: 100%;
   height: 100vh;
@@ -414,13 +428,13 @@ table {
   left: 0px;
 }
 
-/* line 345, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 359, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .loginScreen {
   background-image: url(/assets/login-background-2e70f9c9ebb9f804d47d97d9812dea478c7db95e6288fa37c069f4783bfd9883.jpg);
   background-size: cover;
 }
 
-/* line 350, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 364, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .fullViewportContainer.loginScreen #title {
   position: relative;
   width: 150px;
@@ -428,7 +442,7 @@ table {
   margin-top: 120px;
 }
 
-/* line 357, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 371, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .fullViewportContainer.loginScreen #displayBox {
   position: relative;
   width: 340px;
@@ -439,13 +453,13 @@ table {
   background-color: #FFFFFF;
 }
 
-/* line 368, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 382, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .loginScreen .modalButtonContainer .modalBottomFullButton {
   padding-top: 0px;
 }
 
 /*----------- Crop editor ----------------- */
-/* line 374, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 388, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #cropInEditConnection, #cropInCreateConnection, #cropInEditUser {
   width: 100%;
   height: 250px;
@@ -454,17 +468,17 @@ table {
 }
 
 /*User dashboard*/
-/* line 384, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 398, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 body {
   background: #F6F6F6 !important;
 }
 
-/* line 389, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 403, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #loading > div > div {
   background: #0d9ddb !important;
 }
 
-/* line 393, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 407, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #profile {
   z-index: 2;
   position: fixed !important;
@@ -474,7 +488,7 @@ body {
   top: 0px !important;
 }
 
-/* line 402, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 416, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #logo {
   position: absolute;
   color: white;
@@ -482,13 +496,13 @@ body {
   left: 50px;
 }
 
-/* line 409, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 423, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .profileButtonsContainer {
   position: absolute;
   top: 25px;
 }
 
-/* line 414, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 428, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .profileButton {
   cursor: pointer;
   transition: color 0.2s ease;
@@ -496,68 +510,68 @@ body {
   font-size: 25px;
 }
 
-/* line 421, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 435, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .profileButtonsContainer.hideOnMobile {
   width: 120px;
   right: 50px;
 }
 
-/* line 426, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 440, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .profileButtonsContainer.hideOnMobile .profileButton {
   text-align: center;
   width: 45%;
   display: inline-block;
 }
 
-/* line 432, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 446, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .profileButtonsContainer.showOnMobile .profileButton {
   width: 100%;
   text-align: center;
   display: inline-block;
 }
 
-/* line 438, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 452, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .profileButtonsContainer.showOnMobile {
   width: 60px;
   right: 170px;
 }
 
-/* line 444, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 458, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #logout a {
   color: #FFF;
   transition: color 0.2s ease;
 }
 
-/* line 449, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 463, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .profileButton:hover {
   color: #B5ADAC;
 }
 
-/* line 453, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 467, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #logout a:hover {
   color: #B5ADAC;
 }
 
-/* line 457, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 471, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #navigation-tabs-container {
   width: 100%;
   position: absolute;
   top: 75px;
 }
 
-/* line 463, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 477, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .topTabsContent {
   padding: 0px !important;
 }
 
-/* line 467, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 481, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .topTabs-header.clearfix {
   box-shadow: none !important;
   height: 100px;
   width: 100%;
 }
 
-/* line 473, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 487, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #navigation {
   float: none !important;
   width: 68%;
@@ -566,7 +580,7 @@ body {
   margin-right: auto;
 }
 
-/* line 481, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 495, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #navigation li {
   padding-top: 10px;
   border: none !important;
@@ -574,18 +588,18 @@ body {
   height: 100%;
 }
 
-/* line 488, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 502, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #navigation li span span {
   font-size: 13px;
   font-weight: 500;
 }
 
-/* line 493, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 507, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #photoUploader, #photoUploaderInCreate, #photoUploaderInUserInfo {
   display: none;
 }
 
-/* line 494, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 508, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 label[for=photoUploader] {
   border: 1px solid #E9E9E9;
   font-family: 'eausans_book';
@@ -603,64 +617,64 @@ label[for=photoUploader] {
   transition: background-color 0.2s ease;
 }
 
-/* line 511, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 525, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 label[for=photoUploader]:hover {
   background-color: #F1F1F1;
 }
 
 /* Add connection screen related  */
-/* line 518, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 532, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#mainImportView .addConnectionPopupContent {
   padding: 0px 30px;
 }
 
 /* Import contacts modal view */
-/* line 524, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 538, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#listSelect .modalContentContainer {
   height: 350px;
 }
 
-/* line 528, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 542, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#listSelect .modalContentContainer #importContacts {
   overflow-x: scroll;
 }
 
-/* line 532, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 546, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#listSelect .modalContentContainer #importContacts #importSelectionTable {
   table-layout: fixed;
   width: 100%;
   text-align: left;
 }
 
-/* line 538, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 552, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#listSelect .modalContentContainer #importContacts #importSelectionTable tr {
   cursor: pointer;
 }
 
 /* Bubbles related */
-/* line 545, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 559, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#plans .photo, .modalView#plans .icon {
   transition: box-shadow 0.2s ease;
 }
 
-/* line 549, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 563, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#plans .photo:hover, .modalView#plans .icon:hover {
   box-shadow: 0px 0px 10px #636363;
 }
 
-/* line 554, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 568, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalTokenBox {
   margin-top: 5px;
   width: 100%;
 }
 
-/* line 559, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 573, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#plans .modalTokenBox {
   margin-top: 5px;
   width: 90%;
 }
 
-/* line 566, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 580, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalTokenBox ul.TokensContainer {
   height: 38px !important;
   border: none !important;
@@ -668,12 +682,12 @@ label[for=photoUploader]:hover {
   transition: background-color 0.2s ease;
 }
 
-/* line 573, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 587, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalTokenBox ul.TokensContainer:hover {
   background-color: #ECECEC;
 }
 
-/* line 577, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 591, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalTokenBox ul.TokensContainer li.Token {
   background-color: #FFF !important;
   border: 1px solid #ECECEC !important;
@@ -684,42 +698,42 @@ label[for=photoUploader]:hover {
   line-height: 28px !important;
 }
 
-/* line 588, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 602, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalTokenBox ul.TokensContainer li.TokenSearch input {
   line-height: 28px;
   height: 28px;
   font-size: 15px;
 }
 
-/* line 594, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 608, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalTokenBox ul.TokensContainer li.Token a.Close {
   font-size: 15px !important;
   line-height: 28px !important;
 }
 
-/* line 599, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 613, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalTokenBox ul.TokensContainer li.Token span {
   font-size: 15px !important;
   margin: 0px 10px;
   margin-right: 2px;
 }
 
-/* line 606, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 620, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .connectionBubble:hover .initialsDisplayedInBubble {
   opacity: 0;
 }
 
-/* line 610, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 624, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .overlayWithName {
   opacity: 0;
 }
 
-/* line 613, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 627, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .connectionBubble:hover .overlayWithName {
   opacity: 1;
 }
 
-/* line 617, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 631, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .remodal.standardModal {
   border-radius: 8px;
   padding: 0px;
@@ -731,13 +745,13 @@ label[for=photoUploader]:hover {
   overflow: hidden;
 }
 
-/* line 628, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 642, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .remodal.standardModal .modalView {
   height: 100%;
   position: relative;
 }
 
-/* line 633, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 647, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .remodal.standardModal .modalView .modalContentContainer {
   position: absolute;
   left: 0px;
@@ -747,7 +761,7 @@ label[for=photoUploader]:hover {
   overflow-y: scroll;
 }
 
-/* line 642, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 656, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalButtonContainer {
   position: absolute;
   width: 100%;
@@ -756,7 +770,7 @@ label[for=photoUploader]:hover {
   left: 0px;
 }
 
-/* line 650, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 664, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .remodal.standardModal .modalView .modalButtonContainer {
   position: absolute;
   width: 100%;
@@ -765,13 +779,13 @@ label[for=photoUploader]:hover {
   left: 0px;
 }
 
-/* line 658, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 672, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereRedBackground {
   background-color: #FE0000;
   transition: background-color 0.2s ease;
 }
 
-/* line 663, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 677, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereRedBackground.disabled {
   background-color: #C56666;
   color: #E2E2E2;
@@ -779,23 +793,23 @@ label[for=photoUploader]:hover {
   transition: background-color 0.2s ease;
 }
 
-/* line 670, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 684, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereRedBackground.hoverable:not(.disabled):hover {
   background-color: #CC1919;
 }
 
-/* line 675, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 689, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereBlueBackground {
   background-color: #0099E5;
   transition: background-color 0.2s ease;
 }
 
-/* line 680, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 694, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereBlueBackground.hoverable:not(.disabled):hover {
   background-color: #0584C3;
 }
 
-/* line 684, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 698, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereBlueBackground.disabled {
   background-color: #5896B5;
   color: #E2E2E2;
@@ -803,13 +817,13 @@ label[for=photoUploader]:hover {
   transition: background-color 0.2s ease;
 }
 
-/* line 693, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 707, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereGreenBackground {
   background-color: #34BF49;
   transition: background-color 0.2s ease;
 }
 
-/* line 697, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 711, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereGreenBackground.disabled {
   background-color: #659C6D;
   color: #E2E2E2;
@@ -817,19 +831,19 @@ label[for=photoUploader]:hover {
   transition: background-color 0.2s ease;
 }
 
-/* line 704, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 718, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .sphereGreenBackground.hoverable:not(.disabled):hover {
   background-color: #37AF49;
 }
 
 /* Revive connections modal screen*/
-/* line 711, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 725, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer {
   height: 350px;
   overflow: scroll;
 }
 
-/* line 716, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 730, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .photo {
   width: 100px;
   height: 100px;
@@ -843,7 +857,7 @@ label[for=photoUploader]:hover {
   background-color: #efefef;
 }
 
-/* line 729, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 743, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .icon {
   display: inline-block;
   width: 100px;
@@ -853,42 +867,42 @@ label[for=photoUploader]:hover {
   font-size: 100px;
 }
 
-/* line 738, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 752, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .detailsContainer {
   text-align: left;
   height: 100px;
   line-height: 30px;
 }
 
-/* line 744, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 758, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .detailsContainer .row {
   margin-top: 15px;
 }
 
-/* line 749, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 763, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .detailsContainer .row .texts {
   margin: auto;
 }
 
-/* line 753, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 767, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .detailsContainer .row .texts .name {
   font-size: 15px;
   font-weight: bold;
   text-align: left;
 }
 
-/* line 759, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 773, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .detailsContainer .row .texts .expiredAt {
   text-align: left;
   font-size: 12px;
 }
 
-/* line 764, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 778, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .detailsContainer .row .buttonContainer {
   margin-top: 10px;
 }
 
-/* line 768, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 782, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#expiredConnections .modalContentContainer .detailsContainer .row .buttonContainer .button {
   margin: auto;
   font-size: 12px;
@@ -896,12 +910,12 @@ label[for=photoUploader]:hover {
 }
 
 /*Edit connection screen */
-/* line 777, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 791, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#editConnection .modalContentContainer {
   padding: 0px 30px;
 }
 
-/* line 781, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 795, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#editConnection form span {
   display: block;
   width: 100%;
@@ -909,7 +923,7 @@ label[for=photoUploader]:hover {
   font-size: 17px;
 }
 
-/* line 788, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 802, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 form div.btn-group {
   margin-top: 10px;
   width: 100%;
@@ -918,28 +932,28 @@ form div.btn-group {
   background-color: #FAFAFA;
 }
 
-/* line 797, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 811, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 form div.btn-group .btn {
   background-color: #FAFAFA;
 }
 
-/* line 801, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 815, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 form div.btn-group .btn:hover {
   background-color: #F1F1F1;
 }
 
-/* line 806, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 820, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 form div.btn-group .btn.active {
   background-color: #34BF49;
   color: #FFFFFF;
 }
 
-/* line 811, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 825, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 form div.btn-group .btn.active:hover {
   background-color: #2CAF40;
 }
 
-/* line 815, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 829, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#editConnection form textarea {
   margin-top: 20px;
   padding: 10px;
@@ -950,7 +964,7 @@ form div.btn-group .btn.active:hover {
   border: 1px solid #E9E9E9;
 }
 
-/* line 825, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 839, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#editConnection form .details {
   margin-top: 10px;
   margin-bottom: -10px;
@@ -958,7 +972,7 @@ form div.btn-group .btn.active:hover {
   text-align: center;
 }
 
-/* line 832, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 846, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#editConnection form .details input {
   padding: 0px 10px;
   background-color: #FAFAFA;
@@ -971,7 +985,7 @@ form div.btn-group .btn.active:hover {
 }
 
 /* Check in screen */
-/* line 845, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 859, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#detailedCheckIn ul li {
   height: 40px;
   line-height: 40px;
@@ -981,26 +995,26 @@ form div.btn-group .btn.active:hover {
   border: 1px solid gray;
 }
 
-/* line 854, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 868, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#detailedCheckIn ul li:hover {
   background-color: gray;
 }
 
 /* Event scheduling screen */
-/* line 859, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 873, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#makePlan .formElement {
   padding: 0px;
   height: 33px;
   overflow: hidden;
 }
 
-/* line 864, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 878, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#makePlan .icon {
   float: left;
   width: 50px;
 }
 
-/* line 869, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 883, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .modalView#makePlan .field {
   float: left;
   height: 33px;
@@ -1012,40 +1026,40 @@ form div.btn-group .btn.active:hover {
 }
 
 /* Challenges, Progress, Achievements UI*/
-/* line 883, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 897, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #challenges, #progress, #achievements {
   width: 100%;
 }
 
-/* line 888, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 902, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #challenges > .title, #progress > .title, #achievements > .title {
   margin: 40px 0px;
   width: 100%;
   text-align: center;
 }
 
-/* line 894, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 908, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #challenges > .title h1, #progress > .title h1, #achievements > .title h1 {
   font-size: 25px;
   font-weight: 400;
 }
 
 /*Progress-specific*/
-/* line 900, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 914, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #progress #levelDisplay .content {
   margin: auto;
   width: 400px;
   height: 140px;
 }
 
-/* line 906, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 920, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #progress #levelDisplay .content .graphic {
   width: 120px;
   height: 100%;
   float: left;
 }
 
-/* line 912, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 926, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #progress #levelDisplay .content .details {
   padding: 10px;
   width: 280px;
@@ -1053,7 +1067,7 @@ form div.btn-group .btn.active:hover {
   float: left;
 }
 
-/* line 919, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 933, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #progress #levelDisplay .content h2 {
   font-size: 20px;
   font-weight: 400;
@@ -1061,12 +1075,12 @@ form div.btn-group .btn.active:hover {
 
 /* Cards in the main dashboard */
 /*general*/
-/* line 930, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 944, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .cardColumn {
   padding: 10px;
 }
 
-/* line 934, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 948, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card {
   height: 370px;
   background-color: white;
@@ -1077,20 +1091,20 @@ form div.btn-group .btn.active:hover {
   overflow: hidden;
 }
 
-/* line 944, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 958, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card .title {
   padding: 5px 0px;
   text-align: center;
 }
 
-/* line 949, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 963, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card .title h2 {
   font-size: 20px;
   font-weight: 400;
 }
 
 /*Challenge-specific */
-/* line 957, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 971, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.challengeCard .buttons {
   position: absolute;
   width: 100%;
@@ -1100,7 +1114,7 @@ form div.btn-group .btn.active:hover {
   text-align: center;
 }
 
-/* line 967, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 981, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.challengeCard .graphic {
   height: 150px;
   width: 100%;
@@ -1108,7 +1122,7 @@ form div.btn-group .btn.active:hover {
   margin: 15px 0px;
 }
 
-/* line 974, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 988, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.challengeCard .graphicWrapper {
   position: relative;
   display: block;
@@ -1119,7 +1133,7 @@ form div.btn-group .btn.active:hover {
   overflow: hidden;
 }
 
-/* line 984, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 998, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.challengeCard img {
   position: absolute;
   left: 8px;
@@ -1128,7 +1142,7 @@ form div.btn-group .btn.active:hover {
   width: 134px;
 }
 
-/* line 992, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1006, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.challengeCard .daysRemaining {
   position: absolute;
   right: 10px;
@@ -1139,7 +1153,7 @@ form div.btn-group .btn.active:hover {
   padding-top: 3px;
 }
 
-/* line 1004, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1018, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.challengeCard .subtitle {
   padding: 0px 20px;
   text-align: center;
@@ -1148,13 +1162,13 @@ form div.btn-group .btn.active:hover {
 }
 
 /*Achievement-specific*/
-/* line 1013, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1027, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.badgeCard {
   background-color: transparent;
   border: 3px solid white;
 }
 
-/* line 1018, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1032, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.badgeCard .graphic {
   height: 150px;
   margin: 30px 0px;
@@ -1162,14 +1176,14 @@ form div.btn-group .btn.active:hover {
   position: relative;
 }
 
-/* line 1025, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1039, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.badgeCard .graphic img {
   display: block;
   margin: auto;
   height: 100%;
 }
 
-/* line 1032, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1046, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .card.badgeCard .subtitle {
   padding: 0px 20px;
   text-align: center;
@@ -1177,7 +1191,7 @@ form div.btn-group .btn.active:hover {
 }
 
 /* Search bar */
-/* line 1040, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1054, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #searchBar {
   position: fixed;
   right: 50px;
@@ -1186,7 +1200,7 @@ form div.btn-group .btn.active:hover {
   height: 30px;
 }
 
-/* line 1048, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1062, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #searchBar .result ul {
   box-shadow: -1px -3px 6px 0px rgba(0, 0, 0, 0.16);
   position: absolute;
@@ -1200,7 +1214,7 @@ form div.btn-group .btn.active:hover {
   z-index: 3;
 }
 
-/* line 1061, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1075, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #searchBar .speechBubbleThingy {
   box-shadow: -1px -8px 19px 0px rgba(0, 0, 0, 0.16);
   height: 30px;
@@ -1213,45 +1227,51 @@ form div.btn-group .btn.active:hover {
   z-index: 2;
 }
 
-/* line 1074, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1088, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #searchBar .result .item {
   padding: 15px;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
-/* line 1080, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1094, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #searchBar .result .item:hover {
   background: linear-gradient(#0b73a0, #1695cc);
   color: #FFF;
   cursor: pointer;
 }
 
-/* line 1086, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1100, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #searchBar .result .name {
   font-weight: bold;
   font-size: 15px;
 }
 
-/* line 1091, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1105, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #searchBar .result .tags {
   font-style: italic;
 }
 
 /* For Admin Dashboard*/
-/* line 1097, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1111, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 #wrapper.container #main {
   overflow-x: scroll;
 }
 
 /*FOR RESPONSIVE DESIGN*/
 @media (max-width: 600px) {
-  /* line 1104, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1118, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .hideOnMobile {
     display: none;
   }
 
-  /* line 1108, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1122, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  .userLevelNotificationDisplayElement .badge {
+    right: -15px;
+    top: -20px;
+  }
+
+  /* line 1127, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .remodal.standardModal {
     position: absolute;
     bottom: 30px;
@@ -1259,12 +1279,12 @@ form div.btn-group .btn.active:hover {
     right: 0px;
   }
 
-  /* line 1115, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1134, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .showOnMobile {
     display: initial !important;
   }
 
-  /* line 1119, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1138, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.hideOnMobile {
     width: 130px;
     right: 50px;
@@ -1275,12 +1295,12 @@ form div.btn-group .btn.active:hover {
     padding: 10px;
   }
 
-  /* line 1129, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1148, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.hideOnMobile .divider {
     margin: 10px 0px;
   }
 
-  /* line 1133, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1152, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.hideOnMobile .profileButton {
     font-size: 20px;
     text-align: right;
@@ -1289,7 +1309,7 @@ form div.btn-group .btn.active:hover {
     display: block;
   }
 
-  /* line 1141, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1160, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.hideOnMobile .profileButton p {
     font-size: 15px;
     text-align: right;
@@ -1297,29 +1317,29 @@ form div.btn-group .btn.active:hover {
     transition: color 0.2s ease;
   }
 
-  /* line 1148, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1167, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.hideOnMobile .profileButton i {
     color: #707070;
     transition: color 0.2s ease;
   }
 
-  /* line 1153, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1172, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.hideOnMobile .profileButton:hover p, .profileButtonsContainer.hideOnMobile .profileButton:hover i {
     color: #B5ADAC;
   }
 
-  /* line 1157, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1176, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.showOnMobile {
     width: 120px;
     right: 20px;
   }
 
-  /* line 1162, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1181, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .profileButtonsContainer.showOnMobile .profileButton {
     width: 55%;
   }
 
-  /* line 1166, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1185, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   div.topTabs-header.clearfix {
     position: fixed;
     bottom: 0px;
@@ -1328,18 +1348,18 @@ form div.btn-group .btn.active:hover {
     height: 70px;
   }
 
-  /* line 1174, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1193, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   #navigation {
     width: 100%;
     z-index: 11;
   }
 
-  /* line 1179, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1198, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   #navigation li {
     padding-top: 0px;
   }
 
-  /* line 1183, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1202, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   #searchBar {
     position: fixed;
     right: 20px;
@@ -1348,31 +1368,31 @@ form div.btn-group .btn.active:hover {
     height: 30px;
   }
 
-  /* line 1191, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1210, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .topTabsContent {
     padding: 0px !important;
     height: 100vh;
   }
 
   /* Revive connection screen on mobile*/
-  /* line 1197, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1216, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .modalView#expiredConnections .modalContentContainer .detailsContainer {
     line-height: 20px;
   }
 
-  /* line 1201, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1220, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .modalView#expiredConnections .modalContentContainer .detailsContainer .row {
     margin-top: 8px;
   }
 
-  /* line 1205, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+  /* line 1224, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
   .modalView#expiredConnections .modalContentContainer .detailsContainer .row .buttonContainer {
     margin-top: 10px;
   }
 }
 /* Customization of plugins */
 /* Toastr notification */
-/* line 1218, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
+/* line 1237, /Users/stevelong/sphere/sphere/app/assets/stylesheets/application.css.scss */
 .toast-success {
   background-color: #34BF49 !important;
 }
