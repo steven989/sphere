@@ -84,6 +84,7 @@ class UsersController < ApplicationController
           redirect_to admin_dashboard_path
         else
           @current_user_email = current_user.email
+          @one_time_notification = Notification.where(one_time_display:true).order(priority: :asc).take
           @authorized_google_calendar = current_user.authorized_by("google","calendar")
           @authorized_google_contacts = current_user.authorized_by("google","contacts")
           @settings = current_user.user_setting.value_evaled
@@ -253,6 +254,16 @@ class UsersController < ApplicationController
           render json: {status:status,message:message,actions:actions,data:data}
         } 
       end
+    end
+
+    def showed_one_time_notification
+      notification = Notification.find(params[:notification_id])
+      notification.showed_one_time_notification
+      respond_to do |format|
+        format.json {
+          render json: {status:true}
+        } 
+      end      
     end
 
     private

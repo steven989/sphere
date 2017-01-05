@@ -9,6 +9,10 @@ class Notification < ActiveRecord::Base
         Notification.where("expiry_date < ?", Date.today).destroy_all # this will delete the notification the night immediately AFTER the expiry date specified
     end
 
+    def showed_one_time_notification
+      self.update_attributes(one_time_display:false)
+    end
+
     # This is a user-level notification
     def self.create_new_level_notification(user,old_level,new_level,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
@@ -19,8 +23,9 @@ class Notification < ActiveRecord::Base
           notification_type:"level_up",
           notification_date:date,
           expiry_date:date+expiry_days.day,
-          data_type:"float",
-          value:"{old_level:old_level,new_level:new_level}"
+          data_type:"hash",
+          value:"{old_level:#{old_level},new_level:#{new_level}}",
+          one_time_display:true
           )
     end
 

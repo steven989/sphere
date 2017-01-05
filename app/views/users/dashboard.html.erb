@@ -90,6 +90,17 @@ $(function(){
         fuse = new Fuse(bubblesData, options);
     }
 
+    // one-time notification popup
+
+    function oneTimeNotificationPopup(modalElement,notificationId,value1) {
+        if(value1){$(modalElement).find('.value1').html(value1);}
+        initializeReModal(modalElement,"standardModal",0);
+        buttonAjax($(modalElement),{notification_id:notificationId});
+    }
+    <% if @one_time_notification %>
+        oneTimeNotificationPopup("[data-remodal-id=notificationsModal]",<%= @one_time_notification.id %>,<%= @one_time_notification.value_in_specified_type[:new_level] %>)
+    <% end %>
+
     // In place update
     function inPlaceUpdate() {
         $('.inPlaceField').each(function(){
@@ -100,7 +111,7 @@ $(function(){
 
             $(this).off("focusout").on("focusout",function(){
                 if ($(this).val() != currentValue) {
-                    buttonAjax($(this),{id:$(this).data('id'),value:$(this).val()});    
+                    buttonAjax($(this),{id:$(this).data('id'),value:$(this).val()});
                 }
             });
         })
@@ -284,7 +295,6 @@ $(function(){
     }
 
     // open modal instance
-    initializeReModal("[data-remodal-id=notificationsModal]","standardModal",0)
     function initializeReModal(element,modifier,resetType) {
         if(!modalInstance || modalInstance.state != "opened") {
             modalInstance = $(element).remodal({
@@ -1680,13 +1690,14 @@ $(function(){
     </div>
 </div>
 
-<div data-remodal-id="notificationsModal" data-default-css="([{'attribute':'height','value':'400px'}])">
-    <div class="modalView" id="challengeDetails">
+<div data-remodal-id="notificationsModal" data-method="PUT" href="<%= showed_one_time_notification_path %>" data-default-css="([{'attribute':'height','value':'400px'}])">
+    <div class="modalView" id="levelUpNotificationPopup">
         <div class="modalContentContainer p-h-xxlg">
-            <%= image_tag Gemojione.image_url_for_name('heart') %>
+            <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>You are now level <span class="value1" style="font-weight:600;"></span></h1><br><p>Keep up the awesome work!</p><br><%= image_tag '1f388.svg' %>
+
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomFullButton sphereGreenBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">COOL</div>
+            <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">COOL</div>
         </div>
     </div>
 </div>

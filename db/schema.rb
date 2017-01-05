@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104094001) do
+ActiveRecord::Schema.define(version: 20170105100536) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -168,11 +168,12 @@ ActiveRecord::Schema.define(version: 20170104094001) do
     t.date     "expiry_date"
     t.string   "data_type"
     t.string   "value"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.integer  "priority"
     t.integer  "notifiable_id"
     t.string   "notifiable_type"
+    t.boolean  "one_time_display",  default: false
   end
 
   add_index "notifications", ["notifiable_id", "notifiable_type"], name: "index_notifications_on_notifiable_id_and_notifiable_type", using: :btree

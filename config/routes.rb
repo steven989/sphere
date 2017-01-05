@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   put 'users/info' => 'users#update_user_info', as: 'update_user_info'
   get 'users/info' => 'users#get_user_info', as: 'get_user_info'
   put 'users/update_tags' => 'users#update_tags', as: 'update_tags'
+  put 'users/showed_one_time_notification' => 'users#showed_one_time_notification', as: 'showed_one_time_notification'
 
 
 
