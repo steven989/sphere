@@ -284,6 +284,7 @@ $(function(){
     }
 
     // open modal instance
+    initializeReModal("[data-remodal-id=notificationsModal]","standardModal",0)
     function initializeReModal(element,modifier,resetType) {
         if(!modalInstance || modalInstance.state != "opened") {
             modalInstance = $(element).remodal({
@@ -1675,6 +1676,17 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomFullButton sphereGreenBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
+        </div>
+    </div>
+</div>
+
+<div data-remodal-id="notificationsModal" data-default-css="([{'attribute':'height','value':'400px'}])">
+    <div class="modalView" id="challengeDetails">
+        <div class="modalContentContainer p-h-xxlg">
+            <%= image_tag Gemojione.image_url_for_name('heart') %>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereGreenBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">COOL</div>
         </div>
     </div>
 </div>
