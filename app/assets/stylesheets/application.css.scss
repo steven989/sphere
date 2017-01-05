@@ -221,6 +221,10 @@ table {
     margin-top: 20px;
 }
 
+.m-t-xlg {
+    margin-top: 25px;
+}
+
 .m-b-lg {
     margin-bottom: 20px;
 }
@@ -954,6 +958,10 @@ form div.btn-group .btn.active:hover{
 } 
 
 /*Progress-specific*/
+#progress #levelDisplay {
+    margin-top:25px;    
+}
+
 #progress #levelDisplay .content {
     margin: auto;
     width: 400px;
