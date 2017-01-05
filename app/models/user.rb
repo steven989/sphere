@@ -68,7 +68,7 @@ class User < ActiveRecord::Base
     new_level = Level.find_level_for(self)
     if new_level > current_level
       stat = user_statistics.find_statistic("level").take
-      stat.update_attributes(value:level)
+      stat.update_attributes(value:new_level)
       Notification.create_new_level_notification(self,current_level,new_level,1)
     end
   end
