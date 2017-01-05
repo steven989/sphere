@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170105100536) do
+ActiveRecord::Schema.define(version: 20170105125522) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -244,6 +244,7 @@ ActiveRecord::Schema.define(version: 20170105100536) do
     t.integer  "priority",          default: 1
     t.string   "start_value_type"
     t.string   "start_value"
+    t.string   "timeframe"
   end
 
   create_table "system_settings", force: :cascade do |t|
@@ -322,11 +323,17 @@ ActiveRecord::Schema.define(version: 20170105100536) do
     t.datetime "updated_at",              null: false
     t.string   "data_type"
     t.float    "value"
+    t.integer  "year"
+    t.integer  "month"
+    t.integer  "week"
   end
 
+  add_index "user_statistics", ["month"], name: "index_user_statistics_on_month", using: :btree
   add_index "user_statistics", ["name"], name: "index_user_statistics_on_name", using: :btree
   add_index "user_statistics", ["statistic_definition_id"], name: "index_user_statistics_on_statistic_definition_id", using: :btree
   add_index "user_statistics", ["user_id"], name: "index_user_statistics_on_user_id", using: :btree
+  add_index "user_statistics", ["week"], name: "index_user_statistics_on_week", using: :btree
+  add_index "user_statistics", ["year"], name: "index_user_statistics_on_year", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",            null: false

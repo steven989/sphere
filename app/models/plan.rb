@@ -88,8 +88,9 @@ class Plan < ActiveRecord::Base
                                 details:details,
                                 put_on_calendar: true
                                 )
+                        StatisticDefinition.triggers("individual","create_plan",self.user) 
                         status = true
-                        message = "Activity created! We put it on your calendar for you"
+                        message = "Hangout created! We put it on your calendar for you"
                     end
                 end
             end
@@ -120,8 +121,9 @@ class Plan < ActiveRecord::Base
                         details:details,
                         put_on_calendar:false
                         )
+                StatisticDefinition.triggers("individual","create_plan",self.user) 
                 status = true
-                message = "Activity created!"
+                message = "Hangout created!"
             end
         end
         {status:status,message:message,access_token:token_object,plan:plan}

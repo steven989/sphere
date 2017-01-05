@@ -217,6 +217,7 @@ class Connection < ActiveRecord::Base
                 tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
               end
               Connection.port_photo_url_to_access_url(matched_connection.id)
+              StatisticDefinition.triggers("individual","create_connection",user)
               status = true
               message = "Connection successfully updated"
               data = matched_connection
@@ -290,6 +291,7 @@ class Connection < ActiveRecord::Base
                     tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
                   end
                   Connection.port_photo_url_to_access_url(matched_connection.id)
+                  StatisticDefinition.triggers("individual","create_connection",user)
                   status = true
                   message = "Connection successfully updated"
                   data = matched_connection
@@ -331,6 +333,7 @@ class Connection < ActiveRecord::Base
                   new_connection.update_score
                   Connection.port_photo_url_to_access_url(new_connection.id)
                   tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
+                  StatisticDefinition.triggers("individual","create_connection",user)
                   status = true
                   message = "Connection successfully created"
                   data = new_connection
@@ -372,6 +375,7 @@ class Connection < ActiveRecord::Base
                   new_connection.update_score
                   Connection.port_photo_url_to_access_url(new_connection.id)
                   tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
+                  StatisticDefinition.triggers("individual","create_connection",user)
                   status = true
                   message = "Connection successfully created"
                   data = new_connection
