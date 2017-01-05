@@ -149,8 +149,7 @@ $(function(){
                     var content = "<span style='font-size:13px;color:#FFFFFF'>"+notification.count+"</span>";
                 }
                 domElements.each(function(){
-                    var coordinates = getNotificationCoordinate(5,$(this).closest('.notificationContainer').width()/2-20,14);
-                    $(this).closest('.notificationContainer').append('<span class="badge" style="width:20px; height:20px;position:absolute;background-color:'+backgroundColor+';left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;padding-top:0px;">'+content+'</span>')
+                    $(this).append('<span class="badge" style="width:20px; height:20px;background-color:'+backgroundColor+';">'+content+'</span>')
                 })
             });
         }

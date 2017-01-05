@@ -254,6 +254,20 @@ table {
     background-color: #FF9595 !important;
 }
 
+/* --------------  User level notifications --------------  */
+.userLevelNotificationDisplayElement {
+    position: relative;
+}
+
+.userLevelNotificationDisplayElement .badge {
+    position:absolute;
+    right:-5px;
+    top:-25px;
+    padding-top:0px;
+}
+
+
+
 /* --------------   Corner Ribbons --------------  */
     .corner-ribbon{
       width: 200px;
@@ -1102,6 +1116,11 @@ form div.btn-group .btn.active:hover{
 @media (max-width: 600px) { 
     .hideOnMobile {
         display: none;
+    }
+
+    .userLevelNotificationDisplayElement .badge {
+        right:-15px;
+        top:-20px;
     }
 
     .remodal.standardModal {
