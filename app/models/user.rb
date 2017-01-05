@@ -75,6 +75,7 @@ class User < ActiveRecord::Base
   end
 
   def get_notifications(json_or_not_json=false)
+      expiring_connection_array_of_ids = []
       result = self.notifications.inject({}) do |accumulator,notification|
                   accumulator[:connection_level] = {} unless accumulator[:connection_level]
                   accumulator[:user_level] = [] unless accumulator[:user_level]
@@ -86,12 +87,9 @@ class User < ActiveRecord::Base
                         accumulator[:connection_level][notification.notifiable_id] = {notification_type:notification.notification_type,value:notification.value_in_specified_type,priority:notification.priority}
                       end
                       if notification.notification_type == "connection_expiration" #user-level notification accumulated from connection-level expiry counts
-                        existing_expiry_count = accumulator[:user_level].select {|notification_in_array| notification_in_array[:notification_type] == "my_sphere"}[0]
-                        if existing_expiry_count
-                          existing_expiry_count[:count] = existing_expiry_count[:count]+1
-                        else
-                          accumulator[:user_level].push({notification_type:"my_sphere",count:1})
-                        end
+                        expiring_connection_array_of_ids.push(notification.notifiable_id)
+                      elsif notification.notification_type == "upcoming_plan"
+                        expiring_connection_array_of_ids.reject! {|connection_id| connection_id == notification.notifiable_id}
                       end
                     else
                       existing_notification = accumulator[:user_level].select {|notification_in_array| notification_in_array[:notification_type] == notification.notification_type}[0]
@@ -105,6 +103,7 @@ class User < ActiveRecord::Base
                   end
                   accumulator
                 end
+        result[:user_level].push({notification_type:"my_sphere", count: expiring_connection_array_of_ids.length}) if expiring_connection_array_of_ids.length > 0
       if json_or_not_json
         result.to_json
       else
