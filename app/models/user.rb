@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
     current_level = self.stat("level")
     new_level = Level.find_level_for(self)
     if new_level > current_level
+
       stat = user_statistics.find_statistic("level").take
       stat.update_attributes(value:new_level)
       Notification.create_new_level_notification(self,current_level,new_level,1)
@@ -101,6 +102,15 @@ class User < ActiveRecord::Base
       else
         result
       end
+  end
+
+  def get_one_time_popup_notification(json_or_not_json=false)
+    result = notifications.where(one_time_display:true).order(priority: :asc).take
+    if json_or_not_json
+      result.to_json
+    else
+      result
+    end
   end
 
   def get_bubbles_display_system_settings(json_or_not_json=false)

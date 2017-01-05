@@ -84,7 +84,7 @@ class UsersController < ApplicationController
           redirect_to admin_dashboard_path
         else
           @current_user_email = current_user.email
-          @one_time_notification = Notification.where(one_time_display:true).order(priority: :asc).take
+          @one_time_notification = current_user.get_one_time_popup_notification(false)
           @authorized_google_calendar = current_user.authorized_by("google","calendar")
           @authorized_google_contacts = current_user.authorized_by("google","contacts")
           @settings = current_user.user_setting.value_evaled
@@ -171,9 +171,11 @@ class UsersController < ApplicationController
           raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
           notifications = current_user.get_notifications(false)
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+          one_time_notification = current_user.get_one_time_popup_notification(false)
           status = true
           message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
           actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+          actions.push({action:"function_call",function:"oneTimeNotificationPopup('[data-remodal-id=notificationsModal]',#{one_time_notification.id},#{one_time_notification.value_in_specified_type[:new_level]})"}) if one_time_notification
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           status = false

@@ -18,7 +18,7 @@ class Notification < ActiveRecord::Base
         # 1) Destroy any existing notifications
         Notification.where(user_id:user.id,notification_type:"level_up").destroy_all
         # 2) Create a notification
-        Notification.create(
+        result = Notification.create(
           user_id: user.id,
           notification_type:"level_up",
           notification_date:date,
