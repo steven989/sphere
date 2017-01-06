@@ -189,7 +189,7 @@ class UsersController < ApplicationController
           new_stats[:points_required_to_progress] = points_required_to_progress
           status = true
           message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
-          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
           actions.push({action:"function_call",function:"oneTimeNotificationPopup('[data-remodal-id=notificationsModal]',#{one_time_notification.id},#{one_time_notification.value_in_specified_type[:new_level]})"}) if one_time_notification
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
         else

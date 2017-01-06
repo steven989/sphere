@@ -118,7 +118,11 @@ $(function(){
     }
 
     // update user-level notifications
-
+    function updateUserLevelNotifications(notifications) {
+        console.log(notifications);
+        userLevelNotifications = notifications;
+        showUserLevelNotifications();
+    }
 
     // In place update
     function inPlaceUpdate() {
@@ -150,7 +154,7 @@ $(function(){
     function showUserLevelNotifications() {
         if (userLevelNotifications != undefined && userLevelNotifications instanceof Array && userLevelNotifications.length > 0) {
             userLevelNotifications.forEach(function(notification){
-                var domElements = $('.userLevelNotificationDisplayElement#'+notification.notification_type);
+                var domElements = $('.userLevelNotificationDisplayElement.'+notification.notification_type);
                 if (notification.notification_type == "level_up") {
                     var backgroundColor = "#ED1C24";
                     var content = '<%= fa_icon 'thumbs-up', style:'font-size:13px;color:#FFFFFF' %>';
@@ -159,7 +163,7 @@ $(function(){
                     var content = "<span style='font-size:13px;color:#FFFFFF'>"+notification.count+"</span>";
                 }
                 domElements.each(function(){
-                    $(this).append('<span class="badge" style="width:20px; height:20px;background-color:'+backgroundColor+';">'+content+'</span>')
+                    $(this).find('.notificationContainer').html('<span class="badge" style="width:20px; height:20px;background-color:'+backgroundColor+';">'+content+'</span>')
                 })
             });
         }
@@ -1327,10 +1331,10 @@ $(function(){
 <div id="navigation-tabs-container">
     <div class="topTabs-header clearfix">
         <ul class="etabs tabs" id="navigation">
-            <li class="tab"><a href="#mySphere"><div class="notificationContainer"><span class="userLevelNotificationDisplayElement" id="my_sphere"><%= fa_icon 'circle-o' %><br><span class="hideOnMobile">MY SPHERE</span></span></div></a></li>
-            <li class="tab"><a href="#progress"><div class="notificationContainer"><span class="userLevelNotificationDisplayElement" id="level_up"><%= fa_icon 'bar-chart' %><br><span class="hideOnMobile">PROGRESS</span></span></div></a></li>
-            <li class="tab"><a href="#challenges"><div class="notificationContainer"><span class="userLevelNotificationDisplayElement" id="new_challenge"><%= fa_icon 'map' %><br><span class="hideOnMobile">CHALLENGES</span></span></div></a></li>
-            <li class="tab"><a href="#achievements"><div class="notificationContainer"><span class="userLevelNotificationDisplayElement" id="new_badge"><%= fa_icon 'star' %><br><span class="hideOnMobile">ACHIEVEMENTS</span></span></div></a></li>
+            <li class="tab"><a href="#mySphere"><span class="userLevelNotificationDisplayElement my_sphere"><%= fa_icon 'circle-o' %><br><span class="hideOnMobile">MY SPHERE</span><span class="notificationContainer"></span></span></a></li>
+            <li class="tab"><a href="#progress"><span class="userLevelNotificationDisplayElement level_up"><%= fa_icon 'bar-chart' %><br><span class="hideOnMobile">PROGRESS</span><span class="notificationContainer"></span></span></a></li>
+            <li class="tab"><a href="#challenges"><span class="userLevelNotificationDisplayElement new_challenge"><%= fa_icon 'map' %><br><span class="hideOnMobile">CHALLENGES</span><span class="notificationContainer"></span></span></a></li>
+            <li class="tab"><a href="#achievements"><span class="userLevelNotificationDisplayElement new_badge"><%= fa_icon 'star' %><br><span class="hideOnMobile">ACHIEVEMENTS</span><span class="notificationContainer"></span></span></a></li>
         </ul>        
     </div> 
     <div class="topTabsContent">
