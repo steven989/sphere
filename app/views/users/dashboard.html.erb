@@ -1117,7 +1117,7 @@ $(function(){
         form.find('#adjust_timezone_title').html(returnedData.timezone.title);
         $('#adjust_timezone_title').siblings('.options').find('select').html("");
         returnedData.timezone.options.forEach(function(timezone){
-            $('#adjust_timezone_title').siblings('.options').find('select').append('<option value="'+timezone.zone+'" '+(returnedData.timezone.value == timezone.zone ? 'selected=true' : '')+'>'+timezone.time+'</option>')
+            $('#adjust_timezone_title').siblings('.options').find('select').append('<option value="'+timezone+'" '+(returnedData.timezone.value == timezone ? 'selected=true' : '')+'>'+timezone+'</option>')
             // 
         })
         // form.find('#event_add_granularity_title').html(returnedData.event_add_granularity.title);
