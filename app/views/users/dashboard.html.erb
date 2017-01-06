@@ -247,8 +247,9 @@ $(function(){
                                 formData.append("notes",form.find('[name=notes]').val());
 
                                 cropVarInEditConnection.croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
-                                       alert(croppedImageData);
-                                        if (croppedImageData == null) {
+                                        if ($('.modalView#editConnection #photoUploader').prop("files")[0] == undefined) {
+                                            formData.append("photo", null);
+                                        } else if (croppedImageData == null) {
                                             formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
                                         } else {
                                             formData.append("photo", croppedImageData);
@@ -281,6 +282,8 @@ $(function(){
                                             }
                                         });
                                 });
+
+
                             }
                         })
                         resetModal($('[data-remodal-id=bubbleModal]'),3);
@@ -481,7 +484,9 @@ $(function(){
                         promiseReady = false;
                         _this = $(this);
                         eval($(this).data('uploader-crop-var')).croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
-                                if (croppedImageData == null) {
+                                if (_this.prop("files")[0] == undefined) {
+                                    formData.append(_this.prop('name'),null);
+                                } else if (croppedImageData == null) {
                                     formData.append(_this.prop('name'),_this.prop("files")[0]);
                                 } else {
                                     formData.append(_this.prop('name'), croppedImageData);
@@ -884,10 +889,10 @@ $(function(){
                     },
                     enableExif: true
                 });
-                $('#photoUploader').on('change', function () { 
-                    $('.modalView#editConnection .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','410px');
+                $('#photoUploader').on('change', function () {
+                    $('.modalView#editConnection .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust = false-value','410px');
                     $('.modalView#plans .photo, .modalView#plans .icon').each(function(){
-                        $(this).data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','700px');
+                        $(this).data('height-adjust-element','.remodal[data-remodal = false-id=bubbleModal]').data('height-adjust-value','700px');
                     });
                     $('#cropInEditConnection').removeClass('hidden');
                     $('.remodal[data-remodal-id=bubbleModal]').animate({height:"700px"})
