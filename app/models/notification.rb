@@ -98,7 +98,7 @@ class Notification < ActiveRecord::Base
         connection.notifications.where(user_id:user.id,notification_type:"upcoming_plan").destroy_all
         # Notification.where(user_id:user.id,connection_id:connection.id,notification_type:"upcoming_plan").destroy_all
         # 2) See if there are upcoming plans, if there are, then create. Otherwise do nothing
-        plans = connection.plans.upcoming.where("date >= ?",Date.today).order(date: :asc)
+        plans = connection.plans.upcoming.order(date: :asc)
         if plans.length > 0 
           plan = plans.limit(1).take
           connection.notifications.create(

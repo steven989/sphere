@@ -1,7 +1,8 @@
 class Plan < ActiveRecord::Base
     belongs_to :user
     belongs_to :connection
-    scope :upcoming, -> { where(status:"Planned") } 
+    scope :upcoming, -> { where("status ilike 'Planned' and date >= ?", Date.today)}
+    scope :completed, -> { where("status ilike 'Planned' and date < ?", Date.today)}
 
     def self.create_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,calendar_id="primary",put_on_google=true)
         date = event_parameters[:date]

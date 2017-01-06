@@ -66,6 +66,13 @@ class Connection < ActiveRecord::Base
         initator_bonus_settings = SystemSetting.search("initiator_bonus").value_in_specified_type
         bonus_multiplier = initiator_bonus_multiplier(percent_of_events_initiated_by_connection,initator_bonus_settings[:maximum_bonus_percent],initator_bonus_settings[:optimal_percent_of_events_initiated_by_connection],initator_bonus_settings[:point_of_zero_bonus_above_50_percent_of_events])
         
+        # 3) Factor in any completed events (for now just count each event as a "check in" from activity definitions not matter what the event)
+        single_check_in_score = 0
+        SystemSetting.search('rqd_weights').value_in_specified_type.each do |key, value|
+          single_check_in_score += ActivityDefinition.where(activity:"Check In").sum("#{key.to_s}*#{value}").to_i
+        end
+        score += plans.completed.length * single_check_in_score
+        
         score *= bonus_multiplier        
         score
     end
