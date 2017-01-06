@@ -109,6 +109,7 @@ $(function(){
 
     // update "real-time" stats
     function updateRealTimeStats(stats) {
+        console.log('stats')
         for (var key in stats) {
             $('.statsToUpdate.'+key).each(function(){
                 $(this).html(stats[key]);    
@@ -119,7 +120,6 @@ $(function(){
 
     // update user-level notifications
     function updateUserLevelNotifications(notifications) {
-        console.log(notifications);
         userLevelNotifications = notifications;
         showUserLevelNotifications();
     }
@@ -812,6 +812,7 @@ $(function(){
 
         $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
         $('.modalView#makePlan input[name=notify]').prop('checked',<%= @settings[:send_event_booking_notification_by_default] %>);
+        $('.modalView#makePlan input[name=putOnGoogle]').prop('checked',true);
 
 
         // update the scheduling TO time selector to make all time slots visible

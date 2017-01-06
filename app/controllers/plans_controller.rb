@@ -73,9 +73,10 @@ class PlansController < ApplicationController
                 end
                 Notification.create_upcoming_plan_notification(current_user,connection)
                 notifications = current_user.get_notifications(false)
-                data = {notifications:notifications}
+                new_stats = current_user.stats
+                data = {notifications:notifications,new_stats:new_stats}
                 message= result[:message]
-                actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"closeModalInstance(100)"}]
+                actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
             elsif !status && result[:message].include?("Unauthorize")
                 message = "Hmm looks like we don't have access to your Google calendar. Click on the import button again to connect your Google account!"
                 scope = current_user.authorizations.where(provider:'google').take.scope_value

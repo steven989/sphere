@@ -88,7 +88,7 @@ class Plan < ActiveRecord::Base
                                 details:details,
                                 put_on_calendar: true
                                 )
-                        StatisticDefinition.triggers("individual","create_plan",self.user) 
+                        StatisticDefinition.triggers("individual","create_plan",user) 
                         status = true
                         message = "Hangout created! We put it on your calendar for you"
                     end
@@ -121,7 +121,7 @@ class Plan < ActiveRecord::Base
                         details:details,
                         put_on_calendar:false
                         )
-                StatisticDefinition.triggers("individual","create_plan",self.user) 
+                StatisticDefinition.triggers("individual","create_plan",user)
                 status = true
                 message = "Hangout created!"
             end
@@ -294,11 +294,14 @@ class Plan < ActiveRecord::Base
         end
 
         # Authenticate with Google and retrieve primary calendar
+        
         begin
-            service = Google::Apis::CalendarV3::CalendarService.new
-            access_token = AccessToken.new(token_object[:access_token])
-            service.authorization = access_token
-            service.delete_event(calendar_id,calendar_event_id,send_notifications:notify)
+            if !self.calendar_event_id.blank?
+                service = Google::Apis::CalendarV3::CalendarService.new
+                access_token = AccessToken.new(token_object[:access_token])
+                service.authorization = access_token
+                service.delete_event(calendar_id,calendar_event_id,send_notifications:notify)
+            end
         rescue => error
             status = false
             message = error.message

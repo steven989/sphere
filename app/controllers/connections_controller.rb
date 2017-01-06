@@ -129,10 +129,18 @@ class ConnectionsController < ApplicationController
 
         if result[:status]
             raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-            notifications = current_user.get_notifications(false)
+            notifications = current_user.get_notifications(false)            
             bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-            data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
-            actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+            new_stats = current_user.stats
+            level_num = new_stats[:level].to_i
+            xp = new_stats[:xp]
+            level_progress_lookup = Level.return_level_xps([level_num,level_num+1])
+            points_gained_in_this_level = xp-level_progress_lookup[level_num]
+            points_required_to_progress = level_progress_lookup[level_num+1]-level_progress_lookup[level_num]
+            new_stats[:points_gained_in_this_level] = points_gained_in_this_level
+            new_stats[:points_required_to_progress] = points_required_to_progress            
+            data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
+            actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"}]
             if current_user.connections.expired.length == 0
                 actions.push({action:"function_call",function:"putWordsBackInIfNoExpiredConnection(610)"}) 
                 actions.push({action:"function_call",function:""})
@@ -200,10 +208,11 @@ class ConnectionsController < ApplicationController
         if result[:status] 
           raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
           notifications = current_user.get_notifications(false)
+          new_stats = current_user.stats
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           message = result[:message]
-          actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
-          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+          actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
+          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
         else
           message = "Oops. Looks like our robots had some errors saving the contacts. Here are the details: #{result[:message]}"
           actions = nil
