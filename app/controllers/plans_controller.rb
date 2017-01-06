@@ -164,7 +164,6 @@ class PlansController < ApplicationController
                                        put_on_google
                                     )
 
-
             status = result[:status]
             message= result[:message]
 

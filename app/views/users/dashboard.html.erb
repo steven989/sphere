@@ -123,6 +123,7 @@ $(function(){
 
     // update user-level notifications
     function updateUserLevelNotifications(notifications) {
+        console.log(notifications);
         userLevelNotifications = notifications;
         showUserLevelNotifications();
     }
@@ -155,6 +156,9 @@ $(function(){
 
     // User-level notifications
     function showUserLevelNotifications() {
+        $('.userLevelNotificationDisplayElement .notificationContainer').each(function(){
+            $(this).html("");
+        });
         if (userLevelNotifications != undefined && userLevelNotifications instanceof Array && userLevelNotifications.length > 0) {
             userLevelNotifications.forEach(function(notification){
                 var domElements = $('.userLevelNotificationDisplayElement.'+notification.notification_type);
