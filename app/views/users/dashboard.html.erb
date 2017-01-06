@@ -247,6 +247,7 @@ $(function(){
                                 formData.append("notes",form.find('[name=notes]').val());
 
                                 cropVarInEditConnection.croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
+                                       alert(croppedImageData);
                                         if (croppedImageData == null) {
                                             formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
                                         } else {
