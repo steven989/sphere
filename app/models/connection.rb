@@ -410,31 +410,38 @@ class Connection < ActiveRecord::Base
     end
 
     def self.create_from_import(user,contacts_imported,access_token=nil,expires_at=nil,merge_name=true)
-      imported_contacts = Connection.import_from_google(user,access_token,expires_at,"api_contact_class")      
-      selected_imports_id_for_matching_purposes = contacts_imported.map {|selectec_contact| selectec_contact["id"] }
-      selected_contacts_in_api_contact_class = imported_contacts[:data].select {|contact| selected_imports_id_for_matching_purposes.include?(contact.id)}
+      begin
+        imported_contacts = Connection.import_from_google(user,access_token,expires_at,"api_contact_class")      
+        selected_imports_id_for_matching_purposes = contacts_imported.map {|selectec_contact| selectec_contact["id"] }
+        selected_contacts_in_api_contact_class = imported_contacts[:data].select {|contact| selected_imports_id_for_matching_purposes.include?(contact.id)}
 
-      result_array = []
-        contacts_imported.each do |contact|
-          id = contact["id"]
-          name = contact["name"]
-          email = contact["email"]
-          phone = contact["phone"]
-          other_emails = contact["other_emails"]
-          photo_object = selected_contacts_in_api_contact_class.select {|contact| contact.id == id}[0].photo_with_header
-          result = Connection.insert_contact(user,name,email,other_emails,phone,photo_object,nil,nil,nil,merge_name)
-          result_array.push(result)
+        result_array = []
+          contacts_imported.each do |contact|
+            id = contact["id"]
+            name = contact["name"]
+            email = contact["email"]
+            phone = contact["phone"]
+            other_emails = contact["other_emails"]
+            photo_object = selected_contacts_in_api_contact_class.select {|contact| contact.id == id}[0].photo_with_header
+            result = Connection.insert_contact(user,name,email,other_emails,phone,photo_object,nil,nil,nil,merge_name)
+            result_array.push(result)
+          end
+        rescue => error
+          status = false
+          message = "Uh oh. We ran into some errors: error.message. Please try again. If it still won't work, please let us know!"
+          data = nil
+        else
+          issues = result_array.select {|result| result[:status] == false}
+          if issues.length > 0 
+            status = false
+            message = issues.map {|issue| issue[:message] }.join(", ")
+            data = issues.map {|issue| issue[:data] }
+          else
+            status = true
+            message = "Connections successfully created"
+            data = nil
+          end
         end
-      issues = result_array.select {|result| result[:status] == false}
-      if issues.length > 0 
-        status = false
-        message = issues.map {|issue| issue[:message] }.join(", ")
-        data = issues.map {|issue| issue[:data] }
-      else
-        status = true
-        message = "Connections successfully created"
-        data = nil
-      end
       {status:status,message:message,data:data}
     end
 
