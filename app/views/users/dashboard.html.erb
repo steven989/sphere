@@ -107,6 +107,19 @@ $(function(){
         oneTimeNotificationPopup("[data-remodal-id=notificationsModal]",<%= @one_time_notification.id %>,<%= @one_time_notification.value_in_specified_type[:new_level] %>)
     <% end %>
 
+    // update "real-time" stats
+    function updateRealTimeStats(stats) {
+        for (var key in stats) {
+            $('.statsToUpdate.'+key).each(function(){
+                $(this).html(stats[key]);    
+            });
+        }
+        $('.statsToUpdate.progressBar').css({'width':Math.round(stats.points_gained_in_this_level/stats.points_required_to_progress*100).toString()+"%"});
+    }
+
+    // update user-level notifications
+
+
     // In place update
     function inPlaceUpdate() {
         $('.inPlaceField').each(function(){
@@ -755,6 +768,7 @@ $(function(){
                 }
                 if (data.data != undefined) {
                     returnedData = data.data;
+                    console.log(returnedData);
                 }
                 if (data.actions != undefined && data.actions.length > 0) {
                     performActions(data.actions);    
@@ -1384,9 +1398,9 @@ $(function(){
                             <h2 class="textDarkGray">Level <span class="statsToUpdate level"><%= @level_num %></span></h2>
                         </div>
                         <div class="progress progressBar" style="margin-bottom:5px;">
-                            <div class="progress-bar bar-green" style="width:<%= @level_progress_percent_string %>"></div>
+                            <div class="progress-bar bar-green statsToUpdate progressBar" style="width:<%= @level_progress_percent_string %>"></div>
                         </div>
-                        <div class="textDarkGray" style="font-size:14px;"><span class="statsToUpdate pointsGainedSinceLevel"><%= @points_gained_in_this_level.to_i %></span> out of <span class="statsToUpdate pointsRequiredToLevel"><%= @points_required_to_progress.to_i %></span> points to next level</div>
+                        <div class="textDarkGray" style="font-size:14px;"><span class="statsToUpdate points_gained_in_this_level"><%= @points_gained_in_this_level.to_i %></span> out of <span class="statsToUpdate points_required_to_progress"><%= @points_required_to_progress.to_i %></span> points to next level</div>
                     </div>
                 </div>
             </div>

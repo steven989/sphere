@@ -173,6 +173,10 @@ class User < ActiveRecord::Base
     level.blank? ? nil : level.take
   end
 
+  def find_xp_gap_to_progress
+    
+  end
+
   def stat(statistic)
     stat = user_statistics.find_statistic(statistic)
     stat.blank? ? nil : stat.take.value_in_type

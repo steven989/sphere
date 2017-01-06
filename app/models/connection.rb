@@ -462,6 +462,7 @@ class Connection < ActiveRecord::Base
 
     def expire
         self.update_attributes(active:false,date_inactive:Date.today)
+        self.notifications.destroy_all
     end
 
     def check_if_conection_is_expiring_and_if_so_create_notification(user,expiring_connection_notification_period_in_days)

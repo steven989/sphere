@@ -179,11 +179,19 @@ class UsersController < ApplicationController
           notifications = current_user.get_notifications(false)
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           one_time_notification = current_user.get_one_time_popup_notification(false)
+          new_stats = current_user.stats
+          level_num = new_stats[:level].to_i
+          xp = new_stats[:xp]
+          level_progress_lookup = Level.return_level_xps([level_num,level_num+1])
+          points_gained_in_this_level = xp-level_progress_lookup[level_num]
+          points_required_to_progress = level_progress_lookup[level_num+1]-level_progress_lookup[level_num]
+          new_stats[:points_gained_in_this_level] = points_gained_in_this_level
+          new_stats[:points_required_to_progress] = points_required_to_progress
           status = true
           message = "Awesome. XP + #{result[:data][:quality_score_gained].round}!"
-          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
           actions.push({action:"function_call",function:"oneTimeNotificationPopup('[data-remodal-id=notificationsModal]',#{one_time_notification.id},#{one_time_notification.value_in_specified_type[:new_level]})"}) if one_time_notification
-          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
         else
           status = false
           message = "Oops. Our robots ran into some problems. Let us know the error: #{result[:message]}"
