@@ -1380,7 +1380,7 @@ $(function(){
                         <div class="progress progressBar" style="margin-bottom:5px;">
                             <div class="progress-bar bar-green" style="width:<%= @level_progress_percent_string %>"></div>
                         </div>
-                        <div class="textDarkGray" style="font-size:14px;"><span class="statsToUpdate pointsGainedSinceLevel"><%= @points_gained_in_this_level %></span> out of <span class="statsToUpdate pointsRequiredToLevel"><%= @points_required_to_progress %></span> points to next level</div>
+                        <div class="textDarkGray" style="font-size:14px;"><span class="statsToUpdate pointsGainedSinceLevel"><%= @points_gained_in_this_level.to_i %></span> out of <span class="statsToUpdate pointsRequiredToLevel"><%= @points_required_to_progress.to_i %></span> points to next level</div>
                     </div>
                 </div>
             </div>
