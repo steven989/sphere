@@ -110,6 +110,7 @@ class PlansController < ApplicationController
 
         unless params[:connection_id] == 0
             connection = Connection.find(params[:connection_id])
+            summary+=" (with #{connection.name})"
         end
 
         plan = Plan.find(params[:plan_id])

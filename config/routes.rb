@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   get 'users/info' => 'users#get_user_info', as: 'get_user_info'
   put 'users/update_tags' => 'users#update_tags', as: 'update_tags'
   put 'users/showed_one_time_notification' => 'users#showed_one_time_notification', as: 'showed_one_time_notification'
-
+  put 'users/put_timezone' => 'users#put_timezone', as: 'put_timezone'
 
 
   # Connections controller

@@ -5,7 +5,7 @@ $(function(){
     // A series of variables that need to be used across functions
     $('[data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
     var returnedData;
-    
+    var timezone = jstz.determine().name();
     var closeModalTimer;    
     var token;
     var tokenInCreate;
@@ -20,6 +20,10 @@ $(function(){
     var cropVarInEditUser;
     var modalInstance;
 
+    <% unless @timezone %>
+        $('#profile').data('data-to-send','({timezone:"'+timezone+'"})').attr("href","<%= put_timezone_path %>").data("method","PUT");
+        buttonAjax($('#profile'),{timezone:timezone});
+    <% end %>
 
     // Search 
     var options = {
@@ -109,7 +113,6 @@ $(function(){
 
     // update "real-time" stats
     function updateRealTimeStats(stats) {
-        console.log('stats')
         for (var key in stats) {
             $('.statsToUpdate.'+key).each(function(){
                 $(this).html(stats[key]);    
@@ -772,7 +775,6 @@ $(function(){
                 }
                 if (data.data != undefined) {
                     returnedData = data.data;
-                    console.log(returnedData);
                 }
                 if (data.actions != undefined && data.actions.length > 0) {
                     performActions(data.actions);    
@@ -1108,13 +1110,19 @@ $(function(){
         var form = $('.modalView#settingsSelect #settingsContainer');
         form.find('#send_event_booking_notification_by_default_title').html(returnedData.send_event_booking_notification_by_default.title);
         form.find('#send_event_booking_notification_by_default_value').prop('checked',returnedData.send_event_booking_notification_by_default.value);
-        form.find('#share_my_calendar_with_contacts_title').html(returnedData.share_my_calendar_with_contacts.title);
-        form.find('#share_my_calendar_with_contacts_value').prop('checked',returnedData.share_my_calendar_with_contacts.value);
+        // form.find('#share_my_calendar_with_contacts_title').html(returnedData.share_my_calendar_with_contacts.title);
+        // form.find('#share_my_calendar_with_contacts_value').prop('checked',returnedData.share_my_calendar_with_contacts.value);
         form.find('#default_contact_interval_in_days_title').html(returnedData.default_contact_interval_in_days.title);
         form.find('#default_contact_interval_in_days_value').val(returnedData.default_contact_interval_in_days.value);
-        form.find('#event_add_granularity_title').html(returnedData.event_add_granularity.title);
-        form.find('#event_add_granularity_detailed_value').prop("selected", (returnedData.event_add_granularity.value == 'detailed'));
-        form.find('#event_add_granularity_quick_value').prop("selected", (returnedData.event_add_granularity.value == 'quick'));
+        form.find('#adjust_timezone_title').html(returnedData.timezone.title);
+        $('#adjust_timezone_title').siblings('.options').find('select').html("");
+        returnedData.timezone.options.forEach(function(timezone){
+            $('#adjust_timezone_title').siblings('.options').find('select').append('<option value="'+timezone.zone+'" '+(returnedData.timezone.value == timezone.zone ? 'selected=true' : '')+'>'+timezone.time+'</option>')
+            // 
+        })
+        // form.find('#event_add_granularity_title').html(returnedData.event_add_granularity.title);
+        // form.find('#event_add_granularity_detailed_value').prop("selected", (returnedData.event_add_granularity.value == 'detailed'));
+        // form.find('#event_add_granularity_quick_value').prop("selected", (returnedData.event_add_granularity.value == 'quick'));
 
         initializeReModal("[data-remodal-id=settingsModal]","standardModal",1);
     }
@@ -1716,6 +1724,14 @@ $(function(){
                 <div class="m-b-md">
                     <div id="default_contact_interval_in_days_title"></div>
                     <div><input type='number' class="settingInput settingInput formElement standardHeight inputData" name='default_contact_interval_in_days' id='default_contact_interval_in_days_value'></div>
+                </div>
+                <div class="m-b-md">
+                    <div id="adjust_timezone_title"></div>
+                    <div class='options'>
+                        <select class="settingInput formElement button standardHeight inputData" name='adjust_timezone'>
+                            
+                        </select>
+                    </div>
                 </div>
                 <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <a href="<%= clear_connections_path %>">Clear contacts (testing button)</a>

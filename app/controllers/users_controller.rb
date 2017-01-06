@@ -13,6 +13,15 @@ class UsersController < ApplicationController
       
     end
 
+    def put_timezone
+      current_user.update_attributes(timezone:params[:timezone]) unless current_user.timezone
+      respond_to do |format|
+        format.json {
+          render json: {status:true}
+        } 
+      end
+    end
+
     def create
         result = User.create_user(
           user_params[:email].downcase,
@@ -83,6 +92,7 @@ class UsersController < ApplicationController
         if current_user.is? "admin"
           redirect_to admin_dashboard_path
         else
+          @timezone = current_user.timezone
           @current_user_email = current_user.email
           @one_time_notification = current_user.get_one_time_popup_notification(false)
           @authorized_google_calendar = current_user.authorized_by("google","calendar")
@@ -219,7 +229,8 @@ class UsersController < ApplicationController
                                 send_event_booking_notification_by_default:{title:"Send calendar invites to my connections by default when creating a calendar event",value:current_user_settings_evaled[:send_event_booking_notification_by_default],type:"boolean"},
                                 share_my_calendar_with_contacts:{title:"Enable connections to see my free/busy status when inviting me to an event",value:current_user_settings_evaled[:share_my_calendar_with_contacts],type:"boolean"},
                                 default_contact_interval_in_days:{title:"Default number of days to connect with people",value:current_user_settings_evaled[:default_contact_interval_in_days],type:"number"},
-                                event_add_granularity:{title:"Granularity of adding events",value:current_user_settings_evaled[:event_add_granularity],type:"selection",options:["Detailed","Quick"]}
+                                event_add_granularity:{title:"Granularity of adding events",value:current_user_settings_evaled[:event_add_granularity],type:"selection",options:["Detailed","Quick"]},
+                                timezone:{title:"Default timezone",value:current_user.timezone,type:"selection",options:TZInfo::Timezone.all.map {|zone| {zone:zone.name,time:"#{zone.name} (currently #{zone.now.strftime('%l:%M%p')})" } } }
                               }
         respond_to do |format|
           format.json {
@@ -229,13 +240,16 @@ class UsersController < ApplicationController
     end
 
     def update_user_settings
+
       send_event_booking_notification_by_default = params[:data][:send_event_booking_notification_by_default] == "true" ? true : false
       share_my_calendar_with_contacts = params[:data][:share_my_calendar_with_contacts] == "true" ? true : false
       default_contact_interval_in_days = params[:data][:default_contact_interval_in_days].to_i
       event_add_granularity = params[:data][:event_add_granularity]
-      
+      timezone = params[:data][:adjust_timezone]
+
       user_setting = current_user.user_setting
       if user_setting.update_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity})
+        current_user.update_attributes(timezone:timezone) unless timezone.blank?
         status = true
         message = "Settings successfully updated"
         actions = [{action:"function_call",function:"closeModalInstance(100)"}]

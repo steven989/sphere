@@ -32,7 +32,8 @@ class Plan < ActiveRecord::Base
                 message = error.message
             else
                 # Calculate start time
-                Time.zone = calendar.time_zone
+                timezone_used = user.timezone ? user.timezone : calendar.time_zone
+                Time.zone = timezone_used
                 Chronic.time_class = Time.zone
                 start_time = Chronic.parse("#{date} #{start_time_only}")
                 end_time = Chronic.parse("#{date} #{end_time_only}")
@@ -78,7 +79,7 @@ class Plan < ActiveRecord::Base
                                 date:start_time.to_date,
                                 date_time:start_time,
                                 end_date_time: end_time,
-                                timezone:calendar.time_zone,
+                                timezone:timezone_used,
                                 name:summary,
                                 location:location,
                                 status:"Planned",
@@ -111,7 +112,7 @@ class Plan < ActiveRecord::Base
                         date:start_time.to_date,
                         date_time:start_time,
                         end_date_time: end_time,
-                        timezone:nil,
+                        timezone:user.timezone,
                         name:summary,
                         location:location,
                         status:"Planned",

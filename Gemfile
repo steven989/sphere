@@ -74,6 +74,9 @@ gem 'email_validator'
 gem 'pretender'
 #Adobe typekit
 gem 'typekit-rails'
+#timezones
+gem 'tzinfo'
+gem 'tzinfo-data'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

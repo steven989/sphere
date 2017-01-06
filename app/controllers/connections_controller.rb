@@ -143,7 +143,6 @@ class ConnectionsController < ApplicationController
             actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"}]
             if current_user.connections.expired.length == 0
                 actions.push({action:"function_call",function:"putWordsBackInIfNoExpiredConnection(610)"}) 
-                actions.push({action:"function_call",function:""})
             end
         else
             actions = nil
@@ -258,8 +257,9 @@ class ConnectionsController < ApplicationController
 
         data = {}
         connection = Connection.find(params[:connection_id])
-        date_of_last_activity_with_this_connection = connection.activities.where("activity not ilike '%added%to%sphere'").last && connection.activities.where("activity not ilike '%added%to%sphere'").order(:date).last.date
-        check_in_button_state =  date_of_last_activity_with_this_connection.nil? || Date.today > date_of_last_activity_with_this_connection
+        timezone = current_user.timezone ? TZInfo::Timezone.get(current_user.timezone) : TZInfo::Timezone.get('America/New_York')
+        date_of_last_activity_with_this_connection_utc = connection.activities.where("activity not ilike '%added%to%sphere'").last && connection.activities.where("activity not ilike '%added%to%sphere'").order(:date).last.created_at
+        check_in_button_state =  date_of_last_activity_with_this_connection_utc.nil? || timezone.now.strftime("%Y-%m-%d").to_date > timezone.utc_to_local(date_of_last_activity_with_this_connection_utc).strftime("%Y-%m-%d").to_date
         data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
         data[:name] = connection.name
