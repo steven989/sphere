@@ -2,8 +2,15 @@
 var test;
 
 $(function(){
-    alert(Modernizr.touch);
-    alert($('.touch'))
+    var touch = false;
+    if (!("ontouchstart" in document.documentElement)) {
+        $('html').removeClass("no-touch").addClass("no-touch");
+        touch = false;
+    } else {
+        $('html').removeClass("no-touch");
+        touch = true;
+    }
+    alert(touch);
     // A series of variables that need to be used across functions
     $('[data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
     var returnedData;
