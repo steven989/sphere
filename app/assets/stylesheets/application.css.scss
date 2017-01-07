@@ -36,10 +36,6 @@ h1,h2,h3,h4,h5,h6,p,div,span,body {
     padding-left: 10px !important;
 }
 
-ul.Dropdown {
-    z-index: 1000;
-}
-
 .col-xs-15 {
     width: 20% !important;
     float: left !important;
@@ -683,7 +679,6 @@ label[for=photoUploader] {
     border-radius: 8px;
     padding:0px;
     height: 410px;
-    max-height: 100%;
     width: 95%;
     margin: auto;
     max-width:625px;
