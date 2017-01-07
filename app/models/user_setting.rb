@@ -7,6 +7,15 @@ class UserSetting < ActiveRecord::Base
         setting
     end
 
+    def get_new_settings_from_system_setting
+        setting = SystemSetting.search('default_user_settings').value_in_specified_type
+        current_user_settings = eval(self.value)
+        setting.each do |key,value|
+            current_user_settings[key.to_sym] = value if current_user_settings[key.to_sym].nil?
+        end
+        self.update_value(current_user_settings)
+    end
+
     def get_value(key)
         value_evaled[key.to_sym]
     end

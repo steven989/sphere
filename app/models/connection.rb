@@ -138,264 +138,270 @@ class Connection < ActiveRecord::Base
     end
 
     def self.insert_contact(user,name,email=nil,other_emails=nil,phones=nil,photo_object=nil,photo_file_upload=nil,tags=nil,notes=nil,merge_name=true)
-          # If email matches an existing contact, merge the contacts and emails addresses (keep the current name and email in app, add any new emails to "additional emails") Otherwise create a new entry in the contacts
-          interval = user.user_setting.get_value(:default_contact_interval_in_days)
-          if email || other_emails
-            unified_email_array = []
-            unified_email_array.push(email) if email
-            unified_email_array += other_emails.split("|>-<+|%") if other_emails
-            unified_email_array = unified_email_array.map {|email| email.gsub(" ","")} #remove any spaces in the email
-            unified_email_array = unified_email_array.uniq
-            unified_email_array.reject! {|email| email.strip == "" || email == "NULL" || email == "null" || email == "nil" || email == "NIL"}
-            unified_email_array = nil if unified_email_array.length == 0
-          else 
-            unified_email_array = nil
-          end
-
-          if phones
-            unified_phones_array = phones.split("|>-<+|%")
-            unified_phones_array.reject! {|phone| phone.strip == ""}
-            unified_phones_array = nil if unified_phones_array.blank?
-          else
-            unified_phones_array = nil
-          end
-
-          first_name_parsed = Connection.parse_first_name(name)
-          last_name_parsed = Connection.parse_last_name(name)
-
-          if !first_name_parsed.blank? && !last_name_parsed.blank? && user.connections.where(first_name:first_name_parsed,last_name:last_name_parsed).length > 0 && merge_name
-            matched_connection = user.connections.where(first_name:first_name_parsed,last_name:last_name_parsed).take
-
-            # Merge emails
-            matched_connection_email = matched_connection.email
-            matched_connection_other_emails = eval((matched_connection.additional_emails.blank? ? "[]" : matched_connection.additional_emails)) #will return either [] or ["some_values"]
-            if matched_connection_email.blank?
-              primary_email_to_update_string = unified_email_array.nil? || unified_email_array.length == 0 ? nil : unified_email_array.slice!(0)
-              updated_additional_emails_array = unified_email_array.nil? || unified_email_array.length == 0 ? nil : unified_email_array
-              updated_additional_emails_string = updated_additional_emails_array.blank? ? nil : updated_additional_emails_array.to_s
-            else
-              primary_email_to_update = nil
-              matched_connection_email.gsub!(" ","")
-              additional_emails_to_merge = unified_email_array ? unified_email_array.delete_if {|email| email == matched_connection_email} : []
-              updated_additional_emails_array = (matched_connection_other_emails + additional_emails_to_merge).uniq
-              updated_additional_emails_string = updated_additional_emails_array.to_s
+      max_connections = user.user_setting.get_value('max_number_of_connections')
+      max_connections = max_connections ? max_connections.to_i : 50
+      if user.stat('total_connections_added').blank? || user.stat('total_connections_added') < max_connections
+            # If email matches an existing contact, merge the contacts and emails addresses (keep the current name and email in app, add any new emails to "additional emails") Otherwise create a new entry in the contacts
+            interval = user.user_setting.get_value(:default_contact_interval_in_days)
+            if email || other_emails
+              unified_email_array = []
+              unified_email_array.push(email) if email
+              unified_email_array += other_emails.split("|>-<+|%") if other_emails
+              unified_email_array = unified_email_array.map {|email| email.gsub(" ","")} #remove any spaces in the email
+              unified_email_array = unified_email_array.uniq
+              unified_email_array.reject! {|email| email.strip == "" || email == "NULL" || email == "null" || email == "nil" || email == "NIL"}
+              unified_email_array = nil if unified_email_array.length == 0
+            else 
+              unified_email_array = nil
             end
 
-            # Merge phone numbers
-            matched_connection_phone = matched_connection.phone
-            matched_connection_other_phones = eval((matched_connection.additional_phones.blank? ? "[]" : matched_connection.additional_phones)) #will return either [] or ["some_values"]
-            if matched_connection_phone.blank?
-              if unified_phones_array.blank?
-                primary_phone_to_update = nil
-                updated_additional_phones_string = nil
+            if phones
+              unified_phones_array = phones.split("|>-<+|%")
+              unified_phones_array.reject! {|phone| phone.strip == ""}
+              unified_phones_array = nil if unified_phones_array.blank?
+            else
+              unified_phones_array = nil
+            end
+
+            first_name_parsed = Connection.parse_first_name(name)
+            last_name_parsed = Connection.parse_last_name(name)
+
+            if !first_name_parsed.blank? && !last_name_parsed.blank? && user.connections.where(first_name:first_name_parsed,last_name:last_name_parsed).length > 0 && merge_name
+              matched_connection = user.connections.where(first_name:first_name_parsed,last_name:last_name_parsed).take
+
+              # Merge emails
+              matched_connection_email = matched_connection.email
+              matched_connection_other_emails = eval((matched_connection.additional_emails.blank? ? "[]" : matched_connection.additional_emails)) #will return either [] or ["some_values"]
+              if matched_connection_email.blank?
+                primary_email_to_update_string = unified_email_array.nil? || unified_email_array.length == 0 ? nil : unified_email_array.slice!(0)
+                updated_additional_emails_array = unified_email_array.nil? || unified_email_array.length == 0 ? nil : unified_email_array
+                updated_additional_emails_string = updated_additional_emails_array.blank? ? nil : updated_additional_emails_array.to_s
               else
-                primary_phone_to_update = unified_phones_array.slice!(0)
-                updated_additional_phones_array = (matched_connection_other_phones + unified_phones_array).uniq
-                updated_additional_phones_string = updated_additional_phones_array.to_s
+                primary_email_to_update = nil
+                matched_connection_email.gsub!(" ","")
+                additional_emails_to_merge = unified_email_array ? unified_email_array.delete_if {|email| email == matched_connection_email} : []
+                updated_additional_emails_array = (matched_connection_other_emails + additional_emails_to_merge).uniq
+                updated_additional_emails_string = updated_additional_emails_array.to_s
               end
-            else
-              if unified_phones_array.blank?
-                primary_phone_to_update = nil
-                updated_additional_phones_string = nil                
-              else
-                additional_phones_to_merge = unified_phones_array.delete_if {|phone| phone == matched_connection_phone}
-                updated_additional_phones_array = (matched_connection_other_phones + additional_phones_to_merge).uniq
-                primary_phone_to_update = nil
-                updated_additional_phones_string = updated_additional_phones_array.to_s
-              end
-            end
 
-            (matched_connection.email = primary_email_to_update_string) if primary_email_to_update_string
-            (matched_connection.additional_emails = updated_additional_emails_string) if updated_additional_emails_string
-            (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
-            (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
-            
-            if matched_connection.save
-              if photo_object && !photo_object[:body].blank?
-                encoded = Base64.strict_encode64(photo_object[:body])
-                photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                Connection.find(matched_connection.id).upload_photo(photo_data_uri,true)
-              elsif photo_file_upload
-                Connection.find(matched_connection.id).upload_photo(photo_file_upload)
-              end
-              if tags
-                connection_tags = matched_connection.tags.map {|tag| tag}
-                tags.reject! {|tag| connection_tags.include?(tag.strip)}
-                tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
-              end
-              Connection.port_photo_url_to_access_url(matched_connection.id)
-              StatisticDefinition.triggers("individual","create_connection",user)
-              status = true
-              message = "Connection successfully updated"
-              data = matched_connection
-            else
-              status = false
-              message = "Connection could not be saved be saved. #{matched_connection.errors.full_messages.join(', ')}"
-              data = name
-            end
-          else
-            if !unified_email_array.blank?
-              sql_where_statement = unified_email_array.map {|email| "(email ilike '%#{email}%') OR (additional_emails ilike '%#{email}%')" }.join(" OR ")
-              matched_connections = user.connections.where(sql_where_statement)
-
-              if matched_connections.length > 0
-                matched_connection = matched_connections.take
-                # Merge emails
-                matched_connection_email = matched_connection.email
-                matched_connection_other_emails = eval((matched_connection.additional_emails.blank? ? "[]" : matched_connection.additional_emails)) #will return either [] or ["some_values"]
-                if matched_connection_email.blank?
-                  primary_email_to_update_string = unified_email_array.slice!(0)
-                  updated_additional_emails_array = unified_email_array
-                  updated_additional_emails_string = updated_additional_emails_array.to_s
+              # Merge phone numbers
+              matched_connection_phone = matched_connection.phone
+              matched_connection_other_phones = eval((matched_connection.additional_phones.blank? ? "[]" : matched_connection.additional_phones)) #will return either [] or ["some_values"]
+              if matched_connection_phone.blank?
+                if unified_phones_array.blank?
+                  primary_phone_to_update = nil
+                  updated_additional_phones_string = nil
                 else
-                  primary_email_to_update = nil
-                  matched_connection_email.gsub!(" ","")
-                  additional_emails_to_merge = unified_email_array.delete_if {|email| email == matched_connection_email}
-                  updated_additional_emails_array = (matched_connection_other_emails + additional_emails_to_merge).uniq
-                  updated_additional_emails_string = updated_additional_emails_array.to_s
+                  primary_phone_to_update = unified_phones_array.slice!(0)
+                  updated_additional_phones_array = (matched_connection_other_phones + unified_phones_array).uniq
+                  updated_additional_phones_string = updated_additional_phones_array.to_s
                 end
+              else
+                if unified_phones_array.blank?
+                  primary_phone_to_update = nil
+                  updated_additional_phones_string = nil                
+                else
+                  additional_phones_to_merge = unified_phones_array.delete_if {|phone| phone == matched_connection_phone}
+                  updated_additional_phones_array = (matched_connection_other_phones + additional_phones_to_merge).uniq
+                  primary_phone_to_update = nil
+                  updated_additional_phones_string = updated_additional_phones_array.to_s
+                end
+              end
 
-                # Merge phone numbers
-                matched_connection_phone = matched_connection.phone
-                matched_connection_other_phones = eval((matched_connection.additional_phones.blank? ? "[]" : matched_connection.additional_phones)) #will return either [] or ["some_values"]
-                if matched_connection_phone.blank?
+              (matched_connection.email = primary_email_to_update_string) if primary_email_to_update_string
+              (matched_connection.additional_emails = updated_additional_emails_string) if updated_additional_emails_string
+              (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
+              (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
+              
+              if matched_connection.save
+                if photo_object && !photo_object[:body].blank?
+                  encoded = Base64.strict_encode64(photo_object[:body])
+                  photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+                  Connection.find(matched_connection.id).upload_photo(photo_data_uri,true)
+                elsif photo_file_upload
+                  Connection.find(matched_connection.id).upload_photo(photo_file_upload)
+                end
+                if tags
+                  connection_tags = matched_connection.tags.map {|tag| tag}
+                  tags.reject! {|tag| connection_tags.include?(tag.strip)}
+                  tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
+                end
+                Connection.port_photo_url_to_access_url(matched_connection.id)
+                StatisticDefinition.triggers("individual","create_connection",user)
+                status = true
+                message = "Connection successfully updated"
+                data = matched_connection
+              else
+                status = false
+                message = "Connection could not be saved be saved. #{matched_connection.errors.full_messages.join(', ')}"
+                data = name
+              end
+            else
+              if !unified_email_array.blank?
+                sql_where_statement = unified_email_array.map {|email| "(email ilike '%#{email}%') OR (additional_emails ilike '%#{email}%')" }.join(" OR ")
+                matched_connections = user.connections.where(sql_where_statement)
+
+                if matched_connections.length > 0
+                  matched_connection = matched_connections.take
+                  # Merge emails
+                  matched_connection_email = matched_connection.email
+                  matched_connection_other_emails = eval((matched_connection.additional_emails.blank? ? "[]" : matched_connection.additional_emails)) #will return either [] or ["some_values"]
+                  if matched_connection_email.blank?
+                    primary_email_to_update_string = unified_email_array.slice!(0)
+                    updated_additional_emails_array = unified_email_array
+                    updated_additional_emails_string = updated_additional_emails_array.to_s
+                  else
+                    primary_email_to_update = nil
+                    matched_connection_email.gsub!(" ","")
+                    additional_emails_to_merge = unified_email_array.delete_if {|email| email == matched_connection_email}
+                    updated_additional_emails_array = (matched_connection_other_emails + additional_emails_to_merge).uniq
+                    updated_additional_emails_string = updated_additional_emails_array.to_s
+                  end
+
+                  # Merge phone numbers
+                  matched_connection_phone = matched_connection.phone
+                  matched_connection_other_phones = eval((matched_connection.additional_phones.blank? ? "[]" : matched_connection.additional_phones)) #will return either [] or ["some_values"]
+                  if matched_connection_phone.blank?
+                    if unified_phones_array.blank?
+                      primary_phone_to_update = nil
+                      updated_additional_phones_string = nil
+                    else
+                      primary_phone_to_update = unified_phones_array.slice!(0)
+                      updated_additional_phones_array = (matched_connection_other_phones + unified_phones_array).uniq
+                      updated_additional_phones_string = updated_additional_phones_array.to_s
+                    end
+                  else
+                    if unified_phones_array.blank?
+                      primary_phone_to_update = nil
+                      updated_additional_phones_string = nil                
+                    else
+                      additional_phones_to_merge = unified_phones_array.delete_if {|phone| phone == matched_connection_phone}
+                      updated_additional_phones_array = (matched_connection_other_phones + additional_phones_to_merge).uniq
+                      primary_phone_to_update = nil
+                      updated_additional_phones_string = updated_additional_phones_array.to_s
+                    end
+                  end
+
+                  (matched_connection.email = primary_email_to_update_string) if primary_email_to_update_string
+                  (matched_connection.additional_emails = updated_additional_emails_string) if updated_additional_emails_string
+                  (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
+                  (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
+                  
+                  if matched_connection.save
+                    if photo_object && !photo_object[:body].blank?
+                      encoded = Base64.strict_encode64(photo_object[:body])
+                      photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+                      Connection.find(matched_connection.id).upload_photo(photo_data_uri,true)
+                    elsif photo_file_upload
+                      Connection.find(matched_connection.id).upload_photo(photo_file_upload)
+                    end
+                    if tags
+                      connection_tags = matched_connection.tags.map {|tag| tag}
+                      tags.reject! {|tag| connection_tags.include?(tag.strip)}
+                      tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
+                    end
+                    Connection.port_photo_url_to_access_url(matched_connection.id)
+                    StatisticDefinition.triggers("individual","create_connection",user)
+                    status = true
+                    message = "Connection successfully updated"
+                    data = matched_connection
+                  else
+                    status = false
+                    message = "Connection could not be saved be saved. #{matched_connection.errors.full_messages.join(', ')}"
+                    data = name
+                  end
+                else
+
                   if unified_phones_array.blank?
                     primary_phone_to_update = nil
                     updated_additional_phones_string = nil
                   else
                     primary_phone_to_update = unified_phones_array.slice!(0)
-                    updated_additional_phones_array = (matched_connection_other_phones + unified_phones_array).uniq
+                    updated_additional_phones_array = unified_phones_array.uniq
                     updated_additional_phones_string = updated_additional_phones_array.to_s
                   end
-                else
-                  if unified_phones_array.blank?
-                    primary_phone_to_update = nil
-                    updated_additional_phones_string = nil                
-                  else
-                    additional_phones_to_merge = unified_phones_array.delete_if {|phone| phone == matched_connection_phone}
-                    updated_additional_phones_array = (matched_connection_other_phones + additional_phones_to_merge).uniq
-                    primary_phone_to_update = nil
-                    updated_additional_phones_string = updated_additional_phones_array.to_s
-                  end
-                end
 
-                (matched_connection.email = primary_email_to_update_string) if primary_email_to_update_string
-                (matched_connection.additional_emails = updated_additional_emails_string) if updated_additional_emails_string
-                (matched_connection.phone = primary_phone_to_update) if primary_phone_to_update
-                (matched_connection.additional_phones = updated_additional_phones_string) if updated_additional_phones_string
-                
-                if matched_connection.save
-                  if photo_object && !photo_object[:body].blank?
-                    encoded = Base64.strict_encode64(photo_object[:body])
-                    photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                    Connection.find(matched_connection.id).upload_photo(photo_data_uri,true)
-                  elsif photo_file_upload
-                    Connection.find(matched_connection.id).upload_photo(photo_file_upload)
+                  first_name_to_create = first_name_parsed
+                  first_name_to_create = first_name_to_create.nil? ? Connection.extract_display_name_from_email(email) : first_name_to_create
+                  last_name_to_create = last_name_parsed
+                  email_to_create = email.blank? ? nil : email
+                  other_emails_to_create = other_emails.blank? ? "[]" : other_emails
+                  phone_to_create = primary_phone_to_update
+                  other_phones_to_create = updated_additional_phones_string
+
+                  new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
+
+                  if new_connection.save
+                    if photo_object && !photo_object[:body].blank?
+                      encoded = Base64.strict_encode64(photo_object[:body])
+                      photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+                      Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
+                    elsif photo_file_upload
+                      Connection.find(new_connection.id).upload_photo(photo_file_upload)
+                    end
+                    user.activities.create(connection_id:new_connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
+                    new_connection.update_score
+                    Connection.port_photo_url_to_access_url(new_connection.id)
+                    tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
+                    StatisticDefinition.triggers("individual","create_connection",user)
+                    status = true
+                    message = "Connection successfully created"
+                    data = new_connection
+                  else
+                    status = false
+                    message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
+                    data = new_connection
                   end
-                  if tags
-                    connection_tags = matched_connection.tags.map {|tag| tag}
-                    tags.reject! {|tag| connection_tags.include?(tag.strip)}
-                    tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
-                  end
-                  Connection.port_photo_url_to_access_url(matched_connection.id)
-                  StatisticDefinition.triggers("individual","create_connection",user)
-                  status = true
-                  message = "Connection successfully updated"
-                  data = matched_connection
-                else
-                  status = false
-                  message = "Connection could not be saved be saved. #{matched_connection.errors.full_messages.join(', ')}"
-                  data = name
                 end
               else
-
-                if unified_phones_array.blank?
-                  primary_phone_to_update = nil
-                  updated_additional_phones_string = nil
-                else
-                  primary_phone_to_update = unified_phones_array.slice!(0)
-                  updated_additional_phones_array = unified_phones_array.uniq
-                  updated_additional_phones_string = updated_additional_phones_array.to_s
-                end
-
-                first_name_to_create = first_name_parsed
-                first_name_to_create = first_name_to_create.nil? ? Connection.extract_display_name_from_email(email) : first_name_to_create
-                last_name_to_create = last_name_parsed
-                email_to_create = email.blank? ? nil : email
-                other_emails_to_create = other_emails.blank? ? "[]" : other_emails
-                phone_to_create = primary_phone_to_update
-                other_phones_to_create = updated_additional_phones_string
-
-                new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
-
-                if new_connection.save
-                  if photo_object && !photo_object[:body].blank?
-                    encoded = Base64.strict_encode64(photo_object[:body])
-                    photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                    Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
-                  elsif photo_file_upload
-                    Connection.find(new_connection.id).upload_photo(photo_file_upload)
+                  if unified_phones_array.blank?
+                    primary_phone_to_update = nil
+                    updated_additional_phones_string = nil
+                  else
+                    primary_phone_to_update = unified_phones_array.slice!(0)
+                    updated_additional_phones_array = unified_phones_array.uniq
+                    updated_additional_phones_string = updated_additional_phones_array.to_s
                   end
-                  user.activities.create(connection_id:new_connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
-                  new_connection.update_score
-                  Connection.port_photo_url_to_access_url(new_connection.id)
-                  tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
-                  StatisticDefinition.triggers("individual","create_connection",user)
-                  status = true
-                  message = "Connection successfully created"
-                  data = new_connection
-                else
-                  status = false
-                  message = "Connection could not be saved be created. #{new_connection.errors.full_messages.join(', ')}"
-                  data = new_connection
-                end
+
+                  first_name_to_create = first_name_parsed
+                  first_name_to_create = first_name_to_create.nil? ? Connection.extract_display_name_from_email(email) : first_name_to_create
+                  last_name_to_create = last_name_parsed
+                  email_to_create = email.blank? ? nil : email
+                  other_emails_to_create = other_emails.blank? ? "[]" : other_emails
+                  phone_to_create = primary_phone_to_update
+                  other_phones_to_create = updated_additional_phones_string
+
+                  new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
+
+                  if new_connection.save
+                    if photo_object && !photo_object[:body].blank?
+                      encoded = Base64.strict_encode64(photo_object[:body])
+                      photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
+                      Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
+                    elsif photo_file_upload
+                      Connection.find(new_connection.id).upload_photo(photo_file_upload)
+                    end
+                    user.activities.create(connection_id:new_connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
+                    new_connection.update_score
+                    Connection.port_photo_url_to_access_url(new_connection.id)
+                    tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
+                    StatisticDefinition.triggers("individual","create_connection",user)
+                    status = true
+                    message = "Connection successfully created"
+                    data = new_connection
+                  else
+                    status = false
+                    message = "#{name} could not be saved be saved. #{new_connection.errors.full_messages.join(', ')}"
+                    data = new_connection
+                  end
               end
-            else
-                if unified_phones_array.blank?
-                  primary_phone_to_update = nil
-                  updated_additional_phones_string = nil
-                else
-                  primary_phone_to_update = unified_phones_array.slice!(0)
-                  updated_additional_phones_array = unified_phones_array.uniq
-                  updated_additional_phones_string = updated_additional_phones_array.to_s
-                end
-
-                first_name_to_create = first_name_parsed
-                first_name_to_create = first_name_to_create.nil? ? Connection.extract_display_name_from_email(email) : first_name_to_create
-                last_name_to_create = last_name_parsed
-                email_to_create = email.blank? ? nil : email
-                other_emails_to_create = other_emails.blank? ? "[]" : other_emails
-                phone_to_create = primary_phone_to_update
-                other_phones_to_create = updated_additional_phones_string
-
-                new_connection = Connection.new(user_id:user.id,first_name:first_name_to_create,last_name:last_name_to_create,email:email_to_create,phone:phone_to_create,additional_emails:other_emails_to_create,additional_phones:other_phones_to_create,active:true,target_contact_interval_in_days:interval,notes:notes)
-
-                if new_connection.save
-                  if photo_object && !photo_object[:body].blank?
-                    encoded = Base64.strict_encode64(photo_object[:body])
-                    photo_data_uri = "data:#{photo_object[:content_type]};base64,#{encoded}"
-                    Connection.find(new_connection.id).upload_photo(photo_data_uri,true)
-                  elsif photo_file_upload
-                    Connection.find(new_connection.id).upload_photo(photo_file_upload)
-                  end
-                  user.activities.create(connection_id:new_connection.id,activity:"Added to Sphere",date:Date.today,initiator:0,activity_description:"Automatically created")
-                  new_connection.update_score
-                  Connection.port_photo_url_to_access_url(new_connection.id)
-                  tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
-                  StatisticDefinition.triggers("individual","create_connection",user)
-                  status = true
-                  message = "Connection successfully created"
-                  data = new_connection
-                else
-                  status = false
-                  message = "#{name} could not be saved be saved. #{new_connection.errors.full_messages.join(', ')}"
-                  data = new_connection
-                end
             end
-          end
-
-
-          {status:status,message:message,data:data}
+      else
+        status = false
+        message = "#{name} could not be saved be saved. Connections limited to #{max_connections}"
+        data = nil
+      end
+      {status:status,message:message,data:data}
     end
 
     def upload_photo(photo,data_uri=false)

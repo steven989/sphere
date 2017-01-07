@@ -163,7 +163,11 @@ class UsersController < ApplicationController
           else
               status = false
               connection = result[:data]
-              message = "Uh oh. Our robots couldn't add #{connection.first_name}: #{connection.errors.full_messages.join(', ')}"
+              if connection
+                message = "Uh oh. Our robots couldn't add #{connection.first_name}: #{connection.errors.full_messages.join(', ')}"
+              else
+                message = result[:message]
+              end
               actions = nil
               data = nil
           end
