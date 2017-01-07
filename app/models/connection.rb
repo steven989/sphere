@@ -443,6 +443,7 @@ class Connection < ActiveRecord::Base
             message = issues.map {|issue| issue[:message] }.join(", ")
             data = issues.map {|issue| issue[:data] }
           else
+            StatisticDefinition.triggers("individual","post_create_connection",user)
             status = true
             message = "Connections successfully created"
             data = nil

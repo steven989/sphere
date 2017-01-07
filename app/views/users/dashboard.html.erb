@@ -693,6 +693,10 @@ $(function(){
         }
     });
 
+    function uncheckAllContactsImport() {
+        $('#importSelectionTable tbody .import input[type=checkbox]').each(function(){$(this).prop('checked',false)});
+    }
+
     // Clicking on rows of the import contacts view
     $('#importContacts #importSelectionTable').off("click").on("click",'tr',function(){
         $(this).find('input.importCheck').prop('checked',!$(this).find('input.importCheck').prop('checked'));

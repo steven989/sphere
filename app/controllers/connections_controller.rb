@@ -202,25 +202,44 @@ class ConnectionsController < ApplicationController
         access_token = session ? session[:access_token] : nil
         expires_at = session ? session[:expires_at] : nil
         merge_name = params[:mergeName].blank? ? nil : (params[:mergeName] == "true" ? true : false)
-        result = Connection.create_from_import(current_user,params[:contactsToImport].values,access_token,expires_at,merge_name)
-
-        if result[:status] 
-          raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-          notifications = current_user.get_notifications(false)
-          new_stats = current_user.stats
-          bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-          message = result[:message]
-          actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
-          data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
+        contacts_imported = params[:contactsToImport].values
+        if contacts_imported.length > 15
+            max_connections = current_user.user_setting.get_value('max_number_of_connections')
+            max_connections = max_connections ? max_connections.to_i : 50
+            if current_user.stat('total_connections_added').blank? || current_user.stat('total_connections_added') < max_connections
+                Connection.delay.create_from_import(current_user,contacts_imported,nil,nil,merge_name)
+                status = true
+                message = "We're importing your contacts in the background since you're importing in a larger batch. Refresh your browser in a minute or so and they'll appear in your Sphere!"
+                actions=[{action:"function_call",function:"uncheckAllContactsImport()"},{action:"function_call",function:"closeModalInstance(100)"}]
+                data = nil
+            else
+                status = false
+                message = "You've reached the limit of #{max_connections} connections!"
+                actions = nil
+                data = nil        
+            end
         else
-          message = result[:message]
-          actions = nil
-          data = result[:data]
+            result = Connection.create_from_import(current_user,contacts_imported,access_token,expires_at,merge_name)
+            if result[:status] 
+              status = result[:status] 
+              raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+              notifications = current_user.get_notifications(false)
+              new_stats = current_user.stats
+              bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+              message = result[:message]
+              actions=[{action:"function_call",function:"uncheckAllContactsImport()"},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
+              data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
+            else
+              status = result[:status]
+              message = result[:message]
+              actions = nil
+              data = result[:data]
+            end
         end
-
+        
         respond_to do |format|
           format.json {
-            render json: {status:result[:status], message:message,actions:actions,data:data}
+            render json: {status:status, message:message,actions:actions,data:data}
           } 
         end
     end
