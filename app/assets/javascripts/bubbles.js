@@ -55,6 +55,7 @@
 
             // 4) loop through the reordered bubblesArray
             scaledBubblesArray.forEach(function(scaledBubble){
+                console.log(scaledBubble)
                 //3.1) generate the next alpha value
                 var alpha = generateNextAlpha(scaledBubble.id_rank);
                 //3.2) generate r - distance between center bubble and this bubble to place
