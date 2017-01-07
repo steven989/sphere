@@ -75,7 +75,7 @@ table {
     box-shadow: 0px 0px 47px 3px rgba(25,230,203,1);
 }
 
-.hoverInput:hover {
+.no-touch .hoverInput:hover {
     background-color: #ECECEC;
     transition: background-color 0.2s ease;
 }
@@ -128,7 +128,7 @@ table {
     text-align: center;
 }
 
-.formElement:hover {
+.no-touch .formElement:hover {
     background-color: #F1F1F1;
 }
 
@@ -507,11 +507,11 @@ body {
     transition:color 0.2s ease;
 }
 
-.profileButton:hover {
+.no-touch .profileButton:hover {
     color: #B5ADAC;
 }
 
-#logout a:hover {
+.no-touch #logout a:hover {
     color: #B5ADAC;
 }
 
@@ -569,7 +569,7 @@ label[for=photoUploader] {
     transition:background-color 0.2s ease;
 }
 
-label[for=photoUploader]:hover {
+.no-touch label[for=photoUploader]:hover {
     background-color: #F1F1F1;    
 }
 
@@ -607,7 +607,7 @@ label[for=photoUploader]:hover {
     transition: box-shadow 0.2s ease;
 }
 
-.modalView#plans .photo:hover, .modalView#plans .icon:hover {
+.no-touch .modalView#plans .photo:hover,.no-touch  .modalView#plans .icon:hover {
     box-shadow: 0px 0px 10px #636363;
 }
 
@@ -631,7 +631,7 @@ label[for=photoUploader]:hover {
     transition: background-color 0.2s ease;
 }
 
-.modalTokenBox ul.TokensContainer:hover {
+.no-touch .modalTokenBox ul.TokensContainer:hover {
     background-color: #ECECEC;
 }
 
@@ -664,14 +664,14 @@ label[for=photoUploader]:hover {
 }
 
 
-.connectionBubble:hover .initialsDisplayedInBubble {
+.no-touch .connectionBubble:hover .initialsDisplayedInBubble {
     opacity:0;
 }
 
 .overlayWithName {
     opacity:0;
 }
-.connectionBubble:hover .overlayWithName {
+.no-touch .connectionBubble:hover .overlayWithName {
     opacity:1;
 }
 
@@ -728,7 +728,7 @@ label[for=photoUploader]:hover {
     transition:background-color 0.2s ease;
 }
 
-.sphereRedBackground.hoverable:not(.disabled):hover {
+.no-touch .sphereRedBackground.hoverable:not(.disabled):hover {
     background-color:#CC1919;
 }
 
@@ -738,7 +738,7 @@ label[for=photoUploader]:hover {
     transition:background-color 0.2s ease;
 }
 
-.sphereBlueBackground.hoverable:not(.disabled):hover {
+.no-touch .sphereBlueBackground.hoverable:not(.disabled):hover {
     background-color: #0584C3;
 }
 
@@ -762,7 +762,7 @@ label[for=photoUploader]:hover {
     transition:background-color 0.2s ease;
 }
 
-.sphereGreenBackground.hoverable:not(.disabled):hover {
+.no-touch .sphereGreenBackground.hoverable:not(.disabled):hover {
     background-color: #37AF49;
 }
 
@@ -859,7 +859,7 @@ form div.btn-group .btn{
     background-color: #FAFAFA;
 }
 
-form div.btn-group .btn:hover{
+.no-touch form div.btn-group .btn:hover{
     background-color: #F1F1F1;
 }
 
@@ -869,7 +869,7 @@ form div.btn-group .btn.active {
     color: #FFFFFF;
 }
 
-form div.btn-group .btn.active:hover{
+.no-touch form div.btn-group .btn.active:hover{
     background-color: #2CAF40;
 }
 
@@ -912,7 +912,7 @@ form div.btn-group .btn.active:hover{
     border:1px solid gray;
 }
 
-.modalView#detailedCheckIn ul li:hover {
+.no-touch .modalView#detailedCheckIn ul li:hover {
     background-color: gray;
 }
 
@@ -1176,7 +1176,7 @@ form div.btn-group .btn.active:hover{
     transition:background 0.2s ease; 
 }
 
-#searchBar .result .item:hover {
+.no-touch #searchBar .result .item:hover {
     background: linear-gradient(#0b73a0,#1695cc);
     color: #FFF;
     cursor: pointer;
@@ -1259,7 +1259,7 @@ form div.btn-group .btn.active:hover{
         transition:color 0.2s ease;
     }
 
-    .profileButtonsContainer.hideOnMobile .profileButton:hover p, .profileButtonsContainer.hideOnMobile .profileButton:hover i {
+    .no-touch .profileButtonsContainer.hideOnMobile .profileButton:hover p, .no-touch .profileButtonsContainer.hideOnMobile .profileButton:hover i {
         color: #B5ADAC;
     }
 
