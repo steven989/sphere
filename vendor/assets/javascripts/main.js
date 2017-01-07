@@ -1,22 +1,6 @@
 $(window).load(function(){
 	$('#loading').fadeOut(1000);
 
-	$('#stats_visits').sparkline('html', { 
-		type: 'bar',
-		chartRangeMin: 0,
-		height: '40px',
-		barWidth: '5px',
-		barColor: '#3e3e3e',
-		tooltipClassname:'tooltip-sp'
-	});
-	$('#stats_balance').sparkline('html', { 
-		type: 'bar',
-		chartRangeMin: 0,
-		height: '40px',
-		barWidth: '5px',
-		barColor: '#ffffff',
-		tooltipClassname:'tooltip-sp'
-	});
 
   // checkbox slider change -> hide the widget
       $('.widget-controls .sl').change(function(){

@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
 
-
   # General
   root to: 'users#dashboard'
   get 'login' => 'user_sessions#new', :as => :login
@@ -61,5 +60,8 @@ Rails.application.routes.draw do
   # Challenges controller
   put  'challenges/start' => 'challenges#start', as: 'start_challenge'
   put  'challenges/mark_complete' => 'challenges#mark_complete', as: 'complete_challenge'
+
+  # Password reset
+  resources :password_resets
 
 end

@@ -1,0 +1,34 @@
+<script>
+$(function(){
+    <% if flash[:alert] %>
+        var alert = "<%= flash[:alert] %>";
+        toastr.error(alert, {timeOut: 5000,closeButton:true});
+    <% elsif flash[:notice] %>
+        var notice = "<%= flash[:notice] %>";
+        toastr.warning(notice,{timeOut: 5000,closeButton:true});
+    <% elsif flash[:success] %>
+        var message = "<%= flash[:success] %>";
+        toastr.success(message, {timeOut: 5000,closeButton:true});
+    <% end %>
+});
+</script>
+<div class="fullViewportContainer loginScreen">
+    <div id="title">
+        <%= image_tag "logo-white.png", width:"230" %>
+    </div>
+    <div id="displayBox">
+        <div class="p-h-xxlg p-v-xxlg" id="login">
+            <p class="textDarkGray">Choose your new password:</p>
+            <%= form_for @user, :url => password_reset_path(@token), :html => {:method => :put} do |f| %>
+                <div>
+                    <div class="textDarkGray formElement m-b-lg tallerInput" style="cursor:default;"><%= @user.email %></div>
+                    <%= f.password_field :password, class:"textDarkGray formElement m-b-lg tallerInput", placeholder:"Password" %>
+                    <%= f.password_field :password_confirmation, class:"textDarkGray formElement m-b-md tallerInput", placeholder:"Retype Password" %>
+                </div>
+                <div class="modalButtonContainer">
+                    <%= submit_tag 'RESET', class:"modalBottomFullButton sphereBlueBackground hoverable" %> 
+                </div>
+            <% end %>
+        </div>
+    </div>
+</div>

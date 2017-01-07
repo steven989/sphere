@@ -1,8 +1,17 @@
 <script>
 $(function(){
+    vex.defaultOptions.className = 'vex-theme-default';
+    vex.dialog.buttons.YES.text = 'RESET'
+    vex.dialog.buttons.NO.text = 'CANCEL'
     <% if flash[:alert] %>
         var alert = "<%= flash[:alert] %>";
         toastr.error(alert, {timeOut: 5000,closeButton:true});
+    <% elsif flash[:notice] %>
+        var notice = "<%= flash[:notice] %>";
+        toastr.warning(notice,{timeOut: 5000,closeButton:true});
+    <% elsif flash[:success] %>
+        var message = "<%= flash[:success] %>";
+        toastr.success(message, {timeOut: 5000,closeButton:true});
     <% end %>
 
     <% if flash[:display] %>
@@ -28,6 +37,38 @@ $(function(){
             $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-value')});        
         }
     });
+    $('#forgotPassword').off("click").on("click",function(){
+        event.preventDefault();
+        vex.dialog.prompt({
+            message:"Reset your password:",
+            placeholder:"Email",
+            callback: function (value) {
+                if (value) {
+                    'use strict';
+                    var form;
+                    form = $('<form />', {
+                        action: "<%= password_resets_path %>",
+                        method: "POST",
+                        style: 'display: none;'
+                    });
+
+                    $('<input />', {
+                        type: 'hidden',
+                        name: "email",
+                        value: value
+                    }).appendTo(form);
+
+                    $('<input />', {
+                        type: 'hidden',
+                        name: "authenticity_token",
+                        value: '<%= form_authenticity_token %>'
+                    }).appendTo(form);
+
+                    form.appendTo('body').submit();
+                }
+            }
+        })        
+    });
 })
 </script>
 <div class="fullViewportContainer loginScreen">
@@ -50,7 +91,7 @@ $(function(){
                 </div>
                 <span style="font-size:12px;text-align:center; display:block; width:100%;">
                     <a class="transitionButton" data-current=".loginScreen #login" data-target=".loginScreen #signup" >Sign Up</a><br>
-                    <a href="#">Forgot Password?</a>
+                    <a id="forgotPassword" style="cursor:pointer;">Forgot Password?</a>
                 </span>
                 <div class="modalButtonContainer">
                     <%= submit_tag 'LOGIN', class:"modalBottomFullButton sphereBlueBackground hoverable" %> 
