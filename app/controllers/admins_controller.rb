@@ -1,4 +1,5 @@
 class AdminsController < ApplicationController
+    before_action :require_login
 
     def dashboard
         @users = User.app_users.order(id: :asc)

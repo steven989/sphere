@@ -77,7 +77,7 @@ class PlansController < ApplicationController
                 data = {notifications:notifications,new_stats:new_stats}
                 message= result[:message]
                 actions = [{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
-            elsif !status && result[:message].include?("Unauthorize")
+            elsif !status && (result[:message].downcase.include?("unauthorize") || result[:message].downcase.include?("permission") || result[:message].downcase.include?("insufficient"))
                 message = "Hmm looks like we don't have access to your Google calendar. Click on the import button again to connect your Google account!"
                 scope = current_user.authorizations.where(provider:'google').take.scope_value
                 scope.reject! {|s| s == "calendar"}
