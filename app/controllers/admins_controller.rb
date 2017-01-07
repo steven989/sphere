@@ -1,5 +1,6 @@
 class AdminsController < ApplicationController
     before_action :require_login
+    before_action :check_if_admin
 
     def dashboard
         @users = User.app_users.order(id: :asc)
@@ -334,6 +335,10 @@ class AdminsController < ApplicationController
 
     end
 
+    private
 
+    def check_if_admin
+        redirect_to login_path unless current_user.is? 'admin'
+    end
 
 end
