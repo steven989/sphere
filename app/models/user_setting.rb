@@ -7,6 +7,12 @@ class UserSetting < ActiveRecord::Base
         setting
     end
 
+    def self.get_new_settings_from_system_setting_for_all_app_users
+        User.app_users.each do |user|
+            user.user_setting.get_new_settings_from_system_setting
+        end
+    end
+
     def get_new_settings_from_system_setting
         setting = SystemSetting.search('default_user_settings').value_in_specified_type
         current_user_settings = eval(self.value)
