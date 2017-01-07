@@ -416,7 +416,7 @@ class Connection < ActiveRecord::Base
     end
 
     def self.create_from_import(user,contacts_imported,access_token=nil,expires_at=nil,merge_name=true)
-      begin
+      # begin
         imported_contacts = Connection.import_from_google(user,access_token,expires_at,"api_contact_class")      
         selected_imports_id_for_matching_purposes = contacts_imported.map {|selectec_contact| selectec_contact["id"] }
         selected_contacts_in_api_contact_class = imported_contacts[:data].select {|contact| selected_imports_id_for_matching_purposes.include?(contact.id)}
@@ -432,11 +432,11 @@ class Connection < ActiveRecord::Base
             result = Connection.insert_contact(user,name,email,other_emails,phone,photo_object,nil,nil,nil,merge_name)
             result_array.push(result)
           end
-        rescue => error
-          status = false
-          message = "Uh oh. We ran into some errors: #{error.message}. Please try again. If it still won't work, please let us know!"
-          data = nil
-        else
+        # rescue => error
+        #   status = false
+        #   message = "Uh oh. We ran into some errors: #{error.message}. Please try again. If it still won't work, please let us know!"
+        #   data = nil
+        # else
           issues = result_array.select {|result| result[:status] == false}
           if issues.length > 0 
             status = false
@@ -447,7 +447,7 @@ class Connection < ActiveRecord::Base
             message = "Connections successfully created"
             data = nil
           end
-        end
+        # end
       {status:status,message:message,data:data}
     end
 
