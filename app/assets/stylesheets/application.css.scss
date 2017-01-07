@@ -24,6 +24,10 @@ h1,h2,h3,h4,h5,h6,p,div,span,body {
   font-family: 'brandon-grotesque' !important;
 }
 
+ul.Dropdown {
+    z-index:10;
+}
+
 /* 5 column definition a la bootstrap */
 
 .col-xs-15,
@@ -262,6 +266,7 @@ table {
     text-align: center;
     padding-top:15px;
     border:none;
+    z-index:9;
 }
 
 .modalBottomRightButton {
@@ -274,6 +279,7 @@ table {
     text-align: center;
     padding-top:15px;
     border:none;
+    z-index:9;
 }
 
 .modalBottomFullButton {
@@ -286,6 +292,7 @@ table {
     text-align: center;
     padding-top:15px;
     border:none;
+    z-index:9;
 }
 
 

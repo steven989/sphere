@@ -434,7 +434,7 @@ class Connection < ActiveRecord::Base
           end
         rescue => error
           status = false
-          message = "Uh oh. We ran into some errors: error.message. Please try again. If it still won't work, please let us know!"
+          message = "Uh oh. We ran into some errors: #{error.message}. Please try again. If it still won't work, please let us know!"
           data = nil
         else
           issues = result_array.select {|result| result[:status] == false}
