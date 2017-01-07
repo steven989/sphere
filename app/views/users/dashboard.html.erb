@@ -833,6 +833,16 @@ $(function(){
             'disableTimeRanges': [['12:00am','12:00am']]
         });
 
+        // make the default highlihgted button to be the first one
+        $('.buttonGroupWithOther.chooseActivity button').each(function(){
+            if($(this).data('value') == "Coffee") {
+                $(this).removeClass('active').addClass('active');
+            } else {
+                $(this).removeClass('active');
+            }
+        });
+        $('#scheduleActivityName').val("Coffee");
+
         $('[data-remodal-id=bubbleModal] .modalView#plans span.nextHangout').html(nextHangout);
         if (returnedData.hasUpcomingPlan) {
             $('.modalView#makePlan input[name=date]').val(returnedData.planData.date);
