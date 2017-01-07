@@ -169,6 +169,7 @@
             var minmaxDistance = [Math.min.apply(null, mappedDistances),Math.max.apply(null, mappedDistances)];
             var minmaxSize = [Math.min.apply(null, mappedSizes),Math.max.apply(null, mappedSizes)];
             return rawDataArray.map(function(bubbleDataObject){
+                console.log("display:"+bubbleDataObject.display+", minDistance:"+minmaxDistance[0]+",maxDistance:"+minmaxDistance[1]+",minAllowedDistance:"+minDistance+",maxAllowedDistance:"+maxDistance+",actualDistance"+bubbleDataObject.distance)
                 return {
                     id:bubbleDataObject.id,
                     id_rank:bubbleDataObject.id_rank,
