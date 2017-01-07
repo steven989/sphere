@@ -20,7 +20,7 @@ class UserSessionsController < ApplicationController
       redirect_to(login_path, alert: "You signed up with #{login_authorizations.map {|login| login.provider.capitalize}.to_sentence}. Please use #{ login_authorizations.length == 1 ? login_authorizations.take.provider.capitalize : 'one of these services'} to log in")
     else
       if @user = login(params[:email], params[:password])
-        redirect_back_or_to(:root, notice: 'Login successful')
+        redirect_back_or_to root_path
       else
         if user 
           redirect_to(login_path, alert: "Password doesn't match what we have on file!")
@@ -36,6 +36,6 @@ class UserSessionsController < ApplicationController
 
   def destroy
     logout
-    redirect_to(login_path, notice: 'Logged out!')
+    redirect_to login_path
   end
 end
