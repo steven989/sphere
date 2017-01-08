@@ -126,6 +126,7 @@ class UsersController < ApplicationController
             @expired_connections_count = current_user_stats[:expired_connections_count] ? current_user_stats[:expired_connections_count].to_i : 0
             @number_of_checkins = current_user_stats[:number_of_checkins] ? current_user_stats[:number_of_checkins].to_i : 0
           # -----
+          @remaining_number_of_connections = @settings[:max_number_of_connections].to_i - current_user_stats[:total_connections_added].to_i
         end
     end
 
@@ -151,6 +152,7 @@ class UsersController < ApplicationController
           notes = params[:notes]
           result = Connection.insert_contact(current_user,name,email,nil,nil,nil,photo,tags,notes)
           if result[:status]
+              StatisticDefinition.triggers("individual","post_create_connection",User.find(current_user.id))
               raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
               notifications = current_user.get_notifications(false)
               new_stats = current_user.stats
@@ -158,7 +160,7 @@ class UsersController < ApplicationController
               connection = result[:data]
               status = true
               message = "#{connection.first_name} added to your Sphere!"
-              actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+              actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"toggleAddToSphereButton()"}]
               data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
           else
               status = false

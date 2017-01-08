@@ -20,7 +20,7 @@ namespace :system do
             # 2) daily_connection_tasks (this has to be before the stats update as the connection scores in this part needs to be calculated first)
             user.daily_connection_tasks
             # 3) Update nightly stats
-            StatisticDefinition.triggers("individual","nightly",user)
+            StatisticDefinition.triggers("individual","nightly",User.find(user.id))
         end
     end 
 

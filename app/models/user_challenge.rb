@@ -27,7 +27,7 @@ class UserChallenge < ActiveRecord::Base
         );
             self.destroy
             self.notifications.destroy_all
-            StatisticDefinition.triggers("individual","complete_challenge",user) if reward
+            StatisticDefinition.triggers("individual","complete_challenge",User.find(user.id)) if reward
             status = true
             message = "Challenge completed"
         else

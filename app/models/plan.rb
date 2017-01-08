@@ -90,7 +90,7 @@ class Plan < ActiveRecord::Base
                                 details:details,
                                 put_on_calendar: true
                                 )
-                        StatisticDefinition.triggers("individual","create_plan",user) 
+                        StatisticDefinition.triggers("individual","create_plan",User.find(user.id))
                         status = true
                         message = "Hangout created! We put it on your calendar for you"
                     end
@@ -123,7 +123,7 @@ class Plan < ActiveRecord::Base
                         details:details,
                         put_on_calendar:false
                         )
-                StatisticDefinition.triggers("individual","create_plan",user)
+                StatisticDefinition.triggers("individual","create_plan",User.find(user.id))
                 status = true
                 message = "Hangout created!"
             end

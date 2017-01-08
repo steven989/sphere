@@ -25,6 +25,8 @@ $(function(){
     var cropVarInCreateConnection;
     var cropVarInEditUser;
     var modalInstance;
+    var maxConnectionsAllowed = <%= @settings[:max_number_of_connections].to_i %>;
+    var remaining_connections = <%= @remaining_number_of_connections %>;
 
     <% unless @timezone %>
         $('#profile').data('data-to-send','({timezone:"'+timezone+'"})').attr("href","<%= put_timezone_path %>").data("method","PUT");
@@ -101,6 +103,20 @@ $(function(){
         fuse = new Fuse(bubblesData, options);
     }
 
+    function checkIfAtImportLimit() {
+        if((remaining_connections - $('#importSelectionTable tbody input[type=checkbox]').filter(function(){return $(this).prop('checked') == true}).length) <= 0 ) {
+            $('#importSelectionTable tbody input[type=checkbox]').filter(function(){return $(this).prop('checked') == false}).each(function(){
+                $(this).prop('disabled',true);
+            })
+            toastr.warning("You have reached your Sphere size limit",null,{timeOut: 5000,closeButton:false});
+        } else {
+            $('#importSelectionTable tbody input[type=checkbox]').each(function(){
+                $(this).removeProp('disabled');
+            })
+            return true;
+        }
+    }
+
     // one-time notification popup
 
     function oneTimeNotificationPopup(modalElement,notificationId,value1) {
@@ -121,15 +137,17 @@ $(function(){
     function updateRealTimeStats(stats) {
         for (var key in stats) {
             $('.statsToUpdate.'+key).each(function(){
-                $(this).html(stats[key]);    
+                $(this).html(stats[key]);
             });
+            if(key=="total_connections_added") {
+                remaining_connections = maxConnectionsAllowed-parseInt(stats[key]);
+            }
         }
         $('.statsToUpdate.progressBar').css({'width':Math.round(stats.points_gained_in_this_level/stats.points_required_to_progress*100).toString()+"%"});
     }
 
     // update user-level notifications
     function updateUserLevelNotifications(notifications) {
-        console.log(notifications);
         userLevelNotifications = notifications;
         showUserLevelNotifications();
     }
@@ -566,10 +584,10 @@ $(function(){
                         if (data.data != undefined) {
                             returnedData = data.data;
                         }
+                        reEnableButton(disabledButtonObject);
                         if (data.actions != undefined && data.actions.length > 0) {
                             performActions(data.actions);
                         }
-                        reEnableButton(disabledButtonObject);
                     });
                 } 
 
@@ -697,10 +715,26 @@ $(function(){
         $('#importSelectionTable tbody .import input[type=checkbox]').each(function(){$(this).prop('checked',false)});
     }
 
+    // Disable the add to sphere button if already at limit
+    toggleAddToSphereButton();
+    function toggleAddToSphereButton() {
+        if (remaining_connections <= 0) {
+            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').removeClass("disabled").addClass("disabled").html("ADD TO SPHERE (LIMIT REACHED)");
+        } else {
+            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').removeClass("disabled").html("ADD TO SPHERE");
+        }
+        
+    }
+
     // Clicking on rows of the import contacts view
     $('#importContacts #importSelectionTable').off("click").on("click",'tr',function(){
-        $(this).find('input.importCheck').prop('checked',!$(this).find('input.importCheck').prop('checked'));
+        if (!$(this).find('input.importCheck').prop('disabled') || $(this).find('input.importCheck').prop('disabled') == undefined) {
+            $(this).find('input.importCheck').prop('checked',!$(this).find('input.importCheck').prop('checked'));
+        }
+        checkIfAtImportLimit();
+        
     });
+
 
     // Putting in calendar
     $('.putInCalendar').off("click").on("click",function(){
@@ -1309,6 +1343,8 @@ $(function(){
 
         $('#importContacts #importSelectionTable .importCheck').off("click").on("click",function(){
             event.stopPropagation();
+        }).off('change').on('change',function(){
+            checkIfAtImportLimit();
         });
  
     }

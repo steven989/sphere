@@ -227,7 +227,7 @@ class Connection < ActiveRecord::Base
                   tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
                 end
                 Connection.port_photo_url_to_access_url(matched_connection.id)
-                StatisticDefinition.triggers("individual","create_connection",user)
+                StatisticDefinition.triggers("individual","create_connection",User.find(user.id))
                 status = true
                 message = "Connection successfully updated"
                 data = matched_connection
@@ -301,7 +301,7 @@ class Connection < ActiveRecord::Base
                       tags.each{|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:matched_connection.id)}
                     end
                     Connection.port_photo_url_to_access_url(matched_connection.id)
-                    StatisticDefinition.triggers("individual","create_connection",user)
+                    StatisticDefinition.triggers("individual","create_connection",User.find(user.id))
                     status = true
                     message = "Connection successfully updated"
                     data = matched_connection
@@ -343,7 +343,7 @@ class Connection < ActiveRecord::Base
                     new_connection.update_score
                     Connection.port_photo_url_to_access_url(new_connection.id)
                     tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
-                    StatisticDefinition.triggers("individual","create_connection",user)
+                    StatisticDefinition.triggers("individual","create_connection",User.find(user.id))
                     status = true
                     message = "Connection successfully created"
                     data = new_connection
@@ -385,7 +385,7 @@ class Connection < ActiveRecord::Base
                     new_connection.update_score
                     Connection.port_photo_url_to_access_url(new_connection.id)
                     tags.each {|tag| Tag.create(tag:tag.strip,user_id:user.id,taggable_type:"Connection",taggable_id:new_connection.id) } if tags
-                    StatisticDefinition.triggers("individual","create_connection",user)
+                    StatisticDefinition.triggers("individual","create_connection",User.find(user.id))
                     status = true
                     message = "Connection successfully created"
                     data = new_connection
@@ -443,12 +443,12 @@ class Connection < ActiveRecord::Base
             message = issues.map {|issue| issue[:message] }.join(", ")
             data = issues.map {|issue| issue[:data] }
           else
-            StatisticDefinition.triggers("individual","post_create_connection",user)
             status = true
             message = "Connections successfully created"
             data = nil
           end
         end
+      StatisticDefinition.triggers("individual","post_create_connection",User.find(user.id))
       {status:status,message:message,data:data}
     end
 
@@ -510,7 +510,7 @@ class Connection < ActiveRecord::Base
         expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
         self.check_if_conection_is_expiring_and_if_so_create_notification(self.user,expiring_connection_notification_period_in_days)
         Activity.create(user:self.user,connection_id:self.id,activity:"Returned from expired connections",date:Date.today,initiator:0,activity_description:"No points")
-        StatisticDefinition.triggers("individual","connection_revive",self.user) 
+        StatisticDefinition.triggers("individual","connection_revive",self.user)
         status = true
         message = "Successfully added#{" "+self.first_name} back to your Sphere! XP -#{penalty_amount}"
       else
