@@ -154,12 +154,13 @@ class User < ActiveRecord::Base
 
   def find_badges
     additional_badges = Badge.identify_badges_for(self)
-    if additional_badges.length > 0 
+    if additional_badges.length > 0
       additional_badges.each do |badge|
         user_badge = self.user_badges.create(badge_id:badge.id)
         Notification.create_new_badge_notification(user_badge)
       end
-    end    
+      Notification.create_one_time_badge_notification(self,additional_badges.length)
+    end
   end
 
 
