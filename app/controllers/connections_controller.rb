@@ -232,7 +232,7 @@ class ConnectionsController < ApplicationController
                   new_stats = current_user.stats
                   bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
                   message = result[:message]
-                  actions=[{action:"function_call",function:"uncheckAllContactsImport()"},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
+                  actions=[{action:"function_call",function:"uncheckAllContactsImport()"},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats);toggleAddToSphereButton()"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
                   data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
                 else
                   status = result[:status]
