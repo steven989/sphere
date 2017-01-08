@@ -11,6 +11,7 @@ $(function(){
     // A series of variables that need to be used across functions
     $('.no-touch [data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
     var returnedData;
+    var searchClick = false;
     var timezone = jstz.determine().name();
     var closeModalTimer;    
     var token;
@@ -32,6 +33,16 @@ $(function(){
         $('#profile').data('data-to-send','({timezone:"'+timezone+'"})').attr("href","<%= put_timezone_path %>").data("method","PUT");
         buttonAjax($('#profile'),{timezone:timezone});
     <% end %>
+
+    // Log front end actions
+    function logFrontEndActions(action) {
+      $.ajax({
+        url: '<%= log_front_end_actions_path %>',
+        type: 'POST',
+        data: {action:action},
+        dataType: 'JSON'
+      })
+    }
 
     // Search 
     var options = {
@@ -80,6 +91,7 @@ $(function(){
                         $('#searchBar .result ul').append("<li class='item' data-bubble-id='connectionBubble"+connection.id+"'><span class='name'>"+connection.display+(connection.email ? "</span><br><span class='email'>"+connection.email : "")+(connection.tags ? "</span><br><span class='tags'>"+connection.tags.join(', ') : "")+"</span></li>");
                     });
                     $('#searchBar .result .item').off("click").on("click",function(){
+                        searchClick = true;
                         $($("#"+$(this).data('bubble-id'))).trigger('click');
                     $('#searchBar .result, #searchBar .speechBubbleThingy').each(function(){
                         $(this).removeClass('hidden')});
@@ -335,7 +347,7 @@ $(function(){
                             }
                         })
                         resetModal($('[data-remodal-id=bubbleModal]'),3);
-                        buttonAjax(_this,{});
+                        buttonAjax(_this,{searchClick:searchClick});
                     } // if (_this.data('connection-id')=='0')
                 } //if (!button.hasClass('disabled'))
             }); // $(this).off("click").on("click")
@@ -859,7 +871,7 @@ $(function(){
             $('[data-remodal-id=bubbleModal] .modalView#plans div.icon').removeClass('hidden');
             $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden').addClass('hidden');
         }
-
+        searchClick = false;
         $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
         $('.modalView#makePlan input[name=notify]').prop('checked',<%= @settings[:send_event_booking_notification_by_default] %>);
         $('.modalView#makePlan input[name=putOnGoogle]').prop('checked',true);

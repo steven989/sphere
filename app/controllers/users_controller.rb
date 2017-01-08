@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
     before_action :require_login, except: [:new, :create]
-
+    require "browser"
 
     def new
         @user = User.new 
@@ -68,6 +68,7 @@ class UsersController < ApplicationController
           notifications = current_user.get_notifications(false)
           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
           current_user.update_attributes(photo_access_url:current_user.photo.url)
+          AppUsage.log_action("Updated user photo",current_user)
           status = true
           message = "Your info is updated!"
           actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
@@ -77,6 +78,7 @@ class UsersController < ApplicationController
           message = "Hmm. We seem to ran into some issues with your photo. Try a different one!"
         end
       else
+        AppUsage.log_action("Updated user info",current_user)
         status = true
         actions = [{action:"function_call",function:"closeModalInstance(100)"}]
         message = "Your info is updated!"
@@ -92,6 +94,7 @@ class UsersController < ApplicationController
         if current_user.is? "admin"
           redirect_to admin_dashboard_path
         else
+          AppUsage.log_action("Accessed dashboard",current_user,"{browser_name:#{browser.name if browser},browser_version:#{browser.version if browser},browser_is_modern:#{browser.modern? if browser},device_name:#{browser.device.name if (browser && browser.device)},platform_name:#{browser.platform.name if (browser && browser.platform)}}")
           @timezone = current_user.timezone
           @current_user_email = current_user.email
           @one_time_notification = current_user.get_one_time_popup_notification(false)
@@ -158,6 +161,7 @@ class UsersController < ApplicationController
               new_stats = current_user.stats
               bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
               connection = result[:data]
+              AppUsage.log_action("Manually added a connection",current_user)
               status = true
               message = "#{connection.first_name} added to your Sphere!"
               actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"toggleAddToSphereButton()"}]
@@ -245,6 +249,15 @@ class UsersController < ApplicationController
         end
     end
 
+    def log_front_end_actions
+        AppUsage.log_action(params[:action],current_user)
+        respond_to do |format|
+          format.json {
+            render json: {status:true}
+          } 
+        end
+    end
+
     def update_user_settings
 
       send_event_booking_notification_by_default = params[:data][:send_event_booking_notification_by_default] == "true" ? true : false
@@ -256,6 +269,7 @@ class UsersController < ApplicationController
       user_setting = current_user.user_setting
       if user_setting.update_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity})
         current_user.update_attributes(timezone:timezone) unless timezone.blank?
+        AppUsage.log_action("Updated settings",current_user)
         status = true
         message = "Settings successfully updated"
         actions = [{action:"function_call",function:"closeModalInstance(100)"}]

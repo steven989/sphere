@@ -14,6 +14,7 @@ class ConnectionsController < ApplicationController
             last_name = Connection.parse_last_name(name)
             connection = Connection.find(connection_id)
             connection.update_attributes(first_name:first_name,last_name:last_name)
+            AppUsage.log_action("Updated name for connection (#{first_name} #{last_name})",current_user)
             status = true
             message = "Name updated!"
             raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
@@ -39,6 +40,7 @@ class ConnectionsController < ApplicationController
         if !params[:value].blank?
             connection = Connection.find(connection_id)
             if connection.update_attributes(email:params[:value])
+                AppUsage.log_action("Updated email for connection (#{connection.first_name}  #{connection.last_name})",current_user)
                 status = true
                 message = "Email updated!"
                 raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
@@ -85,12 +87,14 @@ class ConnectionsController < ApplicationController
                 notes:params[:notes]
             )
             if connection.save
+                AppUsage.log_action("Updated connection (#{connection.first_name} #{connection.last_name})",current_user)
                 Connection.port_photo_url_to_access_url(connection.id)
                 status = true
                 message = "Awesome. We updated #{connection.first_name}'s info for you!"
                 actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(100)"}]
                 data = nil
                 if photo_uploaded
+                  AppUsage.log_action("Updated photo for connection (#{connection.first_name}  #{connection.last_name})",current_user)
                   raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
                   notifications = current_user.get_notifications(false)
                   bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
@@ -320,6 +324,9 @@ class ConnectionsController < ApplicationController
             data[:hasUpcomingPlan] = false
         end
         actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
+        if params[:searchClick] == true || params[:searchClick] == "true"
+            AppUsage.log_action("Opened connection through search",current_user)
+        end
         respond_to do |format|
           format.json {
             render json: {status:true, message:nil,actions:actions,data:data}

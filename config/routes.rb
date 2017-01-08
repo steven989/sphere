@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get 'users/:connection_id/new_activity' => 'users#new_activity', as: 'new_activity'
   post 'users/create_activity' => 'users#create_activity', as: 'create_activity'
   post 'users/create' => 'users#create', as: 'create_user'
+  post 'users/log_front_end_actions' => 'users#log_front_end_actions', as: 'log_front_end_actions'
   get 'users/new' => 'users#new', as: 'create_account'
   get 'users/settings' => 'users#get_user_settings', as: 'get_user_settings'
   put 'users/settings' => 'users#update_user_settings', as: 'update_user_settings'

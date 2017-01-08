@@ -79,6 +79,8 @@ gem 'tzinfo'
 gem 'tzinfo-data'
 #delayed job
 gem 'delayed_job_active_record'
+# get user browser info
+gem 'browser'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
