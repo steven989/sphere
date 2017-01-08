@@ -26,7 +26,7 @@ class ChallengesController < ApplicationController
         if result[:status]
             status = true
             if result[:reward]
-                message = "Nice job! XP +#{result[:reward]}"
+                message = "Nice job! +#{result[:reward]} points"
             else
                 message = "Challenge completed!"
             end

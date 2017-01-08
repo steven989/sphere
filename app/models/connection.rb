@@ -512,7 +512,7 @@ class Connection < ActiveRecord::Base
         Activity.create(user:self.user,connection_id:self.id,activity:"Returned from expired connections",date:Date.today,initiator:0,activity_description:"No points")
         StatisticDefinition.triggers("individual","connection_revive",self.user)
         status = true
-        message = "Successfully added#{" "+self.first_name} back to your Sphere! XP -#{penalty_amount}"
+        message = "Successfully added#{" "+self.first_name} back to your Sphere! -#{penalty_amount} points"
       else
         status = false
         message = "Your current XP is #{self.user.stat("xp")}, not enough for the #{penalty_amount} required to re-add#{" "+self.first_name}! Check in with your connections or complete challenges to earn more XP"
