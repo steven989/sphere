@@ -486,14 +486,19 @@ body {
     font-size: 25px;
 }
 
+.profileButton a {
+    transition:color 0.2s ease;
+    color: #FFF;  
+}
+
 .profileButtonsContainer.hideOnMobile {
-    width: 120px;
+    width: 150px;
     right: 50px;
 }
 
 .profileButtonsContainer.hideOnMobile .profileButton {
     text-align: center;
-    width: 45%;
+    width: 30%;
     display: inline-block;
 }
 
@@ -505,7 +510,7 @@ body {
 
 .profileButtonsContainer.showOnMobile {
     width: 60px;
-    right: 170px;
+    right: 200px;
 }
 
 
@@ -515,6 +520,10 @@ body {
 }
 
 .no-touch .profileButton:hover {
+    color: #B5ADAC;
+}
+
+.no-touch .profileButton:hover.profileButton a {
     color: #B5ADAC;
 }
 

@@ -186,6 +186,14 @@ class UsersController < ApplicationController
         end
     end
 
+    def redirect_to_root
+      redirect_back_or_to root_path
+    end
+
+    def help
+      
+    end
+
     def new_activity
         @connection = Connection.find(params[:connection_id])
         @activity = Activity.new

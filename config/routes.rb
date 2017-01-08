@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   # Users controller
 
   get 'users/new_connection' => 'users#new_connection', as: 'new_connection'
+  get 'users/help' => 'users#help', as: 'help_page'
+  get 'users/redirect_to_root' => 'users#redirect_to_root', as: 'redirect_to_root'
   post 'users/create_connection' => 'users#create_connection', as: 'create_connection'
   get 'users/:connection_id/new_activity' => 'users#new_activity', as: 'new_activity'
   post 'users/create_activity' => 'users#create_activity', as: 'create_activity'
