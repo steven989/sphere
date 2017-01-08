@@ -24,10 +24,6 @@ h1,h2,h3,h4,h5,h6,p,div,span,body {
   font-family: 'brandon-grotesque' !important;
 }
 
-ul.Dropdown {
-    z-index:10;
-}
-
 /* 5 column definition a la bootstrap */
 
 .col-xs-15,
@@ -266,7 +262,6 @@ table {
     text-align: center;
     padding-top:15px;
     border:none;
-    z-index:9;
 }
 
 .modalBottomRightButton {
@@ -279,7 +274,6 @@ table {
     text-align: center;
     padding-top:15px;
     border:none;
-    z-index:9;
 }
 
 .modalBottomFullButton {
@@ -292,7 +286,6 @@ table {
     text-align: center;
     padding-top:15px;
     border:none;
-    z-index:9;
 }
 
 
@@ -618,6 +611,11 @@ label[for=photoUploader] {
 
 
 /* Bubbles related */
+
+.modalView#plans .padding {
+    display:none;
+    height:120px;
+}
 
 .modalView#plans .photo,.modalView#plans .icon {
     transition: box-shadow 0.2s ease;
@@ -1246,6 +1244,10 @@ form div.btn-group .btn.active {
 
     .showOnMobile {
         display: initial !important;
+    }
+
+    .modalView#plans .padding {
+        display:block;
     }
 
     .profileButtonsContainer.hideOnMobile {

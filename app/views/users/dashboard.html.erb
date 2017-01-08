@@ -1,6 +1,5 @@
 <script>
 var test;
-
 $(function(){
     if (!("ontouchstart" in document.documentElement)) {
         $('html').removeClass("no-touch").addClass("no-touch");
@@ -1026,9 +1025,11 @@ $(function(){
         tokenizeTagInCreateContactSelectionField();
 
         $('.modalView#plans .modalTokenBox li.TokenSearch input').off('focusin').on('focusin',function(){
+            $(".modalView#plans .modalContentContainer").scrollTop(300);
             token.tokenRemove("$add$tag$");
         });
         $('.modalView#plans .modalTokenBox li.TokenSearch input').off('focusout').on('focusout',function(){
+                $(".modalView#plans .modalContentContainer").scrollTop(0);
                 setTimeout(function(){
                             if (token.toArray().length == 0) {
                                 token.tokenAdd("$add$tag$","+ Add Tags");
@@ -1617,6 +1618,9 @@ $(function(){
             <div style="font-size:15px;color:#656268"><span class="nextHangout"></span></div>
             <select name="tags" id="tokenize" multiple="multiple" class="modalTokenBox" href="<%= update_tags_path %>" data-method="PUT">
             </select>
+            <div class="padding" style="height:300px;">
+                
+            </div>
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
