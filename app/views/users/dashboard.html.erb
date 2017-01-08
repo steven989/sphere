@@ -1595,10 +1595,20 @@ $(function(){
 <div data-remodal-id="bubbleModal" data-default-css="([{'attribute':'height','value':'410px'}])">
     <div class="modalView" id="plans">
         <div class="modalContentContainer">
+            <div class="subTabNavigationContainer container" style="width:100%;">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton profile textDarkGray" style="font-size:14px;border-bottom:2px solid #e86f56;width:60%;display:inline-block;margin:auto;cursor:pointer;" >PROFILE</div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton preferences textDarkGray transitionButton" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">PREFERENCES</div>
+                    </div>
+                </div>
+            </div>
             <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
             <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:80%; border-radius:10px;font-size:15px;font-weight:300;"></div>
             <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
-            <div style="height:135px;margin-top:20px;">
+            <div style="height:135px;margin-top:10px;">
                 <div class="photo transitionButton" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none; display:block; margin:auto;"></div>
                 <div class="icon transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
                     <%= fa_icon 'user-circle' %>
@@ -1696,8 +1706,18 @@ $(function(){
     </div>
     <div class="modalView hidden" id="editConnection">
         <div class="modalContentContainer">
+            <div class="subTabNavigationContainer container" style="width:100%;">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton profile textDarkGray transitionButton" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">PROFILE</div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton preferences textDarkGray" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;border-bottom:2px solid #e86f56;">PREFERENCES</div>
+                    </div>
+                </div>
+            </div>
             <form id="connectionInfo">
-                <span class="textDarkGray">How often do you want to stay in touch?</span>
+                <span class="textDarkGray m-t-md">How often do you want to stay in touch?</span>
                 <div class="btn-group contactFrequency buttonGroupWithOther" role="group">
                     <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="weekly" data-slide-down=".modalView#editConnection .details" >WEEKLY</button>
                     <button class="btn btn-light-grey btn-secondary" style="width:34%" data-value="monthly" data-slide-down=".modalView#editConnection .details" >MONTHLY</button>

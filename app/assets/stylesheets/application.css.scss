@@ -627,6 +627,10 @@ label[for=photoUploader] {
     box-shadow: 0px 0px 10px #636363;
 }
 
+.no-touch .modalView .subTabNavigationContainer .subTabNavigationButton:hover {
+    transition: color 0.2s ease;
+    color: #333333;
+}
 
 .modalTokenBox {
     margin-top: 5px;
@@ -635,7 +639,7 @@ label[for=photoUploader] {
 
 .modalView#plans .modalTokenBox {
     margin-top: 5px;
-    width: 90%;
+    width: 100%;
 }
 
 
@@ -851,6 +855,10 @@ label[for=photoUploader] {
 
 /*Edit connection screen */
 .modalView#editConnection .modalContentContainer {
+    padding: 0px 30px;
+}
+
+.modalView#plans .modalContentContainer {
     padding: 0px 30px;
 }
 
