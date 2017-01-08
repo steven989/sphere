@@ -613,8 +613,7 @@ label[for=photoUploader] {
 /* Bubbles related */
 
 .modalView#plans .padding {
-    display:none;
-    height:120px;
+    height:150px;
 }
 
 .modalView#plans .photo,.modalView#plans .icon {
@@ -1230,6 +1229,10 @@ form div.btn-group .btn.active {
     }
 
 
+    .modalView#plans .padding {
+        height:200px;
+    }
+
     .userLevelNotificationDisplayElement .badge {
         right:-15px;
         top:-25px;
@@ -1244,10 +1247,6 @@ form div.btn-group .btn.active {
 
     .showOnMobile {
         display: initial !important;
-    }
-
-    .modalView#plans .padding {
-        display:block;
     }
 
     .profileButtonsContainer.hideOnMobile {
