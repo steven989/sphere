@@ -76,7 +76,7 @@ class User < ActiveRecord::Base
 
   def get_notifications(json_or_not_json=false)
       expiring_connection_array_of_ids = []
-      result = self.notifications.inject({}) do |accumulator,notification|
+      result = self.notifications.order(priority: :desc).inject({}) do |accumulator,notification|
                   accumulator[:connection_level] = {} unless accumulator[:connection_level]
                   accumulator[:user_level] = [] unless accumulator[:user_level]
                   if notification.notification_date && notification.expiry_date && Date.today >= notification.notification_date && Date.today <= notification.expiry_date
