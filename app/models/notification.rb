@@ -6,7 +6,7 @@ class Notification < ActiveRecord::Base
 
     # Auto task
     def self.destroy_expired_notifications
-        Notification.where("expiry_date < ?", Date.today).destroy_all # this will delete the notification the night immediately AFTER the expiry date specified
+        Notification.where("expiry_date < ? and one_time_display=false", Date.today).destroy_all # this will delete the notification the night immediately AFTER the expiry date specified
     end
 
     def showed_one_time_notification
@@ -17,6 +17,7 @@ class Notification < ActiveRecord::Base
     def self.create_new_level_notification(user,old_level,new_level,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
         Notification.where(user_id:user.id,notification_type:"level_up").destroy_all
+        Notification.mark_all_one_time_notifications_as_read(user)
         # 2) Create a notification
         result = Notification.create(
           user_id: user.id,
@@ -27,6 +28,12 @@ class Notification < ActiveRecord::Base
           value:"{old_level:#{old_level},new_level:#{new_level}}",
           one_time_display:true
           )
+    end
+
+    def self.mark_all_one_time_notifications_as_read(user)
+        user.notifications.where(one_time_display:true).each do |notification|
+          notification.update_attributes(one_time_display:false)
+        end
     end
 
     # This is a user-level notification
@@ -42,6 +49,20 @@ class Notification < ActiveRecord::Base
           data_type:"hash",
           value:"{badge_id:#{user_badge.badge.id}}"
           )
+    end
+
+    # This is a user-level notification
+    def self.create_one_time_badge_notification(user,number_of_badges)
+        Notification.mark_all_one_time_notifications_as_read(user)
+        Notification.create(
+          user_id:user.id,
+          notification_type:'new_badges_one_time',
+          notification_date:Date.today,
+          expiry_date:Date.today,
+          data_type:"integer",
+          value:number_of_badges,
+          one_time_display:true
+        )
     end
 
     # This is a user-level notification
