@@ -6,7 +6,7 @@ class Notification < ActiveRecord::Base
 
     # Auto task
     def self.destroy_expired_notifications
-        Notification.where("expiry_date < ?", Date.today).destroy_all # this will delete the notification the night immediately AFTER the expiry date specified
+        Notification.where("expiry_date < ? and one_time_display=false", Date.today).destroy_all # this will delete the notification the night immediately AFTER the expiry date specified
     end
 
     def showed_one_time_notification

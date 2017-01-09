@@ -112,7 +112,19 @@ class User < ActiveRecord::Base
   end
 
   def get_one_time_popup_notification(json_or_not_json=false)
-    result = notifications.where(one_time_display:true).order(priority: :asc).take
+    notification = notifications.where(one_time_display:true).order(priority: :asc).take
+    if notification
+      if notification.notification_type == 'level_up'
+        element_id = 'levelUpNotificationPopup'
+        value_1 = notification.value_in_specified_type[:new_level]
+      elsif notification.notification_type == 'new_badges_one_time'
+        element_id = 'new_badges_one_time'
+        value_1 = notification.value_in_specified_type
+      end
+      result = {id:notification.id,element_id:element_id,value_1:value_1}
+    else
+      result = nil
+    end
     if json_or_not_json
       result.to_json
     else
@@ -187,6 +199,14 @@ class User < ActiveRecord::Base
     user_statistics.inject({}){|result,element| result[element.name.to_sym] = element.value_in_type; result }
   end
 
+  def update_stats(stats={})
+    stats.each do |key,value|
+      stat_to_update = self.user_statistics.where(name:key)
+      if stat_to_update.length == 1
+        stat_to_update.take.update_attributes(value:value)
+      end
+    end
+  end
 
   def is? (user_type)
     user_type == self.user_type

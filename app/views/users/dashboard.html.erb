@@ -131,17 +131,21 @@ $(function(){
     // one-time notification popup
 
     function oneTimeNotificationPopup(modalElement,notificationId,value1) {
+        $('[data-remodal-id=notificationsModal] .modalView').each(function(){
+            $(this).removeClass('hidden').addClass('hidden');
+        });
+        $(modalElement).removeClass('hidden');
         if(value1){$(modalElement).find('.value1').html(value1);}
         var check = setInterval(function(){
             if( modalInstance == undefined || modalInstance.state == "closed") {
-                initializeReModal(modalElement,"standardModal",0);
+                initializeReModal('[data-remodal-id=notificationsModal]',"standardModal",0);
                 clearInterval(check);
             }
         },1)
-        buttonAjax($(modalElement),{notification_id:notificationId});
+        buttonAjax($(modalElement).parent(),{notification_id:notificationId});
     }
     <% if @one_time_notification %>
-        oneTimeNotificationPopup("[data-remodal-id=notificationsModal]",<%= @one_time_notification.id %>,<%= @one_time_notification.value_in_specified_type[:new_level] %>)
+        oneTimeNotificationPopup("[data-remodal-id=notificationsModal] #<%= @one_time_notification[:element_id] %>",<%= @one_time_notification[:id] %>,<%= @one_time_notification[:value_1] %>)
     <% end %>
 
     // update "real-time" stats
@@ -1904,4 +1908,14 @@ $(function(){
             <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">COOL</div>
         </div>
     </div>
+    <div class="modalView" id="newBadgePopup">
+        <div class="modalContentContainer p-h-xxlg">
+            <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>You earned <span class="value1" style="font-weight:600;"></span> new badges</h1><br><p>That's awesome!</p><br><%= image_tag '1f388.svg' %>
+
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">COOL</div>
+        </div>
+    </div>
+
 </div>
