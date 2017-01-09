@@ -1245,6 +1245,17 @@ form div.btn-group .btn.active {
         right: 0px;
     }
 
+    #searchBar {
+        height: 50px !important;
+        bottom: 70px !important;
+        right: 0px !important;
+    }
+
+    #searchBar input {
+        height: 50px;
+        line-height: 50px;
+    }
+
     .showOnMobile {
         display: initial !important;
     }
