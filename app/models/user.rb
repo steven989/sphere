@@ -67,7 +67,6 @@ class User < ActiveRecord::Base
     current_level = self.stat("level")
     new_level = Level.find_level_for(self)
     if new_level > current_level
-
       stat = user_statistics.find_statistic("level").take
       stat.update_attributes(value:new_level)
       Notification.create_new_level_notification(self,current_level,new_level,1)
@@ -118,7 +117,7 @@ class User < ActiveRecord::Base
         element_id = 'levelUpNotificationPopup'
         value_1 = notification.value_in_specified_type[:new_level]
       elsif notification.notification_type == 'new_badges_one_time'
-        element_id = 'new_badges_one_time'
+        element_id = 'newBadgePopup'
         value_1 = notification.value_in_specified_type
       end
       result = {id:notification.id,element_id:element_id,value_1:value_1}

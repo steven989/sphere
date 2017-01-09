@@ -134,6 +134,7 @@ $(function(){
         $('[data-remodal-id=notificationsModal] .modalView').each(function(){
             $(this).removeClass('hidden').addClass('hidden');
         });
+        console.log(modalElement);
         $(modalElement).removeClass('hidden');
         if(value1){$(modalElement).find('.value1').html(value1);}
         var check = setInterval(function(){

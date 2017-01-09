@@ -30,7 +30,7 @@ class Notification < ActiveRecord::Base
           )
     end
 
-    def mark_all_one_time_notifications_as_read(user)
+    def self.mark_all_one_time_notifications_as_read(user)
         user.notifications.where(one_time_display:true).each do |notification|
           notification.update_attributes(one_time_display:false)
         end
