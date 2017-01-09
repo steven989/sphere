@@ -265,9 +265,9 @@ class AdminsController < ApplicationController
 
         if error_array.length > 0
             status = false
-            message = "Encountered some errors while updating the challenges. See the highlighted cells"
+            message = "Encountered some errors while updating the challenges: #{error_array.map {|error| error[:message]}.join(', ')}"
             data = {errorInputIds: error_array.map {|error| error[:inputId]}}
-            actions = error_array.map {|error| error[:elements].map{|element| {action:"change_css",element:"#challenge .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } }.flatten
+            actions = error_array.map {|error| error[:elements] ? error[:elements].map{|element| {action:"change_css",element:"#challenge .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } : nil }.flatten.reject! {|element| element.nil? }
             actions.push({action:"function_call",function:"reCheck('challenge',receivedDataFromAJAX.data.errorInputIds,'update')"})
         else
             status = true

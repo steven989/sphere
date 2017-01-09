@@ -1,5 +1,5 @@
 class Badge < ActiveRecord::Base
-    has_many :user_badges
+    has_many :user_badges, :dependent => :destroy
     has_many :users, through: :user_badges
     validates :name, presence: true
     mount_uploader :graphic, GraphicUploader
@@ -37,10 +37,16 @@ class Badge < ActiveRecord::Base
             badgeObj = Badge.find(id)
             if badgeObj
                 if delete
-                    badgeObj.destroy
-                    status = true
-                    message = "Badge deleted"
-                    elements = nil
+                    if badgeObj.user_badges.length == 0
+                        badgeObj.destroy
+                        status = true
+                        message = "Badge deleted"
+                        elements = nil
+                    else
+                        status = false
+                        message = "#{badgeObj.name} cannot be deleted: already earned by a users"
+                        elements = nil
+                    end
                 else
                     # evaluate the criteria to make sure it's actually good
                     evaluation_result = criteria == badgeObj.criteria ? true : User.find_users_matching_criteria(criteria)[:status]
@@ -55,7 +61,7 @@ class Badge < ActiveRecord::Base
                             savedObj = badgeObj.save
                         rescue => error
                             status = false
-                            message = "Badge could not be updated: #{error.message}"
+                            message = "#{badgeObj.name} could not be updated: #{error.message}"
                             elements = nil                            
                         else
                             if savedObj
@@ -64,7 +70,7 @@ class Badge < ActiveRecord::Base
                                 elements = nil
                             else
                                 status = false
-                                message = "Badge could not be updated: #{badgeObj.errors.full_messages.join(', ')}"
+                                message = "#{badgeObj.name} could not be updated: #{badgeObj.errors.full_messages.join(', ')}"
                                 elements = badgeObj.errors.messages.keys
                             end
                         end
