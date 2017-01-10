@@ -192,6 +192,22 @@ table {
     margin-bottom: 5px;   
 }
 
+.m-b-md {
+    margin-bottom: 10px;
+}
+
+.m-b-lg {
+    margin-bottom: 15px;
+}
+
+.m-b-xlg {
+    margin-bottom: 20px;
+}
+
+.m-b-xxxlg {
+    margin-bottom: 30px;
+}
+
 .m-t-sm {
     margin-top: 10px;
 }
@@ -247,6 +263,17 @@ table {
 }
 
 
+.textLeft {
+    text-align: left;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.textRight {
+    text-align: right;
+}
 
 .transitionButton {
     cursor:pointer;
@@ -1211,6 +1238,12 @@ form div.btn-group .btn.active {
     font-style: italic
 }
 
+/* ----------------------- help page ------------------------ */
+
+#helpHeader {
+    padding: 0px 12%;
+}
+
 /* For Admin Dashboard*/
 
 #wrapper.container #main {
@@ -1223,6 +1256,10 @@ form div.btn-group .btn.active {
     .hideOnMobile {
         display: none;
     }
+
+    #helpHeader {
+    padding: 0px 5%;
+}
 
     .smallCard {
         width: 100%;

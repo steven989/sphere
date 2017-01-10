@@ -191,7 +191,11 @@ class UsersController < ApplicationController
     end
 
     def help
-      
+      respond_to do |format|
+        format.json {
+          render json: {status:true,data:render_to_string(partial: 'help.html.erb'),actions:[{action:"function_call",function:"populateHelp()"}]}
+        } 
+      end      
     end
 
     def new_activity
