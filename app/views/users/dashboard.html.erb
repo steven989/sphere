@@ -1201,11 +1201,15 @@ $(function(){
         form.find('#default_contact_interval_in_days_title').html(returnedData.default_contact_interval_in_days.title);
         form.find('#default_contact_interval_in_days_value').val(returnedData.default_contact_interval_in_days.value);
         form.find('#adjust_timezone_title').html(returnedData.timezone.title);
+        form.find('#expiry_external_notification_title').html(returnedData.expiry_external_notification.title);
         $('#adjust_timezone_title').siblings('.options').find('select').html("");
+        $('#expiry_external_notification_title').siblings('.options').find('select').html("")
         returnedData.timezone.options.forEach(function(timezone){
-            $('#adjust_timezone_title').siblings('.options').find('select').append('<option value="'+timezone+'" '+(returnedData.timezone.value == timezone ? 'selected=true' : '')+'>'+timezone+'</option>')
-            // 
-        })
+            $('#adjust_timezone_title').siblings('.options').find('select').append('<option value="'+timezone+'" '+(returnedData.timezone.value == timezone ? 'selected=true' : '')+'>'+timezone+'</option>');
+        });
+        returnedData.expiry_external_notification.options.forEach(function(value){
+            $('#expiry_external_notification_title').siblings('.options').find('select').append('<option value="'+value+'" '+(returnedData.expiry_external_notification.value == value ? 'selected=true' : '')+'>'+value+'</option>');
+        });
         // form.find('#event_add_granularity_title').html(returnedData.event_add_granularity.title);
         // form.find('#event_add_granularity_detailed_value').prop("selected", (returnedData.event_add_granularity.value == 'detailed'));
         // form.find('#event_add_granularity_quick_value').prop("selected", (returnedData.event_add_granularity.value == 'quick'));
@@ -1843,6 +1847,14 @@ $(function(){
                     <div id="adjust_timezone_title"></div>
                     <div class='options'>
                         <select class="settingInput formElement button standardHeight inputData" name='adjust_timezone'>
+                            
+                        </select>
+                    </div>
+                </div>
+                <div class="m-b-md">
+                    <div id="expiry_external_notification_title"></div>
+                    <div class='options'>
+                        <select class="settingInput formElement button standardHeight inputData" name='expiry_external_notification'>
                             
                         </select>
                     </div>

@@ -10,10 +10,10 @@ class ExternalNotification < ActiveRecord::Base
                 send_notification = true
             end
         elsif notification_frequency == 'weekly'
-            if (last_notification.nil? || (Date.today.year > last_notification.created_at.year) || (Date.today.strftime("%V").to_i > last_notification.created_at.to_date.strftime("%V").to_i))
+            if Date.today.wday == 1 && (last_notification.nil? || (Date.today.year > last_notification.created_at.year) || (Date.today.strftime("%V").to_i > last_notification.created_at.to_date.strftime("%V").to_i))
                 send_notification = true
             end
-        elsif notification_frequency == 'monthly'
+        elsif Date.today.wday == 1 && notification_frequency == 'monthly'
             if (last_notification.nil? || (Date.today.year > last_notification.created_at.year) || (Date.today.month > last_notification.created_at.month))
                 send_notification = true
             end
