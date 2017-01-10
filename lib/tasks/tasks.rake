@@ -21,6 +21,8 @@ namespace :system do
             user.daily_connection_tasks
             # 3) Update nightly stats
             StatisticDefinition.triggers("individual","nightly",User.find(user.id))
+            # 4) Send out expiring notifications email
+            ExternalNotification.send_external_notifications_for(user)
         end
     end 
 
