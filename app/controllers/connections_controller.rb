@@ -43,14 +43,52 @@ class ConnectionsController < ApplicationController
                 AppUsage.log_action("Updated email for connection (#{connection.first_name}  #{connection.last_name})",current_user)
                 status = true
                 message = "Email updated!"
-                raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-                notifications = current_user.get_notifications(false)
-                bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-                actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
-                data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+                # raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+                # notifications = current_user.get_notifications(false)
+                # bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+                # data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+                actions = nil
+                data = nil
             else
                 status = false
                 message = connection.errors.full_messages.join(', ')
+                actions = nil
+                data = nil
+            end
+        else
+            status = false
+            message = nil
+            actions = nil
+            data = nil
+        end
+        respond_to do |format|
+          format.json {
+            render json: {status:status,message:message,actions:actions,data:data}
+          } 
+        end        
+    end
+
+    def update_phone
+        connection_id = params[:id]
+        if !params[:value].blank?
+            connection = Connection.find(connection_id)
+            if connection.update_attributes(phone:params[:value])
+                AppUsage.log_action("Updated phone for connection (#{connection.first_name}  #{connection.last_name})",current_user)
+                status = true
+                message = "Phone updated!"
+                # raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+                # notifications = current_user.get_notifications(false)
+                # bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+                # data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+                actions = nil
+                data = nil
+            else
+                status = false
+                message = connection.errors.full_messages.join(', ')
+                actions = nil
+                data = nil
             end
         else
             status = false
@@ -294,6 +332,7 @@ class ConnectionsController < ApplicationController
         data[:photo] = connection.photo_url
         data[:name] = connection.name
         data[:email] = connection.email
+        data[:phone] = connection.phone
         data[:notes] = connection.notes
         data[:contact_frequency] = connection.frequency_word
         data[:target_contact_interval_in_days] = connection.target_contact_interval_in_days
