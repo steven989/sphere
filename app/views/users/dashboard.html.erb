@@ -27,6 +27,7 @@ $(function(){
     var modalInstance;
     var maxConnectionsAllowed = <%= @settings[:max_number_of_connections].to_i %>;
     var remaining_connections = <%= @remaining_number_of_connections %>;
+    var remaining_connections_real_time = remaining_connections;
 
     <% unless @timezone %>
         $('#profile').data('data-to-send','({timezone:"'+timezone+'"})').attr("href","<%= put_timezone_path %>").data("method","PUT");
@@ -115,7 +116,13 @@ $(function(){
     }
 
     function checkIfAtImportLimit() {
-        if((remaining_connections - $('#importSelectionTable tbody input[type=checkbox]').filter(function(){return $(this).prop('checked') == true}).length) <= 0 ) {
+        remaining_connections_real_time = (remaining_connections - $('#importSelectionTable tbody input[type=checkbox]').filter(function(){return $(this).prop('checked') == true}).length);
+
+        $('.reminingContactDisplay').each(function(){
+            $(this).html(remaining_connections_real_time);
+        })
+
+        if(remaining_connections_real_time <= 0 ) {
             $('#importSelectionTable tbody input[type=checkbox]').filter(function(){return $(this).prop('checked') == false}).each(function(){
                 $(this).prop('disabled',true);
             })
@@ -742,6 +749,7 @@ $(function(){
     // Disable the add to sphere button if already at limit
     toggleAddToSphereButton();
     function toggleAddToSphereButton() {
+        checkIfAtImportLimit();
         if (remaining_connections <= 0) {
             $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').removeClass("disabled").addClass("disabled").html("ADD TO SPHERE (LIMIT REACHED)");
         } else {
@@ -1770,6 +1778,7 @@ $(function(){
                 <div class="formElement button textDarkGray disableWhileProcessed" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
+                <p class="textDarkGray">You can add <span class="reminingContactDisplay"><%= @remaining_number_of_connections %></span> more connections to your Sphere</p>
                 <form action="<%= create_connection_path %>" method="POST">
                     <div class="vex-custom-field-wrapper">
                         <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="name" required>
@@ -1797,21 +1806,26 @@ $(function(){
     <div class="modalView hidden" id="listSelect">
         <div class="modalContentContainer p-h-xxlg">
             <div id="importContacts">
-                <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;position:absolute;top:0px;left:0px;"></div>
-                <input type="text" class="search formElement" placeholder="Search">
-                <%= check_box_tag 'mergeName',true,true, style:"display:inline-box;", class:"m-t-sm" %>
-                <label for="mergeName" class="textDarkGray m-t-sm">Merge contacts with the same name</label>
-                <table id="importSelectionTable" class="table table-sm m-t-md table-hover textDarkGray">
-                    <thead class="thead-default">
-                        <th>Import?</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone Numbers</th>
-                        <th>Other Emails</th>
-                    </thead>
-                    <tbody class="list">
-                    </tbody>
-                </table>
+                <div class="search" style="width:100%; height:30%;">
+                    <div class="alert hidden default_hidden" id="connectionFormAlert" style="margin-top:1px;line-height:10px;position:absolute;top:0px;left:0px;"></div>
+                    <input type="text" class="search formElement" placeholder="Search">
+                    <%= check_box_tag 'mergeName',true,true, style:"display:inline-box;", class:"m-t-sm" %>
+                    <label for="mergeName" class="textDarkGray m-t-sm">Merge contacts with the same name</label>
+                    <p class="textDarkGray">You can add <span class="reminingContactDisplay"><%= @remaining_number_of_connections %></span> more connections to your Sphere</p>
+                </div>
+                <div class="result" style="width:100%; height:70%;">
+                    <table id="importSelectionTable" class="table table-sm table-hover textDarkGray">
+                        <thead class="thead-default">
+                            <th style="width:10%;">Import?</th>
+                            <th style="width:30%;">Name</th>
+                            <th style="width:40%;">Email</th>
+                            <th style="width:10%;">Phone Numbers</th>
+                            <th style="width:10%;">Other Emails</th>
+                        </thead>
+                        <tbody class="list">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="modalButtonContainer">

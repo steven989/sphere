@@ -64,7 +64,12 @@ div, p {
 }
 
 table {
-    font-size:15px;   
+    font-size:15px;
+    table-layout: fixed;
+}
+
+td {
+    word-wrap:break-word;
 }
 
 .tooltip-inner {
@@ -622,12 +627,16 @@ label[for=photoUploader] {
     height:350px;
 }
 
-.modalView#listSelect .modalContentContainer #importContacts {
+.modalView#listSelect .modalContentContainer #importContacts{
     overflow-x: scroll;
+    height:100%;
+}
+
+.modalView#listSelect .modalContentContainer #importContacts .result {
+    overflow-y: scroll;
 }
 
 .modalView#listSelect .modalContentContainer #importContacts #importSelectionTable {
-    table-layout: fixed;
     width:100%;
     text-align: left;
 }
