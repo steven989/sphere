@@ -104,7 +104,12 @@ class UsersController < ApplicationController
           @raw_bubbles_data = current_user.get_raw_bubbles_data(nil,true)
           @bubbles_parameters = current_user.get_bubbles_display_system_settings(true)
           @notifications = current_user.get_notifications(true)
-          @demo = @settings[:onboarding_progress] && !@settings[:onboarding_progress][1] && @raw_bubbles_data.blank?
+
+          @demo = (@settings[:onboarding_progress] && !@settings[:onboarding_progress][1] && @raw_bubbles_data.blank?) ? true : false
+          puts '---------------------------------------------------'
+          puts @settings[:onboarding_progress]
+          puts @demo
+          puts '---------------------------------------------------'
           User.find(9).get_raw_bubbles_data(nil,true) if @demo
           @all_tags = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq.to_json
           if @setting_for_activity_entry_details = SystemSetting.search("activity_detail_level_to_be_shown")
