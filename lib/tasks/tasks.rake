@@ -15,12 +15,14 @@ namespace :system do
     desc 'Daily user and connection level tasks'
     task :daily_user_and_connection_level_tasks => [:environment] do |t, args|
         User.app_users.each do |user|
-            # 1) Find badges
-            user.find_badges
-            # 2) daily_connection_tasks (this has to be before the stats update as the connection scores in this part needs to be calculated first)
-            user.daily_connection_tasks
-            # 3) Update nightly stats
+            # 1) Update nightly stats
             StatisticDefinition.triggers("individual","nightly",User.find(user.id))
+            # 2) Find badges
+            user.find_badges
+            # 3) daily_connection_tasks (this has to be before the stats update as the connection scores in this part needs to be calculated first)
+            user.daily_connection_tasks
+            # 4) Send out expiring notifications email
+            ExternalNotification.send_external_notifications_for(user) if user.email == "roman.krem@gmail.com"
         end
     end 
 
