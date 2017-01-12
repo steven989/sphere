@@ -17,6 +17,7 @@
 //= require_tree .
 //= require_tree ../../../vendor/assets/javascripts/priority/.
 //= require_tree ../../../vendor/assets/javascripts/.
+//= require introjs
 
 // Shared utilities
 

@@ -13,8 +13,9 @@
  *= require_tree .
  *= require_self
  *= require jquery-ui
-*= require font-awesome
+ *= require font-awesome
  *= require_tree ../../../vendor/assets/stylesheets/.
+ *= require introjs
  */
 
 /*Some standard components*/
