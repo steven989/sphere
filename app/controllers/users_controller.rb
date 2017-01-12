@@ -253,7 +253,7 @@ class UsersController < ApplicationController
                                 default_contact_interval_in_days:{title:"Default number of days to connect with people",value:current_user_settings_evaled[:default_contact_interval_in_days],type:"number"},
                                 event_add_granularity:{title:"Granularity of adding events",value:current_user_settings_evaled[:event_add_granularity],type:"selection",options:["Detailed","Quick"]},
                                 timezone:{title:"Default timezone",value:current_user.timezone,type:"selection",options:TZInfo::Timezone.all.map {|zone| zone.name } },
-                                expiry_external_notification:{title:"Email me if there are expiring connections",value:current_user_settings_evaled[:expiry_notification_email_frequency],type:"selection",options:["Daily","Weekly","Monthly","Never"]}
+                                expiry_external_notification:{title:"Email reminder for expiring connections and other Sphere activities",value:current_user_settings_evaled[:expiry_notification_email_frequency],type:"selection",options:["Daily","Weekly","Monthly","Never"]}
                               }
         respond_to do |format|
           format.json {

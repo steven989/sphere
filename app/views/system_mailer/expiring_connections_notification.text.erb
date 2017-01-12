@@ -3,7 +3,7 @@ Hey <%= @user.first_name %>
 <% if @number_of_expiring_connections > 0 %>
 There are <%= @number_of_expiring_connections %> connections you should probably follow up with, it's been a while since they've heard from you (and they're expiring soon)!
 <% else %>
-Here's some updates on what you've done <%= @frequency %>:
+Here's some updates of your Sphere activities <%= @frequency %>:
 <% end %>
 
 So far, you've caught up with <%= @checkins %> friends and made <%= @plans %> plans <%= @frequency %>.<% if @number_of_expiring_connections == 0 %> There aren't any connections who are about to expire, hooray!<% end %> Keep building your social circle!
