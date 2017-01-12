@@ -33,7 +33,7 @@ class UsersController < ApplicationController
           false
           )
         if result[:status]
-          auto_login(result[:user])
+          auto_login(result[:user],true)
           redirect_to root_path
         else
           redirect_to(login_path, alert: "Could not create user. #{result[:message]}")

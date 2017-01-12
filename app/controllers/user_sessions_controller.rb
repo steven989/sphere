@@ -19,7 +19,14 @@ class UserSessionsController < ApplicationController
     if oauth_alert
       redirect_to(login_path, alert: "You signed up with #{login_authorizations.map {|login| login.provider.capitalize}.to_sentence}. Please use #{ login_authorizations.length == 1 ? login_authorizations.take.provider.capitalize : 'one of these services'} to log in")
     else
-      if @user = login(params[:email], params[:password])
+      if user.remember_me_token && (user.remember_me_token_expires_at > Time.now.utc)
+        @user = login(params[:email], params[:password],false)
+        set_remember_me_cookie!(@user)
+      else
+        @user = login(params[:email], params[:password],true)
+      end
+
+      if @user
         AppUsage.log_action("Logged in",@user)
         redirect_back_or_to root_path
       else

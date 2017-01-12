@@ -17,13 +17,18 @@ class AuthorizationsController < ApplicationController
                 # If email address matches an existing user, log that user in
                 existing_user = User.find_email(email)
                 if existing_user
-                    auto_login(existing_user)
+                      if existing_user.remember_me_token && (existing_user.remember_me_token_expires_at > Time.now.utc)
+                        auto_login(existing_user,false)
+                        set_remember_me_cookie!(existing_user)
+                      else
+                        auto_login(existing_user,true)
+                      end
                     @action = "close"
                 else
                     # add photo in here later
                     result = User.create_user(email,first_name,last_name,"user",nil,nil,true)
                     if result[:status]
-                        auto_login(result[:user])
+                        auto_login(result[:user],true)
                         authorization = current_user.authorizations.create(provider:"google",scope:"['email','profile']",data:"{email:'#{request.env['omniauth.auth']['extra']['raw_info']['email']}',name:'#{request.env['omniauth.auth']['extra']['raw_info']['name']}'}",login:true)
                         @action = "close"
                     else

@@ -48,7 +48,7 @@ class PasswordResetsController < ApplicationController
     @user.password_confirmation = params[:user][:password_confirmation]
     # the next line clears the temporary token and updates the password
     if @user.change_password!(params[:user][:password])
-      auto_login(@user)
+      auto_login(@user,true)
       redirect_to root_path
     else
       redirect_to(edit_password_reset_path, alert: "Hmm. Our system doesn't seem to accept your password. Try again! Make sure the two passwords matches each other")
