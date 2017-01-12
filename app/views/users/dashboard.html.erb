@@ -1,5 +1,6 @@
 <script>
 var test;
+
 $(function(){
     if (!("ontouchstart" in document.documentElement)) {
         $('html').removeClass("no-touch").addClass("no-touch");
@@ -34,12 +35,13 @@ $(function(){
         buttonAjax($('#profile'),{timezone:timezone});
     <% end %>
 
+
     // Log front end actions
-    function logFrontEndActions(action) {
+    function logFrontEndActions(actionToLog,type) {
       $.ajax({
         url: '<%= log_front_end_actions_path %>',
         type: 'POST',
-        data: {action:action},
+        data: {actionToLog:actionToLog,type:type},
         dataType: 'JSON'
       })
     }
@@ -233,13 +235,13 @@ $(function(){
     });
 
     // Paint the bubbles
-    paintBubbles(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles);
+    paintBubbles(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles,<%= @demo %>);
 
     function paintBubbles(raw_bubbles_data,notifications,bubbles_parameters,callback) {
         $('#canvas').bubblify(raw_bubbles_data,notifications,bubbles_parameters,callback);
     }
     
-    function prettifyBubbles(canvas,notifications){
+    function prettifyBubbles(canvas,notifications,demo){
         canvas.find('.connectionBubble').each(function(){
 
             // 1) Notifications
@@ -281,87 +283,89 @@ $(function(){
             }
 
             // 3) Modal on clicking each bubble
-            $(this).off("click").on("click",function(){
-                if (!$(this).hasClass('disabled')) {
-                    overLayHtml = $(this).find('.overlayWithName span').html();
-                    openBubble = $(this);
-                    $(this).find('.overlayWithName span').html('<%= fa_icon "spinner", class:"rotater" %>');
-                    $(this).find('.overlayWithName').css({'opacity':'1'});
-                    clockedRotate.start($(this).find('.overlayWithName span .rotater'),150,true);
-                    var _this = $(this);
-                    if (_this.data('connection-id')=='0') {
-                        resetModal($('[data-remodal-id=bubbleModal]'),1);
-                        buttonAjax(_this,{});
-                    } else {
-                        $('[data-remodal-id=bubbleModal] .modalView').each(function(){
-                            if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
-                                else {$(this).removeClass('hidden')};
-                        });
-                        $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
-                        $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
-                        $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
-                        $('.createActivity').each(function(){
-                            $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
-                        });
-                        $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
-                            var button = $(this);
-                            if (!button.hasClass('disabled')) {
-                                var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
-                                var formData = new FormData();
-                                var form = $('.modalView#editConnection form');
-                                var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
-                                var custom_frequency;
-                                formData.append("connection_id",_this.data('connection-id'));
-                                if (frequency=="other") { custom_frequency = form.find('.details input').val();}
-                                formData.append("contact_frequency",frequency);
-                                formData.append("custom_frequency",custom_frequency);
-                                formData.append("notes",form.find('[name=notes]').val());
+            if (!demo) {
+                $(this).off("click").on("click",function(){
+                    if (!$(this).hasClass('disabled')) {
+                        overLayHtml = $(this).find('.overlayWithName span').html();
+                        openBubble = $(this);
+                        $(this).find('.overlayWithName span').html('<%= fa_icon "spinner", class:"rotater" %>');
+                        $(this).find('.overlayWithName').css({'opacity':'1'});
+                        clockedRotate.start($(this).find('.overlayWithName span .rotater'),150,true);
+                        var _this = $(this);
+                        if (_this.data('connection-id')=='0') {
+                            resetModal($('[data-remodal-id=bubbleModal]'),1);
+                            buttonAjax(_this,{});
+                        } else {
+                            $('[data-remodal-id=bubbleModal] .modalView').each(function(){
+                                if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
+                                    else {$(this).removeClass('hidden')};
+                            });
+                            $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
+                            $('.modalView#makePlan input[name=connection_id]').val(_this.data('connection-id'));
+                            $('.modalView#makePlan input[name=connection_email]').prop('placeholder',"Type "+_this.data("first-name")+"'s email");
+                            $('.createActivity').each(function(){
+                                $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
+                            });
+                            $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
+                                var button = $(this);
+                                if (!button.hasClass('disabled')) {
+                                    var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
+                                    var formData = new FormData();
+                                    var form = $('.modalView#editConnection form');
+                                    var frequency = form.find('.contactFrequency button').filter(function(){return $(this).hasClass("active") }).data('value');
+                                    var custom_frequency;
+                                    formData.append("connection_id",_this.data('connection-id'));
+                                    if (frequency=="other") { custom_frequency = form.find('.details input').val();}
+                                    formData.append("contact_frequency",frequency);
+                                    formData.append("custom_frequency",custom_frequency);
+                                    formData.append("notes",form.find('[name=notes]').val());
 
-                                cropVarInEditConnection.croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
-                                        if ($('.modalView#editConnection #photoUploader').prop("files")[0] == undefined) {
-                                            formData.append("photo", null);
-                                        } else if (croppedImageData == null) {
-                                            formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
-                                        } else {
-                                            formData.append("photo", croppedImageData);
-                                        }
-
-                                      $.ajax({
-                                        url: '<%= update_connection_path %>',
-                                        type: 'PUT',
-                                        processData: false,
-                                        contentType: false,
-                                        data: formData,
-                                        dataType: 'JSON'
-                                      }).done(function(data){
-                                            if (data.status) {
-                                                    if(data.message != undefined){
-                                                        toastr.success(data.message,null,{timeOut: 5000,closeButton:false});                       
-                                                    }
+                                    cropVarInEditConnection.croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
+                                            if ($('.modalView#editConnection #photoUploader').prop("files")[0] == undefined) {
+                                                formData.append("photo", null);
+                                            } else if (croppedImageData == null) {
+                                                formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
                                             } else {
-                                                toastr.options.closeButton = true;
-                                                if(data.message != undefined /* && alertElement.length > 0 */) {
-                                                    toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                                                formData.append("photo", croppedImageData);
+                                            }
+
+                                          $.ajax({
+                                            url: '<%= update_connection_path %>',
+                                            type: 'PUT',
+                                            processData: false,
+                                            contentType: false,
+                                            data: formData,
+                                            dataType: 'JSON'
+                                          }).done(function(data){
+                                                if (data.status) {
+                                                        if(data.message != undefined){
+                                                            toastr.success(data.message,null,{timeOut: 5000,closeButton:false});                       
+                                                        }
+                                                } else {
+                                                    toastr.options.closeButton = true;
+                                                    if(data.message != undefined /* && alertElement.length > 0 */) {
+                                                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                                                    }
                                                 }
-                                            }
-                                            if (data.data != undefined) {
-                                                returnedData = data.data;
-                                            }
-                                            reEnableButton(disabledButtonObject);
-                                            if (data.actions != undefined && data.actions.length > 0) {
-                                                performActions(data.actions);    
-                                            }
-                                        });
-                                });
+                                                if (data.data != undefined) {
+                                                    returnedData = data.data;
+                                                }
+                                                reEnableButton(disabledButtonObject);
+                                                if (data.actions != undefined && data.actions.length > 0) {
+                                                    performActions(data.actions);    
+                                                }
+                                            });
+                                    });
 
 
-                            }
-                        })
-                        resetModal($('[data-remodal-id=bubbleModal]'),3);
-                        buttonAjax(_this,{searchClick:searchClick});
-                    } // if (_this.data('connection-id')=='0')
-                } //if (!button.hasClass('disabled'))
-            }); // $(this).off("click").on("click")
+                                }
+                            })
+                            resetModal($('[data-remodal-id=bubbleModal]'),3);
+                            buttonAjax(_this,{searchClick:searchClick});
+                        } // if (_this.data('connection-id')=='0')
+                    } //if (!button.hasClass('disabled'))
+                }); // $(this).off("click").on("click")
+            }
         });
     }
 
@@ -637,12 +641,15 @@ $(function(){
         });
     }
     submitButtonListener();
-
-
-
+    <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][3] || !@settings[:onboarding_progress][4] || !@settings[:onboarding_progress][5] ) %>
+    var onBoarding345 = false;
+    <% end %>
     $('#addConnection').off('click').on('click',function(){
         initializeReModal('[data-remodal-id=importModal]','standardModal',1);
         $('label[for=photoUploaderInCreate]').html('<%= fa_icon "id-badge" %> Upload Photo');
+        <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][3] || !@settings[:onboarding_progress][4] || !@settings[:onboarding_progress][5] ) %>    
+        if (!onBoarding345){showOnboarding(".importModalOnboarding","3,4,5")};
+        <% end %>
     });
 
     $('#navigation-tabs-container').easytabs({
@@ -1391,6 +1398,32 @@ $(function(){
  
     }
 
+    // Onboarding
+    function showOnboarding(section,steps) {
+        introJs(section).setOption("showBullets", false).setOption("exitOnOverlayClick",false).setOption("exitOnEsc",false).start().oncomplete(function(){
+            if (steps == "3,4,5") {
+                onBoarding345 = true;
+            } else if (steps == "9,10") {
+                onBoarding910 = true;
+            }
+            logFrontEndActions(steps,"onboarding");
+        });
+        // $('a.introjs-button.introjs-skipbutton').remove();
+    }
+    
+    <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][1] || !@settings[:onboarding_progress][2]) %>
+        showOnboarding(".mainSphereOnboarding","1,2");
+    <% end %>
+
+
+
+    <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][9] || !@settings[:onboarding_progress][10]) %>
+        var onBoarding910 = false;
+        $('#makePlansButton').on("click",function(){
+            if (!onBoarding910) {
+                showOnboarding("#makePlan","9,10") };
+        });
+    <% end %>
 
 // utility functions
 
@@ -1406,225 +1439,227 @@ $(function(){
         }
         return result;
     }
+
 })
 </script>
-<div id="profile">
-    <div id="logo">
-        <%= image_tag "logo-white-beta", width:"175" %>
-    </div>
-    
-        <div class="profileButtonsContainer showOnMobile">
-            <div class="profileButton" id="addConnection" >
-                <%= fa_icon 'user-plus' %>
-            </div>
-            <div class="profileButton showOnMobile" id="settingLogoutToggle" style="display:none">
-                <%= fa_icon 'bars' %>
-            </div>
+<div class="mainSphereOnboarding" style="height:100%;width:100%;position:relative;">
+    <div id="profile">
+        <div id="logo">
+            <%= image_tag "logo-white-beta", width:"175" %>
         </div>
-        <div class="profileButtonsContainer hideOnMobile showOnDesktop" >
-            <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path %>" data-method="GET">
-                <p class="showOnMobile" style="display:none;">Settings</p>
-                <%= fa_icon 'cog' %>
-            </div>
-            <div class="profileButton ajaxButton" href="<%= help_page_path %>" data-method="GET">
-                <p class="showOnMobile" style="display:none;">Help</p>
-                <%= fa_icon 'question-circle' %>
-            </div>
-            <div class="divider showOnMobile" style="display:none;"></div>
-            <div class="profileButton" id="logout">
-                <p class="showOnMobile" style="display:none;">Log out</p>
-                <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
-            </div>
-        </div>    
-</div>
-
-
-<div id="navigation-tabs-container">
-    <div class="topTabs-header clearfix">
-        <ul class="etabs tabs" id="navigation">
-            <li class="tab"><a href="#mySphere"><span class="userLevelNotificationDisplayElement my_sphere"><%= fa_icon 'circle-o' %><br><span class="hideOnMobile">MY SPHERE</span><span class="notificationContainer"></span></span></a></li>
-            <li class="tab"><a href="#progress"><span class="userLevelNotificationDisplayElement level_up"><%= fa_icon 'bar-chart' %><br><span class="hideOnMobile">PROGRESS</span><span class="notificationContainer"></span></span></a></li>
-            <li class="tab"><a href="#challenges"><span class="userLevelNotificationDisplayElement new_challenge"><%= fa_icon 'map' %><br><span class="hideOnMobile">CHALLENGES</span><span class="notificationContainer"></span></span></a></li>
-            <li class="tab"><a href="#achievements"><span class="userLevelNotificationDisplayElement new_badge"><%= fa_icon 'star' %><br><span class="hideOnMobile">ACHIEVEMENTS</span><span class="notificationContainer"></span></span></a></li>
-            <li class="tab hidden"><a href="#help"></span></a></li>
-        </ul>
-    </div> 
-    <div class="topTabsContent">
-        <div id="mySphere" style="overflow:scroll;" class="tabView">
-            <div id="canvas" style="position: relative; margin: auto;"></div>            
-            <div id="searchBar">
-                <div class="result hidden">
-                    <ul>
-                        <li class="item">
-                            <span class="email">Search connection by name, email, or tags</span>
-                        </li>
-                    </ul>
+        
+            <div class="profileButtonsContainer showOnMobile">
+                <div class="profileButton" id="addConnection" data-intro="Click this button to add connections to your Sphere" data-step="2" data-position="left">
+                    <%= fa_icon 'plus' %>
                 </div>
-                <div class="speechBubbleThingy hidden"></div>
-                <input type="text" class="formElement" placeholder="Search Sphere">
+                <div class="profileButton showOnMobile" id="settingLogoutToggle" style="display:none">
+                    <%= fa_icon 'bars' %>
+                </div>
             </div>
-        </div>
-        <div id="help" class='tabView'>
-            <div class="container m-t-xlg textDarkGray" style="text-align:center;font-weight:300;">
+            <div class="profileButtonsContainer hideOnMobile showOnDesktop" >
+                <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path %>" data-method="GET">
+                    <p class="showOnMobile" style="display:none;">Settings</p>
+                    <%= fa_icon 'cog' %>
+                </div>
+                <div class="profileButton ajaxButton" href="<%= help_page_path %>" data-method="GET">
+                    <p class="showOnMobile" style="display:none;">Help</p>
+                    <%= fa_icon 'question-circle' %>
+                </div>
+                <div class="divider showOnMobile" style="display:none;"></div>
+                <div class="profileButton" id="logout">
+                    <p class="showOnMobile" style="display:none;">Log out</p>
+                    <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
+                </div>
+            </div>    
+    </div>
 
+
+    <div id="navigation-tabs-container">
+        <div class="topTabs-header clearfix">
+            <ul class="etabs tabs" id="navigation">
+                <li class="tab"><a href="#mySphere"><span class="userLevelNotificationDisplayElement my_sphere"><%= fa_icon 'circle-o' %><br><span class="hideOnMobile">MY SPHERE</span><span class="notificationContainer"></span></span></a></li>
+                <li class="tab"><a href="#progress"><span class="userLevelNotificationDisplayElement level_up"><%= fa_icon 'bar-chart' %><br><span class="hideOnMobile">PROGRESS</span><span class="notificationContainer"></span></span></a></li>
+                <li class="tab"><a href="#challenges"><span class="userLevelNotificationDisplayElement new_challenge"><%= fa_icon 'map' %><br><span class="hideOnMobile">CHALLENGES</span><span class="notificationContainer"></span></span></a></li>
+                <li class="tab"><a href="#achievements"><span class="userLevelNotificationDisplayElement new_badge"><%= fa_icon 'star' %><br><span class="hideOnMobile">ACHIEVEMENTS</span><span class="notificationContainer"></span></span></a></li>
+                <li class="tab hidden"><a href="#help"></span></a></li>
+            </ul>
+        </div> 
+        <div class="topTabsContent">
+            <div id="mySphere" style="overflow:scroll;" class="tabView">
+                <div id="canvas" data-intro="This is your Sphere canvas, where you can see your most important relationships. Once you have this populated with your connections, you can click on each bubble to start tracking your relationship with them" data-step="1" data-position="top" style="position: relative; margin: auto;" ></div>
+                <div id="searchBar">
+                    <div class="result hidden">
+                        <ul>
+                            <li class="item">
+                                <span class="email">Search connection by name, email, or tags</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="speechBubbleThingy hidden"></div>
+                    <input type="text" class="formElement" placeholder="Search Sphere">
+                </div>
             </div>
-        </div>
-        <div id="challenges" style="display:none;" class="tabView">
-            <div class="container m-t-xlg">
-                <div class="row">
-                    <% @challenges.each  do |user_challenge| %>
-                        <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
-                            <div class="card challengeCard" data-id="<%= user_challenge.challenge.id %>" data-status="<%= user_challenge.status %>" data-total-days="<%= user_challenge.challenge.days_to_complete %>" data-days-remaining="<%= (user_challenge.date_to_be_completed - Date.today) if user_challenge.date_to_be_completed %>" >
-                                <div class="corner-ribbon top-right sticky yellow <%= "hidden" if user_challenge.notifications.length == 0 %>">New!</div>
-                                <div class="title">
-                                    <h2 class="textDarkGray"><%= user_challenge.challenge.name %></h2>
-                                </div>
-                                <div class="reward textDarkGray" style="text-align:center;">
-                                    <i><p>+<%= user_challenge.challenge.reward %>Points</p></i>
-                                </div>
-                                <div class="graphic">
-                                    <div class="graphicWrapper">
-                                        <%= user_challenge.challenge.graphic.blank? ? "" : (image_tag user_challenge.challenge.graphic, alt:"Challenge Graphics") %>
+            <div id="help" class='tabView'>
+                <div class="container m-t-xlg textDarkGray" style="text-align:center;font-weight:300;">
+
+                </div>
+            </div>
+            <div id="challenges" style="display:none;" class="tabView">
+                <div class="container m-t-xlg">
+                    <div class="row">
+                        <% @challenges.each  do |user_challenge| %>
+                            <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
+                                <div class="card challengeCard" data-id="<%= user_challenge.challenge.id %>" data-status="<%= user_challenge.status %>" data-total-days="<%= user_challenge.challenge.days_to_complete %>" data-days-remaining="<%= (user_challenge.date_to_be_completed - Date.today) if user_challenge.date_to_be_completed %>" >
+                                    <div class="corner-ribbon top-right sticky yellow <%= "hidden" if user_challenge.notifications.length == 0 %>">New!</div>
+                                    <div class="title">
+                                        <h2 class="textDarkGray"><%= user_challenge.challenge.name %></h2>
                                     </div>
+                                    <div class="reward textDarkGray" style="text-align:center;">
+                                        <i><p>+<%= user_challenge.challenge.reward %>Points</p></i>
+                                    </div>
+                                    <div class="graphic">
+                                        <div class="graphicWrapper">
+                                            <%= user_challenge.challenge.graphic.blank? ? "" : (image_tag user_challenge.challenge.graphic, alt:"Challenge Graphics") %>
+                                        </div>
+                                    </div>
+                                    <div class="subtitle">
+                                       <p class="textDarkGray"><%= user_challenge.challenge.instructions %></p>
+                                    </div>
+                                    <div class="buttons">
+                                        <div class="sphereGreenBackground hoverable modalBottomLeftButton ajaxButton start <%= 'hidden' if user_challenge.status == 'progressing' %>" data-method="PUT" href="<%= start_challenge_path %>" data-data-to-send="({challenge_id:<%= user_challenge.challenge.id %>})">
+                                            START
+                                        </div>
+                                        <div class="sphereRedBackground hoverable modalBottomLeftButton ajaxButton complete <%= 'hidden' unless user_challenge.status == 'progressing' %>" data-method="PUT" href="<%= complete_challenge_path %>" data-data-to-send="({challenge_id:<%= user_challenge.challenge.id %>})">
+                                            COMPLETE
+                                        </div>
+                                        <div class="sphereBlueBackground hoverable modalBottomRightButton" data-details="<%= h user_challenge.challenge.description %>">
+                                            LEARN
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        <% end %>                    
+                    </div>
+                </div>
+            </div>
+            <div id="progress" style="display:none;" class="tabView">
+                <div id="levelDisplay">
+                    <div class="content">
+                        <div class="graphic">
+                            <%= @level_object.graphic.blank? ? "" : (image_tag @level_object.graphic, alt:"Level Graphic") %>
+                        </div>
+                        <div class="details">
+                            <div class="level">
+                                <h2 class="textDarkGray">Level <span class="statsToUpdate level"><%= @level_num %></span></h2>
+                            </div>
+                            <div class="progress progressBar" style="margin-bottom:5px;">
+                                <div class="progress-bar bar-green statsToUpdate progressBar" style="width:<%= @level_progress_percent_string %>"></div>
+                            </div>
+                            <div class="textDarkGray" style="font-size:14px;"><span class="statsToUpdate points_gained_in_this_level"><%= @points_gained_in_this_level.to_i %></span> out of <span class="statsToUpdate points_required_to_progress"><%= @points_required_to_progress.to_i %></span> points to next level</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row m-t-lg">
+                        <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6">
+                            <div class="smallCard stats textDarkGray center-block">
+                                <div class="icon">
+                                    <%= fa_icon 'users' %>
+                                </div>
+                                <div class="number">
+                                    <span class="statsToUpdate current_sphere_size"><%= @current_sphere_size %></span>
                                 </div>
                                 <div class="subtitle">
-                                   <p class="textDarkGray"><%= user_challenge.challenge.instructions %></p>
-                                </div>
-                                <div class="buttons">
-                                    <div class="sphereGreenBackground hoverable modalBottomLeftButton ajaxButton start <%= 'hidden' if user_challenge.status == 'progressing' %>" data-method="PUT" href="<%= start_challenge_path %>" data-data-to-send="({challenge_id:<%= user_challenge.challenge.id %>})">
-                                        START
-                                    </div>
-                                    <div class="sphereRedBackground hoverable modalBottomLeftButton ajaxButton complete <%= 'hidden' unless user_challenge.status == 'progressing' %>" data-method="PUT" href="<%= complete_challenge_path %>" data-data-to-send="({challenge_id:<%= user_challenge.challenge.id %>})">
-                                        COMPLETE
-                                    </div>
-                                    <div class="sphereBlueBackground hoverable modalBottomRightButton" data-details="<%= h user_challenge.challenge.description %>">
-                                        LEARN
-                                    </div>
+                                   <p>Current Sphere Size</p>
                                 </div>
                             </div> 
                         </div>
-                    <% end %>                    
-                </div>
-            </div>
-        </div>
-        <div id="progress" style="display:none;" class="tabView">
-            <div id="levelDisplay">
-                <div class="content">
-                    <div class="graphic">
-                        <%= @level_object.graphic.blank? ? "" : (image_tag @level_object.graphic, alt:"Level Graphic") %>
-                    </div>
-                    <div class="details">
-                        <div class="level">
-                            <h2 class="textDarkGray">Level <span class="statsToUpdate level"><%= @level_num %></span></h2>
-                        </div>
-                        <div class="progress progressBar" style="margin-bottom:5px;">
-                            <div class="progress-bar bar-green statsToUpdate progressBar" style="width:<%= @level_progress_percent_string %>"></div>
-                        </div>
-                        <div class="textDarkGray" style="font-size:14px;"><span class="statsToUpdate points_gained_in_this_level"><%= @points_gained_in_this_level.to_i %></span> out of <span class="statsToUpdate points_required_to_progress"><%= @points_required_to_progress.to_i %></span> points to next level</div>
-                    </div>
-                </div>
-            </div>
-            <div class="container">
-                <div class="row m-t-lg">
-                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6">
-                        <div class="smallCard stats textDarkGray center-block">
-                            <div class="icon">
-                                <%= fa_icon 'users' %>
-                            </div>
-                            <div class="number">
-                                <span class="statsToUpdate current_sphere_size"><%= @current_sphere_size %></span>
-                            </div>
-                            <div class="subtitle">
-                               <p>Current Sphere Size</p>
-                            </div>
-                        </div> 
-                    </div>
 
-                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
-                        <div class="smallCard stats textDarkGray center-block">
-                            <div class="icon">
-                                <%= fa_icon 'user-plus' %>
-                            </div>
-                            <div class="number">
-                                <span class="statsToUpdate connections_added"><%= @connections_added %></span>
-                            </div>
-                            <div class="subtitle">
-                               <p>New Connections Added This Month</p>
-                            </div>
-                        </div> 
-                    </div>
-
-                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
-                        <div class="smallCard stats textDarkGray center-block">
-                            <div class="icon">
-                                <%= fa_icon 'calendar-plus-o' %>
-                            </div>
-                            <div class="number">
-                                <span class="statsToUpdate events_booked"><%= @events_booked %></span>
-                            </div>
-                            <div class="subtitle">
-                               <p>Hangouts Booked This Month</p>
-                            </div>
-                        </div> 
-                    </div>  
-
-                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
-                        <div class="smallCard stats textDarkGray center-block">
-                            <div class="icon">
-                                <%= fa_icon 'check-circle-o' %>
-                            </div>
-                            <div class="number">
-                                <span class="statsToUpdate number_of_checkins"><%= @number_of_checkins %></span>
-                            </div>
-                            <div class="subtitle">
-                               <p>Check-Ins This Month</p>
-                            </div>
-                        </div> 
-                    </div>  
-
-                    <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
-                        <div class="smallCard stats textDarkGray center-block">
-                            <div class="icon">
-                                <%= fa_icon 'exclamation-circle' %>
-                            </div>
-                            <div class="number">
-                                <span class="statsToUpdate expired_connections_count"><%= @expired_connections_count %></span>
-                            </div>
-                            <div class="subtitle">
-                               <p>Expired Contacts</p>
-                            </div>
-                        </div> 
-                    </div>  
-
-                </div>
-            </div> 
-        </div>
-        <div id="achievements" style="display:none;" class="tabView">
-            <div class="container m-t-xlg">
-                <div class="row">
-                    <% @badges.each  do |user_badge| %>
-                        <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
-                            <div class="card badgeCard" data-id="<%= user_badge.badge.id %>">
-                                <div class="corner-ribbon top-right sticky yellow <%= "hidden" if user_badge.notifications.length == 0 %>">New!</div>
-                                <div class="title">
-                                    <h2 class="textDarkGray"><%= user_badge.badge.name %></h2>
+                        <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                            <div class="smallCard stats textDarkGray center-block">
+                                <div class="icon">
+                                    <%= fa_icon 'user-plus' %>
                                 </div>
-                                <div class="graphic">
-                                    <%= user_badge.badge.graphic.blank? ? "" :  (image_tag user_badge.badge.graphic, alt:"Badge Graphics")  %>
+                                <div class="number">
+                                    <span class="statsToUpdate connections_added"><%= @connections_added %></span>
                                 </div>
                                 <div class="subtitle">
-                                   <p class="textDarkGray"><%= user_badge.badge.description %></p>
+                                   <p>New Connections Added This Month</p>
                                 </div>
                             </div> 
                         </div>
-                    <% end %>                    
-                </div>
-            </div>            
+
+                        <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                            <div class="smallCard stats textDarkGray center-block">
+                                <div class="icon">
+                                    <%= fa_icon 'calendar-plus-o' %>
+                                </div>
+                                <div class="number">
+                                    <span class="statsToUpdate events_booked"><%= @events_booked %></span>
+                                </div>
+                                <div class="subtitle">
+                                   <p>Hangouts Booked This Month</p>
+                                </div>
+                            </div> 
+                        </div>  
+
+                        <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                            <div class="smallCard stats textDarkGray center-block">
+                                <div class="icon">
+                                    <%= fa_icon 'check-circle-o' %>
+                                </div>
+                                <div class="number">
+                                    <span class="statsToUpdate number_of_checkins"><%= @number_of_checkins %></span>
+                                </div>
+                                <div class="subtitle">
+                                   <p>Check-Ins This Month</p>
+                                </div>
+                            </div> 
+                        </div>  
+
+                        <div class="cardColumn col-lg-15 col-md-3 col-sm-3 col-sm-3 col-xs-6 col-half-offset">
+                            <div class="smallCard stats textDarkGray center-block">
+                                <div class="icon">
+                                    <%= fa_icon 'exclamation-circle' %>
+                                </div>
+                                <div class="number">
+                                    <span class="statsToUpdate expired_connections_count"><%= @expired_connections_count %></span>
+                                </div>
+                                <div class="subtitle">
+                                   <p>Expired Contacts</p>
+                                </div>
+                            </div> 
+                        </div>  
+
+                    </div>
+                </div> 
+            </div>
+            <div id="achievements" style="display:none;" class="tabView">
+                <div class="container m-t-xlg">
+                    <div class="row">
+                        <% @badges.each  do |user_badge| %>
+                            <div class="cardColumn col-lg-4 col-md-4 col-sm-6 col-sm-6 col-xs-12">
+                                <div class="card badgeCard" data-id="<%= user_badge.badge.id %>">
+                                    <div class="corner-ribbon top-right sticky yellow <%= "hidden" if user_badge.notifications.length == 0 %>">New!</div>
+                                    <div class="title">
+                                        <h2 class="textDarkGray"><%= user_badge.badge.name %></h2>
+                                    </div>
+                                    <div class="graphic">
+                                        <%= user_badge.badge.graphic.blank? ? "" :  (image_tag user_badge.badge.graphic, alt:"Badge Graphics")  %>
+                                    </div>
+                                    <div class="subtitle">
+                                       <p class="textDarkGray"><%= user_badge.badge.description %></p>
+                                    </div>
+                                </div> 
+                            </div>
+                        <% end %>                    
+                    </div>
+                </div>            
+            </div>
         </div>
     </div>
 </div>
-
-<div data-remodal-id="bubbleModal" data-default-css="([{'attribute':'height','value':'410px'}])">
+<div data-remodal-id="bubbleModal" class="bubbleModalOnboarding" data-default-css="([{'attribute':'height','value':'410px'}])">
     <div class="modalView" id="plans">
         <div class="modalContentContainer">
             <div class="subTabNavigationContainer container" style="width:100%;">
@@ -1637,23 +1672,25 @@ $(function(){
                     </div>
                 </div>
             </div>
-            <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
-            <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"><input name="phone" class="phone hoverInput inPlaceField" href="<%= update_connection_phone_path %>" data-id="" data-method='PUT' placeholder="Add phone" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"></div>
-            <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
-            <div style="height:135px;margin-top:10px;">
-                <div class="photo transitionButton" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none; display:block; margin:auto;"></div>
-                <div class="icon transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
-                    <%= fa_icon 'user-circle' %>
-                </div> 
+            <div data-intro="You can edit your connections' contact information and tag them" data-step="6" data-position="bottom" style="width:100%; height:auto;">
+                <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
+                <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"><input name="phone" class="phone hoverInput inPlaceField" href="<%= update_connection_phone_path %>" data-id="" data-method='PUT' placeholder="Add phone" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"></div>
+                <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
+                <div style="height:135px;margin-top:10px;">
+                    <div class="photo transitionButton" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none; display:block; margin:auto;"></div>
+                    <div class="icon transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
+                        <%= fa_icon 'user-circle' %>
+                    </div> 
+                </div>
+                <div style="font-size:15px;color:#656268"><span class="nextHangout"></span></div>
+                <select name="tags" id="tokenize" multiple="multiple" class="modalTokenBox" href="<%= update_tags_path %>" data-method="PUT">
+                </select>
+                <div class="padding"></div>
             </div>
-            <div style="font-size:15px;color:#656268"><span class="nextHangout"></span></div>
-            <select name="tags" id="tokenize" multiple="multiple" class="modalTokenBox" href="<%= update_tags_path %>" data-method="PUT">
-            </select>
-            <div class="padding"></div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan">MAKE PLANS</div>
-            <div id="checkinButton" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Click here to schedule events with your connection" data-step="8" data-position="top" id="makePlansButton">MAKE PLANS</div>
+            <div id="checkinButton" data-intro="Check in any time you interact with your connection. All check ins are logged by Sphere for points, and we will remind you to check in with your connection if you haven't done so in a while" data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>
@@ -1678,7 +1715,7 @@ $(function(){
         <div class="modalContentContainer p-h-xxlg">
             <span class="textDarkGray" style="font-size:17px;">Choose Activity and Date</span>
             <form action="<%= plans_path %>" method="POST" >
-                <div class="btn-group buttonGroupWithOther chooseActivity" style="height:50px;"  role="group">
+                <div class="btn-group buttonGroupWithOther chooseActivity" data-intro="Choose what type of activity you want to schedule. The hover-over tooltip shows what will be the title of your event. Click the plus sign to enter your own activity" data-step="9" data-position="bottom"  style="height:50px;"  role="group">
                     <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', width: 33 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Food"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px"  data-toggle="tooltip" data-placement="top" data-html="true" title="Food"><%= image_tag 'food', width: 33 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', width: 33 %></button>
@@ -1718,7 +1755,7 @@ $(function(){
                 <input type="hidden" class="inputData" name="plan_id">
                 
                 <div class="row m-t-xs">
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" data-intro="Click to toggle if you want to put this event on your Google calendar. If so, you will be prompted to authorize connection to Google calendar, otherwise Sphere will save this event internally" data-step="10" data-position="bottom">
                         <%= check_box_tag 'putOnGoogle',true,true, style:"display:inline-box;", class:'inputData' %>
                         <label for="putOnGoogle" class="textDarkGray">Put in Google Calendar?</label>
                     </div>
@@ -1777,15 +1814,18 @@ $(function(){
     </div>
 </div>
 
-<div data-remodal-id="importModal" style="height:450px;" data-default-css="([{'attribute':'height','value':'450px'}])">
+<div data-remodal-id="importModal" class="importModalOnboarding" style="height:450px;" data-default-css="([{'attribute':'height','value':'450px'}])">
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
-                <div class="formElement button textDarkGray disableWhileProcessed" href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Import from Google</div>
+                <div class="import" data-intro="You can also import select connections from your Google Contacts" data-step="4" data-position="bottom">
+                    <div class="formElement button textDarkGray disableWhileProcessed " href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Select from Google Contacts</div>
+                    <em style="font-size:11px;">We respect your privacy. Sphere uses secure encrypted connection and will never spam your contacts or share their information</em>
+                </div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
-                <p class="textDarkGray">You can add <span class="reminingContactDisplay"><%= @remaining_number_of_connections %></span> more connections to your Sphere</p>
-                <form action="<%= create_connection_path %>" method="POST">
+                <p class="textDarkGray" data-intro="This shows you the remaining number of connections you can still add to your Sphere" data-step="5" data-position="bottom">You can add <span class="reminingContactDisplay"><%= @remaining_number_of_connections %></span> more connections to your Sphere</p>
+                <form action="<%= create_connection_path %>" method="POST" data-intro="Enter a few basic information of your connection to add them to your Sphere. Once they're in, you can start tracking your interactions with them" data-step="3" data-position="top">
                     <div class="vex-custom-field-wrapper">
                         <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="name" required>
                         <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >

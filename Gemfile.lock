@@ -124,6 +124,8 @@ GEM
       os (~> 0.9)
       signet (~> 0.7)
     hashie (3.4.6)
+    heroku-deflater (0.6.2)
+      rack (>= 1.4.5)
     hirb (0.7.1)
     httparty (0.13.7)
       json (~> 1.8)
@@ -304,6 +306,7 @@ DEPENDENCIES
   fullcontact
   google-api-client (~> 0.9)
   google_contacts_api
+  heroku-deflater
   hirb
   httparty
   jbuilder (~> 2.0)

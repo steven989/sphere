@@ -71,7 +71,7 @@ class UsersController < ApplicationController
           AppUsage.log_action("Updated user photo",current_user)
           status = true
           message = "Your info is updated!"
-          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"closeModalInstance(100)"}]
+          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"closeModalInstance(100)"}]
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
           status = false
@@ -104,6 +104,8 @@ class UsersController < ApplicationController
           @raw_bubbles_data = current_user.get_raw_bubbles_data(nil,true)
           @bubbles_parameters = current_user.get_bubbles_display_system_settings(true)
           @notifications = current_user.get_notifications(true)
+          @demo = @settings[:onboarding_progress] && !@settings[:onboarding_progress][1] && @raw_bubbles_data.blank?
+          User.find(9).get_raw_bubbles_data(nil,true) if @demo
           @all_tags = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq.to_json
           if @setting_for_activity_entry_details = SystemSetting.search("activity_detail_level_to_be_shown")
             @activity_definitions = ActivityDefinition.level(@setting_for_activity_entry_details.value_in_specified_type) #specify the specificity level of the activities shown 
@@ -164,7 +166,7 @@ class UsersController < ApplicationController
               AppUsage.log_action("Manually added a connection",current_user)
               status = true
               message = "#{connection.first_name} added to your Sphere!"
-              actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"toggleAddToSphereButton()"}]
+              actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"resetModal($('[data-remodal-id=importModal]'),3)"},{action:"function_call",function:"createTagginInCreate()"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"toggleAddToSphereButton()"}]
               data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
           else
               status = false
@@ -221,7 +223,7 @@ class UsersController < ApplicationController
           new_stats[:points_required_to_progress] = points_required_to_progress
           status = true
           message = "Awesome. +#{result[:data][:quality_score_gained].round} points!"
-          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+          actions = [{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
           actions.push({action:"function_call",function:"oneTimeNotificationPopup('[data-remodal-id=notificationsModal] ##{one_time_notification[:element_id]}',#{one_time_notification[:id]},#{one_time_notification[:value_1]})"}) if one_time_notification
           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
         else
@@ -263,7 +265,15 @@ class UsersController < ApplicationController
     end
 
     def log_front_end_actions
-        AppUsage.log_action(params[:action],current_user)
+       if params[:type] == "app_usage"
+        AppUsage.log_action(params[:actionToLog],current_user)
+      elsif params[:type] == "onboarding"
+        onboarding_progress = current_user.user_setting.get_value("onboarding_progress")
+        params[:actionToLog].split(",").each do |step|
+          onboarding_progress[step.to_i] = true
+        end
+        current_user.user_setting.update_hash_value({onboarding_progress:onboarding_progress})
+      end
         respond_to do |format|
           format.json {
             render json: {status:true}

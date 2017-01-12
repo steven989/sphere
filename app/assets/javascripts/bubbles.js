@@ -1,5 +1,5 @@
 (function ($) {
-    $.fn.bubblify = function (bubblesData,notifications,options,callback) {
+    $.fn.bubblify = function (bubblesData,notifications,options,callback,demo) {
         _this = $(this)
         var result = [];
         var rawDataArray = bubblesData;
@@ -151,7 +151,7 @@
 
             });
             if (callback instanceof Function) {
-                callback(_this,notifications);
+                callback(_this,notifications,demo);
             }
             
         }

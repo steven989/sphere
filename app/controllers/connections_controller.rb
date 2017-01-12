@@ -20,7 +20,7 @@ class ConnectionsController < ApplicationController
             raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
             notifications = current_user.get_notifications(false)
             bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-            actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+            actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
             data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
         else
             status = false
@@ -46,7 +46,7 @@ class ConnectionsController < ApplicationController
                 # raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
                 # notifications = current_user.get_notifications(false)
                 # bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
                 # data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
                 actions = nil
                 data = nil
@@ -80,7 +80,7 @@ class ConnectionsController < ApplicationController
                 # raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
                 # notifications = current_user.get_notifications(false)
                 # bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"}]
+                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
                 # data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
                 actions = nil
                 data = nil
@@ -137,7 +137,7 @@ class ConnectionsController < ApplicationController
                   notifications = current_user.get_notifications(false)
                   bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
                   data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
-                  actions.push({action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"})
+                  actions.push({action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"})
                 end
             else
                 status = false
@@ -182,7 +182,7 @@ class ConnectionsController < ApplicationController
             new_stats[:points_gained_in_this_level] = points_gained_in_this_level
             new_stats[:points_required_to_progress] = points_required_to_progress            
             data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
-            actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"}]
+            actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"}]
             if current_user.connections.expired.length == 0
                 actions.push({action:"function_call",function:"putWordsBackInIfNoExpiredConnection(610)"}) 
             end
@@ -270,7 +270,7 @@ class ConnectionsController < ApplicationController
                   new_stats = current_user.stats
                   bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
                   message = result[:message]
-                  actions=[{action:"function_call",function:"uncheckAllContactsImport()"},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats);toggleAddToSphereButton()"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
+                  actions=[{action:"function_call",function:"uncheckAllContactsImport()"},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats);toggleAddToSphereButton()"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
                   data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
                 else
                   status = result[:status]
@@ -379,6 +379,9 @@ class ConnectionsController < ApplicationController
             data[:hasUpcomingPlan] = false
         end
         actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
+        onboarding = current_user.user_setting.get_value('onboarding_progress')
+        actions.push({action:"function_call",function:"showOnboarding('#plans','6,7,8')"}) if (onboarding && (!onboarding[6] || !onboarding[7] || !onboarding[8]))
+
         if params[:searchClick] == true || params[:searchClick] == "true"
             AppUsage.log_action("Opened connection through search",current_user)
         end

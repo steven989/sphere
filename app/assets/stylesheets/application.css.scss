@@ -19,6 +19,20 @@
 
 /*Some standard components*/
 
+.introjs-overlay {
+    height: 100vh !important;
+    position: absolute !important;
+    top: 0px !important;
+    left: 0px !important;
+}
+
+/*.standardModal .introjs-overlay {*/
+    /*height: 0 !important;*/
+/*}*/
+
+.remodal-overlay.standardModal.remodal-is-opened {
+    z-index: 0 !important;
+}
 
 h1,h2,h3,h4,h5,h6,p,div,span,body {
   font-family: 'brandon-grotesque' !important;
