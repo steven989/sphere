@@ -1937,7 +1937,9 @@ $(function(){
                     </div>
                 </div>
                 <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
-                <a href="<%= clear_connections_path %>">Clear contacts (testing button)</a>
+                <% if current_user.tester? %>
+                    <a href="<%= clear_connections_path %>">Clear contacts (testing button)</a>
+                <% end %>
 <!--                 <div class="m-b-md">
                     <div id="event_add_granularity_title"></div>
                     <div>
