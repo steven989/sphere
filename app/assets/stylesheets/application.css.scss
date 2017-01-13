@@ -20,15 +20,9 @@
 /*Some standard components*/
 
 .introjs-overlay {
-    height: 100vh !important;
-    position: absolute !important;
-    top: 0px !important;
-    left: 0px !important;
+    display:none !important;
 }
 
-/*.standardModal .introjs-overlay {*/
-    /*height: 0 !important;*/
-/*}*/
 
 .remodal-overlay.standardModal.remodal-is-opened {
     z-index: 0 !important;
