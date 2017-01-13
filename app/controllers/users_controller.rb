@@ -104,7 +104,7 @@ class UsersController < ApplicationController
           @raw_bubbles_data = current_user.get_raw_bubbles_data(nil,true)
           @bubbles_parameters = current_user.get_bubbles_display_system_settings(true)
           @notifications = current_user.get_notifications(true)
-          @demo = (@settings[:onboarding_progress] && !@settings[:onboarding_progress][1] && @raw_bubbles_data.blank?) ? true : false
+          @demo = (@settings[:onboarding_progress] && !@settings[:onboarding_progress][1] && @raw_bubbles_data == "[]") ? true : false
           if @demo 
             @raw_bubbles_data = User.find(9).get_raw_bubbles_data(nil,true) 
           end
