@@ -91,7 +91,7 @@ $(function(){
         $('#searchBar input').off("input").on("input",function(){
             if ($(this).val()=="") {
                 $('#searchBar .result ul').empty();
-                $('#searchBar .result ul').append("<li class='item'><span class='email'>Search connection by name, email or, tags</span></li>");
+                $('#searchBar .result ul').append("<li class='item'><span class='email'>Search connection by name, email, or tags</span></li>");
             } else {
                 var result = fuse.search($(this).val());
                 $('#searchBar .result ul').empty();
