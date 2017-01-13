@@ -150,7 +150,6 @@ $(function(){
         $('[data-remodal-id=notificationsModal] .modalView').each(function(){
             $(this).removeClass('hidden').addClass('hidden');
         });
-        console.log(modalElement);
         $(modalElement).removeClass('hidden');
         if(value1){$(modalElement).find('.value1').html(value1);}
         var check = setInterval(function(){
@@ -191,7 +190,11 @@ $(function(){
             $(this).off("focusin").on("focusin",function(){
                 currentValue = $(this).val();
             });
-
+            $(this).off("keypress").on("keypress",function(){
+                if (event.keyCode == 13) {
+                    $(this).blur();
+                };
+            });
             $(this).off("focusout").on("focusout",function(){
                 if ($(this).val() != currentValue) {
                     buttonAjax($(this),{id:$(this).data('id'),value:$(this).val()});
@@ -327,43 +330,32 @@ $(function(){
                                     formData.append("custom_frequency",custom_frequency);
                                     formData.append("notes",form.find('[name=notes]').val());
 
-                                    cropVarInEditConnection.croppie('result',{type:'blob',size:'original',format:'jpg'}).then(function(croppedImageData){
-                                            if ($('.modalView#editConnection #photoUploader').prop("files")[0] == undefined) {
-                                                formData.append("photo", null);
-                                            } else if (croppedImageData == null) {
-                                                formData.append("photo", $('.modalView#editConnection #photoUploader').prop("files")[0]);
-                                            } else {
-                                                formData.append("photo", croppedImageData);
-                                            }
-
-                                          $.ajax({
-                                            url: '<%= update_connection_path %>',
-                                            type: 'PUT',
-                                            processData: false,
-                                            contentType: false,
-                                            data: formData,
-                                            dataType: 'JSON'
-                                          }).done(function(data){
-                                                if (data.status) {
-                                                        if(data.message != undefined){
-                                                            toastr.success(data.message,null,{timeOut: 5000,closeButton:false});                       
-                                                        }
-                                                } else {
-                                                    toastr.options.closeButton = true;
-                                                    if(data.message != undefined /* && alertElement.length > 0 */) {
-                                                        toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
+                                      $.ajax({
+                                        url: '<%= update_connection_path %>',
+                                        type: 'PUT',
+                                        processData: false,
+                                        contentType: false,
+                                        data: formData,
+                                        dataType: 'JSON'
+                                      }).done(function(data){
+                                            if (data.status) {
+                                                    if(data.message != undefined){
+                                                        toastr.success(data.message,null,{timeOut: 5000,closeButton:false});                       
                                                     }
+                                            } else {
+                                                toastr.options.closeButton = true;
+                                                if(data.message != undefined /* && alertElement.length > 0 */) {
+                                                    toastr.error(data.message,null, {timeOut: 10000,closeButton:true});
                                                 }
-                                                if (data.data != undefined) {
-                                                    returnedData = data.data;
-                                                }
-                                                reEnableButton(disabledButtonObject);
-                                                if (data.actions != undefined && data.actions.length > 0) {
-                                                    performActions(data.actions);    
-                                                }
-                                            });
-                                    });
-
+                                            }
+                                            if (data.data != undefined) {
+                                                returnedData = data.data;
+                                            }
+                                            reEnableButton(disabledButtonObject);
+                                            if (data.actions != undefined && data.actions.length > 0) {
+                                                performActions(data.actions);    
+                                            }
+                                        });
 
                                 }
                             })
@@ -898,18 +890,24 @@ $(function(){
         var contact_frequency = returnedData.contact_frequency;
         var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
 
+
+        $('[data-remodal-id=bubbleModal] .modalView#plans .default_photo').removeClass("formElement").removeClass('photo').addClass('photo');
+        $('[data-remodal-id=bubbleModal] .modalView#plans .default_icon').removeClass("formElement").removeClass('icon').addClass('icon');
+        $('[data-remodal-id=bubbleModal] .submitButton').removeClass('hidden').addClass('hidden');
         $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.name').val(name).data('id',returnedData.connection_id);
+        $('[data-remodal-id=bubbleModal] .modalView#plans form .inputData[name=connection_id]').val(returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.email').val(email).data('id',returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.phone').val(phone).data('id',returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
+        $('.modalView#makePlan .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
+        $('.modalView#editConnection .subTabNavigationButton.profile').removeData('height-adjust-element').removeData('height-adjust-value');
         if (photoUrl) {
-            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden');
-            $('[data-remodal-id=bubbleModal] .modalView#plans div.icon').removeClass('hidden').addClass('hidden');
-            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').css({'background-image':'url('+photoUrl+')','background-size':'cover','background-position':'center','background-repeat':'no-repeat','background-color':'#EFEFEF'});
+            $('[data-remodal-id=bubbleModal] .modalView#plans label.photo').removeClass('hidden').css({'background-image':'url('+photoUrl+')','background-size':'cover','background-position':'center','background-repeat':'no-repeat','background-color':'#EFEFEF'}).html('<span class="edit_icon"><%= fa_icon "upload" %></span>');
+            $('[data-remodal-id=bubbleModal] .modalView#plans label.icon').removeClass('hidden').addClass('hidden').html('<%= fa_icon "user-circle" %><span class="edit_icon"><%= fa_icon "upload" %></span>');
         } else {
-            $('[data-remodal-id=bubbleModal] .modalView#plans div.icon').removeClass('hidden');
-            $('[data-remodal-id=bubbleModal] .modalView#plans div.photo').removeClass('hidden').addClass('hidden');
+            $('[data-remodal-id=bubbleModal] .modalView#plans label.icon').removeClass('hidden').html('<%= fa_icon "user-circle" %><span class="edit_icon"><%= fa_icon "upload" %></span>');
+            $('[data-remodal-id=bubbleModal] .modalView#plans label.photo').removeClass('hidden').addClass('hidden').html('<span class="edit_icon"><%= fa_icon "upload" %></span>');
         }
         searchClick = false;
         $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
@@ -957,7 +955,6 @@ $(function(){
                         $(this).addClass('active');
                         $($(this).data('slide-down')).slideDown();
                         $('.modalView#plans .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','460px');   
-
                     }
                 }
             });
@@ -1021,9 +1018,18 @@ $(function(){
                     enableExif: true
                 });
                 $('#photoUploader').on('change', function () {
-                    $('.modalView#editConnection .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust = false-value','410px');
+                    if($('.modalView#plans .modalBottomLeftButton').data('height-adjust-element') == undefined) {
+                        $('.modalView#plans .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','410px');
+                    }
+                    if($('.modalView#plans .subTabNavigationButton.preferences').data('height-adjust-element') == undefined) {
+                        $('.modalView#plans .subTabNavigationButton.preferences').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','410px');
+                    }
+
+                    $('.modalView#makePlan .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','700px');
+                    $('.modalView#editConnection .subTabNavigationButton.profile').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','700px');
                     $('.modalView#plans .photo, .modalView#plans .icon').each(function(){
-                        $(this).data('height-adjust-element','.remodal[data-remodal = false-id=bubbleModal]').data('height-adjust-value','700px');
+                        $(this).removeClass('photo').removeClass('icon').addClass("formElement ").addClass("button").css({"background-image":"none"});
+                    $('.modalView#plans .submitButton').removeClass("hidden");
                     });
                     $('#cropInEditConnection').removeClass('hidden');
                     $('.remodal[data-remodal-id=bubbleModal]').animate({height:"700px"})
@@ -1038,7 +1044,7 @@ $(function(){
         // Hide the photo cropping preview area
         $('#cropInEditConnection').addClass('hidden');
         // reset the photo upload label
-        $('label[for=photoUploader]').html('<%= fa_icon "id-badge" %> Upload Photo');
+        // $('label[for=photoUploader]').html('<%= fa_icon "id-badge" %> Upload Photo');
 
         // Related to the tagging field in the modal. Used jQuery Tokenize plugin, but made slight modifications to the plugin so that upon clearing all tokens it doesn't trigger the callbacks that is triggered for one-by-one removing token
          if ((typeof token == "undefined")) {
@@ -1118,7 +1124,10 @@ $(function(){
             $(this).on("click",function(){
                 if ($(this).data('value') != "other") {
                     $($(this).data('slide-down')+' input').val($(this).data('value'));
-                }                
+                    $('.modalView#plans .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','410px');   
+                } else {
+                    $('.modalView#plans .modalBottomLeftButton').data('height-adjust-element','.remodal[data-remodal-id=bubbleModal]').data('height-adjust-value','460px');                      
+                }         
             });
         });
 
@@ -1379,7 +1388,7 @@ $(function(){
             incrementer++;
         });
         
-        $('#importContacts .search').off("keyup").on("keyup",function(){
+        $('#importContacts .search .search').off("keyup").on("keyup",function(){
             var keyword = $(this).val().toLowerCase();
             var matchedItemsIDs = contacts.filter(function(c){ return ((c.name+" "+c.email+" "+c.phone.join(', ')+" "+c.other_emails.join(', ')).toLowerCase().indexOf(keyword) > -1 ) }).map(function(c){return c.incID });
             $('#importContacts table tbody tr').each(function(){
@@ -1695,11 +1704,20 @@ $(function(){
                 <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
                 <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"><input name="phone" class="phone hoverInput inPlaceField" href="<%= update_connection_phone_path %>" data-id="" data-method='PUT' placeholder="Add phone" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"></div>
                 <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
-                <div style="height:135px;margin-top:10px;">
-                    <div class="photo transitionButton" alt="No photo available" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="cursor:pointer; width:120px;height:120px;border-radius:50%; border:none; display:block; margin:auto;"></div>
-                    <div class="icon transitionButton textLightGray" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection" style="display:inline-block; cursor:pointer; width:120px;height:120px;border-radius:50%; border:none;font-size:120px;" >
-                        <%= fa_icon 'user-circle' %>
-                    </div> 
+                <div style="min-height:135px;margin-top:10px;">
+                    <div id="cropInEditConnection" class='hidden'></div>
+                    <form action="<%= update_connection_path %>" method="PUT">
+                        <input type="hidden" class="inputData" name="connection_id">
+                        <input name="photoUploader" class="inputData hiddenUploader" id="photoUploader" type="file" accept="image/*"  data-uploader-crop-var="cropVarInEditConnection">
+                        <label for="photoUploader" class="photo default_photo">
+                            <span class="edit_icon"><%= fa_icon 'upload' %></span>
+                        </label>
+                        <label for="photoUploader" class="icon textLightGray default_icon">
+                            <%= fa_icon 'user-circle' %>
+                            <span class="edit_icon"><%= fa_icon 'upload' %></span>
+                        </label>
+                    </form>
+                    <div class="formElement button sphereGreenBackground disableWhileProcessed hoverable hidden submitButton m-b-xxxlg" data-submit-form=".modalView#plans form" style="color:white;border:none;">Upload</div>
                 </div>
                 <div style="font-size:15px;color:#656268"><span class="nextHangout"></span></div>
                 <select name="tags" id="tokenize" multiple="multiple" class="modalTokenBox" href="<%= update_tags_path %>" data-method="PUT">
@@ -1815,13 +1833,6 @@ $(function(){
                 <div class="details" style="display:none;" >
                     Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
                 </div>
-
-                <div id="cropInEditConnection" class='hidden'></div>
-                <input name="photoUploader" class="hiddenUploader" id="photoUploader" type="file" accept="image/*">
-                <label for="photoUploader" class="textDarkGray" style="margin-top: 20px;">
-                    <%= fa_icon 'id-badge' %>
-                    Upload Photo
-                </label>
                 <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
                 <div class="deleteButtonContainer" style='text-align:center;width:100%;'>
                 <%= link_to "Permanently Delete Connection", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from Sphere server and it won't be possible to recover later", method:"PUT"} %>

@@ -604,26 +604,6 @@ body {
 }
 
 #photoUploader, #photoUploaderInCreate, #photoUploaderInUserInfo { display: none; }
-label[for=photoUploader] {
-    border: 1px solid #E9E9E9;
-    font-family: 'eausans_book';
-    width: 100%; 
-    padding-left: 12%;
-    background-color: #FAFAFA;
-    border-radius: 5px;
-    font-size: 12px;
-    color: #656268;
-    position: relative;
-    text-align: left;
-    cursor: pointer;
-    height: 35px;
-    line-height: 35px;
-    transition:background-color 0.2s ease;
-}
-
-.no-touch label[for=photoUploader]:hover {
-    background-color: #F1F1F1;    
-}
 
 
 /* Add connection screen related  */
@@ -666,11 +646,36 @@ label[for=photoUploader] {
 
 .modalView#plans .photo,.modalView#plans .icon {
     transition: box-shadow 0.2s ease;
+    position: relative;
+    cursor:pointer; 
+    width:120px;
+    height:120px;
+    border-radius:50%; 
+    border:none; 
+    display:block; 
+    margin:auto;
+    font-size:120px;
 }
 
 .no-touch .modalView#plans .photo:hover,.no-touch  .modalView#plans .icon:hover {
     box-shadow: 0px 0px 10px #636363;
 }
+
+.modalView#plans .photo .edit_icon,.modalView#plans .icon .edit_icon {
+    transition: opacity 0.2s ease;
+    opacity: 0;
+    font-size: 20px;
+    color: black;
+    position:absolute;
+    right: -5px;
+    bottom: -3px;
+    color: #707070;
+}
+
+.no-touch .modalView#plans .photo:hover.photo .edit_icon,.no-touch  .modalView#plans .icon:hover.icon .edit_icon {
+    opacity: 1;
+}
+
 
 .no-touch .modalView .subTabNavigationContainer .subTabNavigationButton:hover {
     transition: color 0.2s ease;
@@ -795,6 +800,9 @@ label[for=photoUploader] {
 .no-touch .sphereRedBackground.hoverable:not(.disabled):hover {
     background-color:#CC1919;
 }
+.no-touch .sphereRedBackground.hoverable.disabled:hover {
+    background-color:#C56666;
+}
 
 
 .sphereBlueBackground {
@@ -812,7 +820,9 @@ label[for=photoUploader] {
     cursor:auto;
     transition:background-color 0.2s ease;
 }
-
+.no-touch .sphereBlueBackground.hoverable.disabled:hover {
+    background-color: #5896B5;
+}
 
 
 .sphereGreenBackground {
@@ -829,7 +839,9 @@ label[for=photoUploader] {
 .no-touch .sphereGreenBackground.hoverable:not(.disabled):hover {
     background-color: #37AF49;
 }
-
+.no-touch .sphereGreenBackground.hoverable.disabled:hover {
+    background-color: #659C6D;
+}
 
 /* Revive connections modal screen*/
 

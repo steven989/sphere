@@ -105,7 +105,7 @@ class ConnectionsController < ApplicationController
 
     def update
         connection = Connection.find(params[:connection_id])
-        photo_uploaded = !((params[:photo] == "undefined") || (params[:photo] == "null") || params[:photo].blank?)
+        photo_uploaded = !((params[:photoUploader] == "undefined") || (params[:photoUploader] == "null") || params[:photoUploader].blank?)
 
         if params[:contact_frequency] == "other" && (params[:custom_frequency].blank? || params[:custom_frequency].to_i < 1 )
             status = false
@@ -115,24 +115,30 @@ class ConnectionsController < ApplicationController
             if photo_uploaded
                 connection.remove_photo!
                 connection.save
-                connection.photo = params[:photo]
+                connection.photo = params[:photoUploader]
+                usage_log_message = "Updated photo for connection (#{connection.first_name}  #{connection.last_name})"
+                message = "#{connection.first_name}'s photo updated!"
             end
-            target_contact_interval_in_days = (params[:contact_frequency] == "monthly" ? 30 : ( params[:contact_frequency] == "weekly" ? 7 : params[:custom_frequency].to_i ) )
-            connection.assign_attributes(
-                id:params[:connection_id],
-                frequency_word:params[:contact_frequency],
-                target_contact_interval_in_days:target_contact_interval_in_days,
-                notes:params[:notes]
-            )
+            
+            if params[:contact_frequency] || params[:notes]
+                target_contact_interval_in_days = (params[:contact_frequency] == "monthly" ? 30 : ( params[:contact_frequency] == "weekly" ? 7 : params[:custom_frequency].to_i ) )
+                connection.assign_attributes(
+                    id:params[:connection_id],
+                    frequency_word:params[:contact_frequency],
+                    target_contact_interval_in_days:target_contact_interval_in_days,
+                    notes:params[:notes]
+                )
+                usage_log_message = "Updated connection (#{connection.first_name} #{connection.last_name})"
+                message = "Awesome. We updated #{connection.first_name}'s info for you!"
+            end
             if connection.save
-                AppUsage.log_action("Updated connection (#{connection.first_name} #{connection.last_name})",current_user)
+                AppUsage.log_action(usage_log_message,current_user)
                 Connection.port_photo_url_to_access_url(connection.id)
                 status = true
-                message = "Awesome. We updated #{connection.first_name}'s info for you!"
+                message = message
                 actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(100)"}]
                 data = nil
                 if photo_uploaded
-                  AppUsage.log_action("Updated photo for connection (#{connection.first_name}  #{connection.last_name})",current_user)
                   raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
                   notifications = current_user.get_notifications(false)
                   bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
