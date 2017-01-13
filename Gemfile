@@ -80,8 +80,6 @@ gem 'tzinfo-data'
 gem 'delayed_job_active_record'
 # get user browser info
 gem 'browser'
-# intro js
-gem "introjs-rails"
 
 
 # Use ActiveModel has_secure_password
