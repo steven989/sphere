@@ -1,5 +1,5 @@
 class ConnectionsController < ApplicationController
-
+    before_action :require_login
 
     def create_note
         ConnectionNote.create(user_id:current_user.id,connection_id:params[:id],notes:params[:notes])
@@ -8,23 +8,30 @@ class ConnectionsController < ApplicationController
 
     def update_name
         connection_id = params[:id]
-        if !params[:value].blank?
-            name = params[:value]
-            first_name = Connection.parse_first_name(name)
-            last_name = Connection.parse_last_name(name)
-            connection = Connection.find(connection_id)
-            connection.update_attributes(first_name:first_name,last_name:last_name)
-            AppUsage.log_action("Updated name for connection (#{first_name} #{last_name})",current_user)
-            status = true
-            message = "Name updated!"
-            raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-            notifications = current_user.get_notifications(false)
-            bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-            actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
-            data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+        connection = Connection.find(connection_id)
+        if connection.belongs_to?(current_user)
+            if !params[:value].blank?
+                name = params[:value]
+                first_name = Connection.parse_first_name(name)
+                last_name = Connection.parse_last_name(name)
+                connection.update_attributes(first_name:first_name,last_name:last_name)
+                AppUsage.log_action("Updated name for connection (#{first_name} #{last_name})",current_user)
+                status = true
+                message = "Name updated!"
+                raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+                notifications = current_user.get_notifications(false)
+                bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+                actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
+                data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+            else
+                status = false
+                message = nil
+                actions = nil
+                data = nil
+            end
         else
             status = false
-            message = nil
+            message = "You do not have access to edit this connection"
             actions = nil
             data = nil
         end
@@ -39,20 +46,22 @@ class ConnectionsController < ApplicationController
         connection_id = params[:id]
         if !params[:value].blank?
             connection = Connection.find(connection_id)
-            if connection.update_attributes(email:params[:value])
-                AppUsage.log_action("Updated email for connection (#{connection.first_name}  #{connection.last_name})",current_user)
-                status = true
-                message = "Email updated!"
-                # raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-                # notifications = current_user.get_notifications(false)
-                # bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
-                # data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
-                actions = nil
-                data = nil
+            if connection.belongs_to?(current_user)
+                if connection.update_attributes(email:params[:value])
+                    AppUsage.log_action("Updated email for connection (#{connection.first_name}  #{connection.last_name})",current_user)
+                    status = true
+                    message = "Email updated!"
+                    actions = nil
+                    data = nil
+                else
+                    status = false
+                    message = connection.errors.full_messages.join(', ')
+                    actions = nil
+                    data = nil
+                end
             else
                 status = false
-                message = connection.errors.full_messages.join(', ')
+                message = "You do not have access to edit this connection"
                 actions = nil
                 data = nil
             end
@@ -73,20 +82,22 @@ class ConnectionsController < ApplicationController
         connection_id = params[:id]
         if !params[:value].blank?
             connection = Connection.find(connection_id)
-            if connection.update_attributes(phone:params[:value])
-                AppUsage.log_action("Updated phone for connection (#{connection.first_name}  #{connection.last_name})",current_user)
-                status = true
-                message = "Phone updated!"
-                # raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-                # notifications = current_user.get_notifications(false)
-                # bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-                # actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"}]
-                # data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
-                actions = nil
-                data = nil
+            if connection.belongs_to?(current_user)
+                if connection.update_attributes(phone:params[:value])
+                    AppUsage.log_action("Updated phone for connection (#{connection.first_name}  #{connection.last_name})",current_user)
+                    status = true
+                    message = "Phone updated!"
+                    actions = nil
+                    data = nil
+                else
+                    status = false
+                    message = connection.errors.full_messages.join(', ')
+                    actions = nil
+                    data = nil
+                end
             else
                 status = false
-                message = connection.errors.full_messages.join(', ')
+                message = "You do not have access to edit this connection"
                 actions = nil
                 data = nil
             end
@@ -105,52 +116,58 @@ class ConnectionsController < ApplicationController
 
     def update
         connection = Connection.find(params[:connection_id])
-        photo_uploaded = !((params[:photoUploader] == "undefined") || (params[:photoUploader] == "null") || params[:photoUploader].blank?)
-
-        if params[:contact_frequency] == "other" && (params[:custom_frequency].blank? || params[:custom_frequency].to_i < 1 )
-            status = false
-            message = "Please enter a valid number of days"
-            actions = [{action:"add_class",element:".modalView#editConnection input[name=other_days]",class:"errorFormInput"}]
-        else
-            if photo_uploaded
-                connection.remove_photo!
-                connection.save
-                connection.photo = params[:photoUploader]
-                usage_log_message = "Updated photo for connection (#{connection.first_name}  #{connection.last_name})"
-                message = "#{connection.first_name}'s photo updated!"
-            end
-            
-            if params[:contact_frequency] || params[:notes]
-                target_contact_interval_in_days = (params[:contact_frequency] == "monthly" ? 30 : ( params[:contact_frequency] == "weekly" ? 7 : params[:custom_frequency].to_i ) )
-                connection.assign_attributes(
-                    id:params[:connection_id],
-                    frequency_word:params[:contact_frequency],
-                    target_contact_interval_in_days:target_contact_interval_in_days,
-                    notes:params[:notes]
-                )
-                usage_log_message = "Updated connection (#{connection.first_name} #{connection.last_name})"
-                message = "Awesome. We updated #{connection.first_name}'s info for you!"
-            end
-            if connection.save
-                AppUsage.log_action(usage_log_message,current_user)
-                Connection.port_photo_url_to_access_url(connection.id)
-                status = true
-                message = message
-                actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(100)"}]
-                data = nil
-                if photo_uploaded
-                  raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-                  notifications = current_user.get_notifications(false)
-                  bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-                  data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
-                  actions.push({action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"})
-                end
-            else
+        if connection.belongs_to?(current_user)
+            photo_uploaded = !((params[:photoUploader] == "undefined") || (params[:photoUploader] == "null") || params[:photoUploader].blank?)
+            if params[:contact_frequency] == "other" && (params[:custom_frequency].blank? || params[:custom_frequency].to_i < 1 )
                 status = false
-                message = "Oops. Our robots ran into some issues: #{connection.errors.full_messages.join(', ')}"
-                actions = nil
-                data = nil
+                message = "Please enter a valid number of days"
+                actions = [{action:"add_class",element:".modalView#editConnection input[name=other_days]",class:"errorFormInput"}]
+            else
+                if photo_uploaded
+                    connection.remove_photo!
+                    connection.save
+                    connection.photo = params[:photoUploader]
+                    usage_log_message = "Updated photo for connection (#{connection.first_name}  #{connection.last_name})"
+                    message = "#{connection.first_name}'s photo updated!"
+                end
+                
+                if params[:contact_frequency] || params[:notes]
+                    target_contact_interval_in_days = (params[:contact_frequency] == "monthly" ? 30 : ( params[:contact_frequency] == "weekly" ? 7 : params[:custom_frequency].to_i ) )
+                    connection.assign_attributes(
+                        id:params[:connection_id],
+                        frequency_word:params[:contact_frequency],
+                        target_contact_interval_in_days:target_contact_interval_in_days,
+                        notes:params[:notes]
+                    )
+                    usage_log_message = "Updated connection (#{connection.first_name} #{connection.last_name})"
+                    message = "Awesome. We updated #{connection.first_name}'s info for you!"
+                end
+                if connection.save
+                    AppUsage.log_action(usage_log_message,current_user)
+                    Connection.port_photo_url_to_access_url(connection.id)
+                    status = true
+                    message = message
+                    actions = [{action:"function_call",function:"resetModal($('.modalView#editConnection  .modalContentContainer'),1)"},{action:"function_call",function:"closeModalInstance(100)"}]
+                    data = nil
+                    if photo_uploaded
+                      raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+                      notifications = current_user.get_notifications(false)
+                      bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+                      data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
+                      actions.push({action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"})
+                    end
+                else
+                    status = false
+                    message = "Oops. Our robots ran into some issues: #{connection.errors.full_messages.join(', ')}"
+                    actions = nil
+                    data = nil
+                end
             end
+        else
+            status = false
+            message = "You do not have access to edit this connection"
+            actions = nil
+            data = nil
         end
         respond_to do |format|
           format.json {
@@ -174,25 +191,31 @@ class ConnectionsController < ApplicationController
         result = connection.revive
         status = result[:status]
         message = result[:message]
-
-        if result[:status]
-            raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-            notifications = current_user.get_notifications(false)            
-            bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-            new_stats = current_user.stats
-            level_num = new_stats[:level].to_i
-            xp = new_stats[:xp]
-            level_progress_lookup = Level.return_level_xps([level_num,level_num+1])
-            points_gained_in_this_level = xp-level_progress_lookup[level_num]
-            points_required_to_progress = level_progress_lookup[level_num+1]-level_progress_lookup[level_num]
-            new_stats[:points_gained_in_this_level] = points_gained_in_this_level
-            new_stats[:points_required_to_progress] = points_required_to_progress            
-            data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
-            actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"}]
-            if current_user.connections.expired.length == 0
-                actions.push({action:"function_call",function:"putWordsBackInIfNoExpiredConnection(610)"}) 
+        if connection.belongs_to?(current_user)
+            if result[:status]
+                raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+                notifications = current_user.get_notifications(false)            
+                bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+                new_stats = current_user.stats
+                level_num = new_stats[:level].to_i
+                xp = new_stats[:xp]
+                level_progress_lookup = Level.return_level_xps([level_num,level_num+1])
+                points_gained_in_this_level = xp-level_progress_lookup[level_num]
+                points_required_to_progress = level_progress_lookup[level_num+1]-level_progress_lookup[level_num]
+                new_stats[:points_gained_in_this_level] = points_gained_in_this_level
+                new_stats[:points_required_to_progress] = points_required_to_progress            
+                data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
+                actions = [{action:"fadeDelete",element:"#expiredConnectionRow#{params[:connection_id]}",fadeoutTime:600},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"}]
+                if current_user.connections.expired.length == 0
+                    actions.push({action:"function_call",function:"putWordsBackInIfNoExpiredConnection(610)"}) 
+                end
+            else
+                actions = nil
+                data = nil
             end
         else
+            status = false
+            message = "You do not have access to edit this connection"
             actions = nil
             data = nil
         end
@@ -301,23 +324,31 @@ class ConnectionsController < ApplicationController
 
     def destroy
        connection = Connection.find(params[:connection_id])
-       connection.activities.destroy_all
-       connection.connection_score.destroy if connection.connection_score
-       connection.connection_score_histories.destroy_all
-       connection.plans.destroy_all
-       connection.notifications.destroy_all
-       connection.tags.destroy_all
-       connection.destroy
+       if connection.belongs_to?(current_user)
+           connection.activities.destroy_all
+           connection.connection_score.destroy if connection.connection_score
+           connection.connection_score_histories.destroy_all
+           connection.plans.destroy_all
+           connection.notifications.destroy_all
+           connection.user_reminders.destroy_all
+           connection.tags.destroy_all
+           connection.destroy
 
-       StatisticDefinition.triggers("individual","destroy_connection",User.find(current_user.id))
+           StatisticDefinition.triggers("individual","destroy_connection",User.find(current_user.id))
 
-       raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
-       notifications = current_user.get_notifications(false)
-       new_stats = current_user.stats
-       bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
-       message = "Connection permanently deleted"
-       actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"closeModalInstance(100)"}]
-       data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
+           raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+           notifications = current_user.get_notifications(false)
+           new_stats = current_user.stats
+           bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+           message = "Connection permanently deleted"
+           actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"closeModalInstance(100)"}]
+           data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
+       else 
+            status = false
+            message = "You do not have access to edit this connection"
+            actions = nil
+            data = nil
+       end
 
        respond_to do |format|
           format.json {
@@ -413,5 +444,9 @@ class ConnectionsController < ApplicationController
         end        
     end
 
+    private
 
+    def require_login
+        redirect_to login_path if !logged_in?
+    end
 end

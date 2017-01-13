@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   has_many :tags
   has_many :penalties
   has_many :external_notifications
+  has_many :user_reminders, dependent: :destroy
 
   # Validations
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }

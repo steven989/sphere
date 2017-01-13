@@ -8,6 +8,7 @@ class Connection < ActiveRecord::Base
     has_many :plans
     has_many :tags, as: :taggable
     has_many :notifications, as: :notifiable
+    has_many :user_reminders
     # Callbacks
     after_create :callbacks_after_create
     after_update :callbacks_after_update
@@ -520,6 +521,10 @@ class Connection < ActiveRecord::Base
         message = "Your current XP is #{self.user.stat("xp")}, not enough for the #{penalty_amount} required to re-add#{" "+self.first_name}! Check in with your connections or complete challenges to earn more XP"
       end
       {status:status,message:message}
+    end
+
+    def belongs_to?(user)
+      self.user == user
     end
 
     private

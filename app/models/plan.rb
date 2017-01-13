@@ -433,4 +433,8 @@ class Plan < ActiveRecord::Base
         end
     end
 
+    def belongs_to?(user)
+        self.user == user
+    end
+
 end

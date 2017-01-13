@@ -68,4 +68,6 @@ Rails.application.routes.draw do
   # Password reset
   resources :password_resets
 
+  # User Reminders controller
+
 end

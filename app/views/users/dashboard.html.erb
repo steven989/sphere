@@ -1834,10 +1834,16 @@ $(function(){
                     Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
                 </div>
                 <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
-                <div class="deleteButtonContainer" style='text-align:center;width:100%;'>
-                <%= link_to "Permanently Delete Connection", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from Sphere server and it won't be possible to recover later", method:"PUT"} %>
-                </div>
             </form>
+            <div class="reminders">
+                <div class="formElement reminder" data-reminder-id="0" >
+                    <span class="icon textDarkGray" ><%= fa_icon 'calendar-o' %></span>
+                    <input type="text" style="float:left" class="button inputData field textDarkGray" name="date" id="scheduleDatePicker" placeholder="Add a reminder" />
+                </div>
+            </div>
+            <div class="deleteButtonContainer" style='text-align:center;width:100%;'>
+            <%= link_to "Permanently Delete Connection", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from Sphere server and it won't be possible to recover later", method:"PUT"} %>
+            </div>
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>

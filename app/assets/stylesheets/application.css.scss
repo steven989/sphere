@@ -1017,7 +1017,15 @@ form div.btn-group .btn.active {
     background: none;
 }
 
+/* reminders */
+.modalView#editConnection .reminders {
+    width: 100%;
+}
 
+.modalView#editConnection .reminders .icon{
+    float:left;
+    width: 50px;
+}
 
 /* Challenges, Progress, Achievements UI*/
 
