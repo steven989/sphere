@@ -380,7 +380,7 @@ class ConnectionsController < ApplicationController
         end
         actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
         onboarding = current_user.user_setting.get_value('onboarding_progress')
-        actions.push({action:"function_call",function:"showOnboarding('#plans','6,7,8')"}) if (onboarding && (!onboarding[6] || !onboarding[7] || !onboarding[8]))
+        actions.push({action:"function_call",function:"setTimeout(function(){showOnboarding('#plans','6,7,8');},1200);"}) if (onboarding && (!onboarding[6] || !onboarding[7] || !onboarding[8]))
 
         if params[:searchClick] == true || params[:searchClick] == "true"
             AppUsage.log_action("Opened connection through search",current_user)

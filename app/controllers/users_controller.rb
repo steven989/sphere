@@ -108,13 +108,6 @@ class UsersController < ApplicationController
           if @demo 
             @raw_bubbles_data = User.find(9).get_raw_bubbles_data(nil,true) 
           end
-
-          puts '---------------------------------------------------'
-          puts @settings[:onboarding_progress]
-          puts @demo
-          puts @raw_bubbles_data
-          puts '---------------------------------------------------'
-
           @all_tags = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq.to_json
           if @setting_for_activity_entry_details = SystemSetting.search("activity_detail_level_to_be_shown")
             @activity_definitions = ActivityDefinition.level(@setting_for_activity_entry_details.value_in_specified_type) #specify the specificity level of the activities shown 

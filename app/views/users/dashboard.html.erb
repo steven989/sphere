@@ -237,8 +237,8 @@ $(function(){
     // Paint the bubbles
     paintBubbles(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles,<%= @demo %>);
 
-    function paintBubbles(raw_bubbles_data,notifications,bubbles_parameters,callback) {
-        $('#canvas').bubblify(raw_bubbles_data,notifications,bubbles_parameters,callback);
+    function paintBubbles(raw_bubbles_data,notifications,bubbles_parameters,callback,demo) {
+        $('#canvas').bubblify(raw_bubbles_data,notifications,bubbles_parameters,callback,demo);
     }
     
     function prettifyBubbles(canvas,notifications,demo){
