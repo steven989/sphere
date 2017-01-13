@@ -9,7 +9,7 @@ $(function(){
     } else {
         $('html').removeClass("no-touch");
         var canvasElement = document.getElementById('canvas');
-        canvasElement.setAttribute('data-position','auto');
+        canvasElement.setAttribute('data-position','bottom');
     }
 
     // A series of variables that need to be used across functions
@@ -1465,7 +1465,7 @@ $(function(){
         </div>
         
             <div class="profileButtonsContainer showOnMobile">
-                <div class="profileButton" id="addConnection" data-intro="Click this button to add connections to your Sphere" data-step="2" data-position="auto">
+                <div class="profileButton" id="addConnection" data-intro="Click this button to add connections to your Sphere" data-step="2" data-position="bottom">
                     <%= fa_icon 'plus' %>
                 </div>
                 <div class="profileButton showOnMobile" id="settingLogoutToggle" style="display:none">
@@ -1688,7 +1688,7 @@ $(function(){
                     </div>
                 </div>
             </div>
-            <div data-intro="You can edit your connections' contact information and tag them" data-step="6" data-position="auto" style="width:100%; height:auto;">
+            <div data-intro="You can edit your connections' contact information and tag them" data-step="6" data-position="top" style="width:100%; height:auto;">
                 <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
                 <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"><input name="phone" class="phone hoverInput inPlaceField" href="<%= update_connection_phone_path %>" data-id="" data-method='PUT' placeholder="Add phone" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"></div>
                 <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
@@ -1834,14 +1834,14 @@ $(function(){
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >
-                <div class="import" data-intro="You can also import select connections from your Google Contacts" data-step="4" data-position="auto">
+                <div class="import" data-intro="You can also import select connections from your Google Contacts" data-step="4" data-position="bottom">
                     <div class="formElement button textDarkGray disableWhileProcessed " href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Select from Google Contacts</div>
                     <em style="font-size:11px;">We respect your privacy. Sphere uses secure encrypted connection and will never spam your contacts or share their information</em>
                 </div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
-                <p class="textDarkGray" data-intro="This shows you the remaining number of connections you can still add to your Sphere" data-step="5" data-position="auto">You can add <span class="reminingContactDisplay"><%= @remaining_number_of_connections %></span> more connections to your Sphere</p>
-                <form action="<%= create_connection_path %>" method="POST" data-intro="Enter a few basic information of your connection to add them to your Sphere. Once they're in, you can start tracking your interactions with them" data-step="3" data-position="auto">
+                <p class="textDarkGray" data-intro="This shows you the remaining number of connections you can still add to your Sphere" data-step="5" data-position="bottom">You can add <span class="reminingContactDisplay"><%= @remaining_number_of_connections %></span> more connections to your Sphere</p>
+                <form action="<%= create_connection_path %>" method="POST" data-intro="Enter a few basic information of your connection to add them to your Sphere. Once they're in, you can start tracking your interactions with them" data-step="3" data-position="top">
                     <div class="vex-custom-field-wrapper">
                         <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="name" required>
                         <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
