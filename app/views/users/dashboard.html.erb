@@ -4,8 +4,12 @@ var test;
 $(function(){
     if (!("ontouchstart" in document.documentElement)) {
         $('html').removeClass("no-touch").addClass("no-touch");
+        var canvasElement = document.getElementById('canvas');
+        canvasElement.setAttribute('data-position','right');
     } else {
         $('html').removeClass("no-touch");
+        var canvasElement = document.getElementById('canvas');
+        canvasElement.setAttribute('data-position','auto');
     }
 
     // A series of variables that need to be used across functions
@@ -1498,7 +1502,7 @@ $(function(){
         </div> 
         <div class="topTabsContent">
             <div id="mySphere" style="overflow:scroll;" class="tabView">
-                <div id="canvas" data-intro="This is your Sphere canvas, where you can see your most important relationships. Once you have this populated with your connections, you can click on each bubble to start tracking your relationship with them" data-step="1" data-position="auto" style="position: relative; margin: auto;" ></div>
+                <div id="canvas" data-intro="This is your Sphere canvas, where you can see your most important relationships. Once you have this populated with your connections, you can click on each bubble to start tracking your relationship with them" data-step="1" style="position: relative; margin: auto;" ></div>
                 <div id="searchBar">
                     <div class="result hidden">
                         <ul>
@@ -1701,8 +1705,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Click here to schedule events with your connection" data-step="8" data-position="auto" id="makePlansButton">MAKE PLANS</div>
-            <div id="checkinButton" data-intro="Check in any time you interact with your connection. All check ins are logged by Sphere for points, and we will remind you to check in with your connection if you haven't done so in a while" data-step="7" data-position="auto" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Click here to schedule events with your connection" data-step="8" data-position="top" id="makePlansButton">MAKE PLANS</div>
+            <div id="checkinButton" data-intro="Check in any time you interact with your connection. All check ins are logged by Sphere for points, and we will remind you to check in with your connection if you haven't done so in a while" data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>
@@ -1727,7 +1731,7 @@ $(function(){
         <div class="modalContentContainer p-h-xxlg">
             <span class="textDarkGray" style="font-size:17px;">Choose Activity and Date</span>
             <form action="<%= plans_path %>" method="POST" >
-                <div class="btn-group buttonGroupWithOther chooseActivity" data-intro="Choose what type of activity you want to schedule. The hover-over tooltip shows what will be the title of your event. Click the plus sign to enter your own activity" data-step="9" data-position="auto"  style="height:50px;"  role="group">
+                <div class="btn-group buttonGroupWithOther chooseActivity" data-intro="Choose what type of activity you want to schedule. The hover-over tooltip shows what will be the title of your event. Click the plus sign to enter your own activity" data-step="9" data-position="bottom"  style="height:50px;"  role="group">
                     <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', width: 33 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Food"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px"  data-toggle="tooltip" data-placement="top" data-html="true" title="Food"><%= image_tag 'food', width: 33 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', width: 33 %></button>
@@ -1767,7 +1771,7 @@ $(function(){
                 <input type="hidden" class="inputData" name="plan_id">
                 
                 <div class="row m-t-xs">
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" data-intro="Click to toggle if you want to put this event on your Google calendar. If so, you will be prompted to authorize connection to Google calendar, otherwise Sphere will save this event internally" data-step="10" data-position="auto">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" data-intro="Click to toggle if you want to put this event on your Google calendar. If so, you will be prompted to authorize connection to Google calendar, otherwise Sphere will save this event internally" data-step="10" data-position="top">
                         <%= check_box_tag 'putOnGoogle',true,true, style:"display:inline-box;", class:'inputData' %>
                         <label for="putOnGoogle" class="textDarkGray">Put in Google Calendar?</label>
                     </div>
