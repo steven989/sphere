@@ -302,7 +302,22 @@ class ConnectionsController < ApplicationController
        connection.notifications.destroy_all
        connection.tags.destroy_all
        connection.destroy
-       redirect_to root_path
+
+       StatisticDefinition.triggers("individual","destroy_connection",User.find(current_user.id))
+
+       raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
+       notifications = current_user.get_notifications(false)
+       new_stats = current_user.stats
+       bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
+       message = "Connection permanently deleted"
+       actions=[{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats)"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"closeModalInstance(100)"}]
+       data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
+
+       respond_to do |format|
+          format.json {
+            render json: {status:true, message:message,actions:actions,data:data}
+          } 
+       end
     end
 
     def destroy_all

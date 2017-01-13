@@ -12,8 +12,11 @@ $(function(){
         canvasElement.setAttribute('data-position','bottom');
     }
 
+    $('.no-touch .buttonGroupWithOther.chooseActivity [data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
+    $('.no-touch .deleteButtonContainer [data-toggle="tooltip"]').tooltip({container: '.deleteButtonContainer'});
+
     // A series of variables that need to be used across functions
-    $('.no-touch [data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
+    
     var returnedData;
     var searchClick = false;
     var timezone = jstz.determine().name();
@@ -1820,7 +1823,9 @@ $(function(){
                     Upload Photo
                 </label>
                 <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
-                <%= link_to "Delete Connection (testing purpose button)", destroy_connection_path, method: :put, id: "destroy_single_connection" %>
+                <div class="deleteButtonContainer" style='text-align:center;width:100%;'>
+                <%= link_to "Permanently Delete Connection", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from Sphere server and it won't be possible to recover later", method:"PUT"} %>
+                </div>
             </form>
         </div>
         <div class="modalButtonContainer">
