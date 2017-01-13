@@ -1982,9 +1982,9 @@ $(function(){
     </div>
 </div>
 
-<div data-remodal-id="notificationsModal" data-method="PUT" href="<%= showed_one_time_notification_path %>" data-default-css="([{'attribute':'height','value':'400px'}])">
+<div data-remodal-id="notificationsModal" data-method="PUT" href="<%= showed_one_time_notification_path %>" data-default-css="([{'attribute':'height','value':'400px'}])" >
     <% if @settings[:onboarding_progress] && !@settings[:onboarding_progress][1] %>
-        <div class="modalView" id="welcomeMessage">
+        <div class="modalView textDarkGray" id="welcomeMessage">
             <div class="modalContentContainer p-h-xxlg">
                 <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>Welcome to Sphere!</h1><br><p>It takes discipline to make and nurture meaningful relationships. Sphere will help you develop the right habit to grow your network</p><br><p>We'll give you a quick tour of the features so you can get started right away!</p><%= image_tag '1f388.svg' %>
             </div>
@@ -1993,7 +1993,7 @@ $(function(){
             </div>
         </div>
     <% end %>
-    <div class="modalView" id="levelUpNotificationPopup">
+    <div class="modalView textDarkGray" id="levelUpNotificationPopup">
         <div class="modalContentContainer p-h-xxlg">
             <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>You are now level <span class="value1" style="font-weight:600;"></span></h1><br><p>Keep up the awesome work!</p><br><%= image_tag '1f388.svg' %>
 
@@ -2002,7 +2002,7 @@ $(function(){
             <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
         </div>
     </div>
-    <div class="modalView" id="newBadgePopup">
+    <div class="modalView textDarkGray" id="newBadgePopup">
         <div class="modalContentContainer p-h-xxlg">
             <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>You earned <span class="value1" style="font-weight:600;"></span> new badges</h1><br><p>That's awesome!</p><br><%= image_tag '1f388.svg' %>
 
