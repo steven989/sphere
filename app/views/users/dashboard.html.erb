@@ -648,7 +648,11 @@ $(function(){
         initializeReModal('[data-remodal-id=importModal]','standardModal',1);
         $('label[for=photoUploaderInCreate]').html('<%= fa_icon "id-badge" %> Upload Photo');
         <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][3] || !@settings[:onboarding_progress][4] || !@settings[:onboarding_progress][5] ) %>    
-        if (!onBoarding345){showOnboarding(".importModalOnboarding","3,4,5")};
+        if (!onBoarding345){
+            setTimeout(function(){
+                showOnboarding(".importModalOnboarding","3,4,5");
+              },1200);
+        };
         <% end %>
     });
 
@@ -1414,9 +1418,9 @@ $(function(){
     <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][1] || !@settings[:onboarding_progress][2]) %>
         initializeReModal('[data-remodal-id=notificationsModal]',"standardModal",0);
         $('#welcomeMessage').on('click',function(){
-            closeModalTimer = setTimeout(function(){
-                                showOnboarding(".mainSphereOnboarding","1,2");
-                              },400);
+            setTimeout(function(){
+                showOnboarding(".mainSphereOnboarding","1,2");
+              },400);
         })
     <% end %>
 
@@ -1426,7 +1430,10 @@ $(function(){
         var onBoarding910 = false;
         $('#makePlansButton').on("click",function(){
             if (!onBoarding910) {
-                showOnboarding("#makePlan","9,10") };
+                setTimeout(function(){
+                    showOnboarding("#makePlan","9,10");
+                  },1200);
+            };
         });
     <% end %>
 
