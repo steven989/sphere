@@ -32,14 +32,14 @@ class SystemMailer < ApplicationMailer
     @frequency = frequency
     timezone = user.timezone ? TZInfo::Timezone.get(user.timezone) : TZInfo::Timezone.get("UTC")
     if @frequency == "today"
-      @checkins = user.activities.where("created_at >= ?", timezone.local_to_utc(timezone.now.strftime("%Y-%m-%d").to_datetime)).length
-      @plans =  user.plans.where("status ilike 'Planned' and created_at >= ?", timezone.local_to_utc(timezone.now.strftime("%Y-%m-%d").to_datetime)).length
+      @checkins = user.activities.where("created_at >= ?", timezone.local_to_utc(timezone.now.strftime("%Y-%m-%d").to_datetime-1)).length
+      @plans =  user.plans.where("status ilike 'Planned' and created_at >= ?", timezone.local_to_utc(timezone.now.strftime("%Y-%m-%d").to_datetime-1)).length
     elsif @frequency == "this week"
-      @checkins = user.activities.where("EXTRACT(WEEK FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now).strftime("%V").to_i,timezone.local_to_utc(timezone.now).year.to_i).length
-      @plans =  user.plans.where("status ilike 'Planned' and EXTRACT(WEEK FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now).strftime("%V").to_i,timezone.local_to_utc(timezone.now).year.to_i).length
+      @checkins = user.activities.where("EXTRACT(WEEK FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now-1).strftime("%V").to_i,timezone.local_to_utc(timezone.now-1).year.to_i).length
+      @plans =  user.plans.where("status ilike 'Planned' and EXTRACT(WEEK FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now-1).strftime("%V").to_i,timezone.local_to_utc(timezone.now-1).year.to_i).length
     else
-      @checkins = user.activities.where("EXTRACT(MONTH FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now).month.to_i,timezone.local_to_utc(timezone.now).year.to_i).length
-      @plans =  user.plans.where("status ilike 'Planned' and EXTRACT(MONTH FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now).month.to_i,timezone.local_to_utc(timezone.now).year.to_i).length
+      @checkins = user.activities.where("EXTRACT(MONTH FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now-1).month.to_i,timezone.local_to_utc(timezone.now-1).year.to_i).length
+      @plans =  user.plans.where("status ilike 'Planned' and EXTRACT(MONTH FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now-1).month.to_i,timezone.local_to_utc(timezone.now-1).year.to_i).length
     end
 
     mail(:to => user.email,
