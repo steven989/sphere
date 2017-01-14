@@ -260,8 +260,13 @@ class User < ActiveRecord::Base
       # 2) update status of expired connections
       target_contact_interval_in_days = connection.target_contact_interval_in_days
       date_of_last_activity = timezone.utc_to_local(connection.activities.where("date is not null").order(date: :desc).first.created_at).strftime("%Y-%m-%d").to_date
-      date_of_last_plan = timezone.utc_to_local(Plan.last(self,connection).date_time).strftime("%Y-%m-%d").to_date
-      combined_date_of_last_activity = date_of_last_activity > date_of_last_plan ? date_of_last_activity : date_of_last_plan
+      date_of_last_plan = Plan.last(self,connection) ? timezone.utc_to_local(Plan.last(self,connection).date_time).strftime("%Y-%m-%d").to_date : nil
+      if date_of_last_plan.nil?
+        combined_date_of_last_activity = date_of_last_activity
+      else
+        combined_date_of_last_activity = date_of_last_activity > date_of_last_plan ? date_of_last_activity : date_of_last_plan
+      end
+      
       number_of_days_since_last_activity = (timezone.now.strftime("%Y-%m-%d").to_date - combined_date_of_last_activity).to_i
       if number_of_days_since_last_activity > target_contact_interval_in_days
         if connection.plans.where("date_time >= ?",timezone.local_to_utc(timezone.now)).length == 0
