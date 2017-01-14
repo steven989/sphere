@@ -395,14 +395,14 @@ class ConnectionsController < ApplicationController
 
         if last_plan || last_checkin
             if last_checkin && !last_plan
-                last_activity_time_string = Plan.to_human_time_difference_past((Date.today - timezone.utc_to_local(last_checkin.created_at).strftime("%Y-%m-%d").to_date).to_i)
+                last_activity_time_string = Plan.to_human_time_difference_past((timezone.now.strftime("%Y-%m-%d").to_date - timezone.utc_to_local(last_checkin.created_at).strftime("%Y-%m-%d").to_date).to_i)
                 last_activity_name_string = "Checked in"
             elsif !last_checkin && last_plan
                 last_activity_time_string = last_plan.last_activity_date_difference_humanized
                 last_activity_name_string = last_plan.name_with_parentheses_removed
             else
                 days_to_last_plan = last_plan.days_to_last_plan_string
-                days_to_last_checkin = (Date.today - timezone.utc_to_local(last_checkin.created_at).strftime("%Y-%m-%d").to_date).to_i
+                days_to_last_checkin = (timezone.now.strftime("%Y-%m-%d").to_date - timezone.utc_to_local(last_checkin.created_at).strftime("%Y-%m-%d").to_date).to_i
                 if days_to_last_plan < days_to_last_checkin
                     last_activity_time_string = Plan.to_human_time_difference_past(days_to_last_plan)
                     last_activity_name_string = last_plan.name_with_parentheses_removed
