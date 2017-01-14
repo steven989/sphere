@@ -43,7 +43,7 @@ class SystemMailer < ApplicationMailer
     end
 
     mail(:to => user.email,
-         :subject => "Your Sphere activity #{@frequency}!") do |format|
+         :subject => "Your Sphere activities #{@frequency}!") do |format|
         format.text
     end     
   end
