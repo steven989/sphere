@@ -3,7 +3,7 @@ var test;
 
 $(function(){
     if (!("ontouchstart" in document.documentElement)) {
-        $('html').removeClass("no-touch").addClass("no-touch");
+        $('html').addClass("no-touch");
         var canvasElement = document.getElementById('canvas');
         canvasElement.setAttribute('data-position','right');
     } else {
@@ -82,7 +82,7 @@ $(function(){
             $('.topTabsContent,.topTabs-header.clearfix').off("click").on("click",function(){
 
                     $('#searchBar .result, #searchBar .speechBubbleThingy').each(function(){
-                        $(this).removeClass('hidden').addClass('hidden');
+                        $(this).addClass('hidden');
                     });            
             })
 
@@ -106,7 +106,7 @@ $(function(){
                         $(this).removeClass('hidden')});
                     });
                     $('#searchBar .result .item').hover(function(){
-                        $($("#"+$(this).data('bubble-id'))).removeClass('glowBlue').addClass('glowBlue');
+                        $($("#"+$(this).data('bubble-id'))).addClass('glowBlue');
                     },function(){
                         $($("#"+$(this).data('bubble-id'))).removeClass('glowBlue');
                     });
@@ -148,7 +148,7 @@ $(function(){
 
     function oneTimeNotificationPopup(modalElement,notificationId,value1) {
         $('[data-remodal-id=notificationsModal] .modalView').each(function(){
-            $(this).removeClass('hidden').addClass('hidden');
+            $(this).addClass('hidden');
         });
         $(modalElement).removeClass('hidden');
         if(value1){$(modalElement).find('.value1').html(value1);}
@@ -213,6 +213,16 @@ $(function(){
         }
     }
 
+    // delete connection
+    $('#confirm_delete').on("change",function(){
+        if($(this).prop('checked')) {
+            $('#destroy_single_connection').removeClass('disabled');
+        } else {
+            $('#destroy_single_connection').addClass('disabled');
+        }
+    });
+
+
     // User-level notifications
     function showUserLevelNotifications() {
         $('.userLevelNotificationDisplayElement .notificationContainer').each(function(){
@@ -240,9 +250,20 @@ $(function(){
     toastr.options.newestOnTop = true;
 
     // Navigation bar related
-    $('#settingLogoutToggle').off("click").on("click",function(){
+    $('#settingLogoutToggle').off("click").on("click",toggleMobileTopMenu);
+
+    function toggleMobileTopMenu() {
         $('.profileButtonsContainer.hideOnMobile').toggle();
-    });
+        event.stopPropagation();
+
+        if ($('.profileButtonsContainer.hideOnMobile').css("display") != "none") {
+            $('#settingLogoutToggle').css({"color":"#345C6F"});
+            $('html').on("click",toggleMobileTopMenu);
+        } else {
+            $('#settingLogoutToggle').css({"color":"#FFFFFF"});
+            $('html').off("click",toggleMobileTopMenu);
+        }
+    }
 
     // Paint the bubbles
     paintBubbles(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles,<%= @demo %>);
@@ -259,7 +280,7 @@ $(function(){
                     // 1.1)Progress bar
                     if (connectionNotification["notification_type"] == "connection_expiration") {
                         var remaining_days_until_expiry = connectionNotification["value"]["remaining_days_until_expiry"];
-                        var percentageValueOfRemainingDays = Math.max(Math.min(remaining_days_until_expiry*1.0/7.0,1),0.2);
+                        var percentageValueOfRemainingDays = Math.max(Math.min(remaining_days_until_expiry*1.0/<%= @system_settings_used[:expiring_connection_notification_period_in_days] ? @system_settings_used[:expiring_connection_notification_period_in_days] : 5 %>,1),0.2);
                         
                         paintProgressBar($(this).parent('.connectBubbleContainer'),1,"#ED1C24",percentageValueOfRemainingDays);
 
@@ -310,7 +331,7 @@ $(function(){
                             buttonAjax(_this,{});
                         } else {
                             $('[data-remodal-id=bubbleModal] .modalView').each(function(){
-                                if ($(this).prop('id') != 'plans') {$(this).removeClass('hidden').addClass('hidden')}
+                                if ($(this).prop('id') != 'plans') {$(this).addClass('hidden')}
                                     else {$(this).removeClass('hidden')};
                             });
                             $('[data-remodal-id=bubbleModal]').data("connection-id",_this.data('connection-id'));
@@ -368,6 +389,9 @@ $(function(){
                     } //if (!button.hasClass('disabled'))
                 }); // $(this).off("click").on("click")
             }
+            // Scroll to the top center
+            $('#mySphere').scrollLeft(($('#canvas').width()-$('body').width())/2);
+            $(window).scrollTop(0);
         });
     }
 
@@ -495,7 +519,7 @@ $(function(){
             });
             // Reset the fields that should be hidden by default
             modal.find('.default_hidden').each(function(){
-                $(this).removeClass('hidden').addClass('hidden');
+                $(this).addClass('hidden');
             });
         }
 
@@ -534,7 +558,7 @@ $(function(){
         var current_value = button.val();
         var status = true;
         if (button.hasClass('disableWhileProcessed')) {
-            button.removeClass('disabled').addClass('disabled');
+            button.addClass('disabled');
             button.html('<span class=\'rotater\' style=\'display:inline-block;\'><%= fa_icon 'spinner' %></span>');
             clockedRotate.start(button.find('.rotater'),150,true);
             button.val("Wait...");
@@ -764,7 +788,7 @@ $(function(){
     function toggleAddToSphereButton() {
         checkIfAtImportLimit();
         if (remaining_connections <= 0) {
-            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').removeClass("disabled").addClass("disabled").html("ADD TO SPHERE (LIMIT REACHED)");
+            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').addClass("disabled").html("ADD TO SPHERE (LIMIT REACHED)");
         } else {
             $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').removeClass("disabled").html("ADD TO SPHERE");
         }
@@ -923,10 +947,9 @@ $(function(){
         var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
         var reminders = returnedData.reminders;
 
-        $('[data-remodal-id=bubbleModal] .modalView#plans .default_photo').removeClass("formElement").removeClass('photo').addClass('photo');
-        $('[data-remodal-id=bubbleModal] .modalView#plans .default_icon').removeClass("formElement").removeClass('icon').addClass('icon');
-        $('[data-remodal-id=bubbleModal] .modalView#plans .submitButton').removeClass('hidden').addClass('hidden');
-        $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
+        $('[data-remodal-id=bubbleModal] .modalView#plans .default_photo').removeClass("formElement").addClass('photo');
+        $('[data-remodal-id=bubbleModal] .modalView#plans .default_icon').removeClass("formElement").addClass('icon');
+        $('[data-remodal-id=bubbleModal] .modalView#plans .submitButton').addClass('hidden');
         $('[data-remodal-id=bubbleModal] .modalView#plans input.name').val(name).data('id',returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans form .inputData[name=connection_id]').val(returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.email').val(email).data('id',returnedData.connection_id);
@@ -935,12 +958,15 @@ $(function(){
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         $('.modalView#makePlan .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
         $('.modalView#editConnection .subTabNavigationButton.profile').removeData('height-adjust-element').removeData('height-adjust-value');
+        $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
+        $('#confirm_delete').prop('checked',false);
+        $('#destroy_single_connection').addClass('disabled');
         if (photoUrl) {
             $('[data-remodal-id=bubbleModal] .modalView#plans label.photo').removeClass('hidden').css({'background-image':'url('+photoUrl+')','background-size':'cover','background-position':'center','background-repeat':'no-repeat','background-color':'#EFEFEF'}).html('<span class="edit_icon"><%= fa_icon "upload" %></span>');
-            $('[data-remodal-id=bubbleModal] .modalView#plans label.icon').removeClass('hidden').addClass('hidden').html('<%= fa_icon "user-circle" %><span class="edit_icon"><%= fa_icon "upload" %></span>');
+            $('[data-remodal-id=bubbleModal] .modalView#plans label.icon').addClass('hidden').html('<%= fa_icon "user-circle" %><span class="edit_icon"><%= fa_icon "upload" %></span>');
         } else {
             $('[data-remodal-id=bubbleModal] .modalView#plans label.icon').removeClass('hidden').html('<%= fa_icon "user-circle" %><span class="edit_icon"><%= fa_icon "upload" %></span>');
-            $('[data-remodal-id=bubbleModal] .modalView#plans label.photo').removeClass('hidden').addClass('hidden').html('<span class="edit_icon"><%= fa_icon "upload" %></span>');
+            $('[data-remodal-id=bubbleModal] .modalView#plans label.photo').addClass('hidden').html('<span class="edit_icon"><%= fa_icon "upload" %></span>');
         }
         $('.existingReminders table tbody').html("");
         if (reminders.length > 0) {
@@ -966,7 +992,7 @@ $(function(){
         // make the default highlihgted button to be the first one
         $('.buttonGroupWithOther.chooseActivity button').each(function(){
             if($(this).data('value') == "Coffee") {
-                $(this).removeClass('active').addClass('active');
+                $(this).addClass('active');
             } else {
                 $(this).removeClass('active');
             }
@@ -988,7 +1014,7 @@ $(function(){
             var selectedActivities = 0;
             $('.modalView#makePlan .chooseActivity button').each(function(){
                 if($(this).data('value')==returnedData.planData.name) {
-                    $(this).removeClass('active').addClass('active');
+                    $(this).addClass('active');
                     $('.modalView#plans .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
                     selectedActivities++;
                 } else {
@@ -1018,7 +1044,7 @@ $(function(){
             
             submitButtonListener();
         } else {
-            $('.modalView#makePlan div#deleteEvent').removeClass('hidden').addClass('hidden');
+            $('.modalView#makePlan div#deleteEvent').addClass('hidden');
             $('.modalView#makePlan form').attr('action',"<%= plans_path %>").attr('method','POST');
             submitButtonListener();
             $('.modalView#makePlan .modalBottomRightButton').html("CREATE ACTIVITY");
@@ -1156,7 +1182,7 @@ $(function(){
         // related to the monthly, weekly and other contact frequency button group
         $('.modalView#editConnection .contactFrequency button').each(function(){
             if ($(this).data('value') == contact_frequency) {
-                $(this).removeClass('active').addClass('active');
+                $(this).addClass('active');
             } else {
                 $(this).removeClass('active');
             }
@@ -1225,7 +1251,7 @@ $(function(){
                         $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-original-value')});
                     }
                 }
-                $(this).removeClass('active').addClass('active');
+                $(this).addClass('active');
             })
         })        
     }
@@ -1365,7 +1391,7 @@ $(function(){
                     window.location.reload();
                 }, 100);
             } else if (actionObject.action=="hide") {
-                $(actionObject.element).removeClass('hidden').addClass('hidden');
+                $(actionObject.element).addClass('hidden');
             } else if (actionObject.action=="unhide") {
                 $(actionObject.element).removeClass('hidden');
             } else if (actionObject.action == "change_css") {
@@ -1375,7 +1401,7 @@ $(function(){
             } else if (actionObject.action == "function_call") {
                 eval(actionObject.function);
             } else if (actionObject.action == "add_class") {
-                $(actionObject.element).removeClass(actionObject.class).addClass(actionObject.class);
+                $(actionObject.element).addClass(actionObject.class);
             } else if (actionObject.action == "remove_class") {
                 $(actionObject.element).removeClass(actionObject.class);
             } else if (actionObject.action == "fadeDelete") {
@@ -1409,8 +1435,8 @@ $(function(){
             }
         } else {
             _this.off("click");
-            _this.html('<%= fa_icon "check" %> CHECKED IN TODAY!');
-            _this.removeClass('disabled').addClass('disabled');
+            _this.html('<span id="checkedInToday"><%= fa_icon "check" %> CHECKED IN TODAY!</span>');
+            _this.addClass('disabled');
             if (_this.hasClass('transitionButton')) {
                 _this.data("transition-button",true);
                 _this.removeClass('transitionButton');
@@ -1441,7 +1467,7 @@ $(function(){
                 if ( matchedItemsIDs.indexOf($(this).data('inc-id')) > -1 ) {
                     $(this).removeClass("hidden");
                 } else {
-                    $(this).removeClass("hidden").addClass('hidden');
+                    $(this).addClass('hidden');
                 }
             });
 
@@ -1530,16 +1556,16 @@ $(function(){
             </div>
             <div class="profileButtonsContainer hideOnMobile showOnDesktop" >
                 <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path %>" data-method="GET">
-                    <p class="showOnMobile" style="display:none;">Settings</p>
+                    <p class="showOnMobile" style="display:none;">SETTINGS</p>
                     <%= fa_icon 'cog' %>
                 </div>
                 <div class="profileButton ajaxButton" href="<%= help_page_path %>" data-method="GET">
-                    <p class="showOnMobile" style="display:none;">Help</p>
+                    <p class="showOnMobile" style="display:none;">HELP</p>
                     <%= fa_icon 'question-circle' %>
                 </div>
                 <div class="divider showOnMobile" style="display:none;"></div>
                 <div class="profileButton" id="logout">
-                    <p class="showOnMobile" style="display:none;">Log out</p>
+                    <p class="showOnMobile" style="display:none;">LOG OUT</p>
                     <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
                 </div>
             </div>    
@@ -1570,11 +1596,13 @@ $(function(){
                     <div class="speechBubbleThingy hidden"></div>
                     <input type="text" class="formElement" placeholder="Search Sphere">
                 </div>
+                <div class="bottomPadding"></div>
             </div>
             <div id="help" class='tabView'>
                 <div class="container m-t-xlg textDarkGray" style="text-align:center;font-weight:300;">
 
                 </div>
+                <div class="bottomPadding"></div>
             </div>
             <div id="challenges" style="display:none;" class="tabView">
                 <div class="container m-t-xlg">
@@ -1771,7 +1799,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Click here to schedule events with your connection" data-step="8" data-position="top" id="makePlansButton"><%= fa_icon 'calendar-plus-o' %>  MAKE PLANS</div>
-            <div id="checkinButton" data-intro="Check in any time you interact with your connection. All check ins are logged by Sphere for points, and we will remind you to check in with your connection if you haven't done so in a while" data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> ><%= fa_icon 'check' %>  CHECK IN</div>
+            <div id="checkinButton" data-intro="Check in any time you interact with your connection. All check ins are logged by Sphere for points, and we will remind you to check in with your connection if you haven't done so in a while" data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> ><%= fa_icon 'check' %>  CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>
@@ -1898,8 +1926,10 @@ $(function(){
                     </table>                                     
                 </div>
             </div>
-            <div class="deleteButtonContainer" style='text-align:center;width:100%;'>
-            <%= link_to "Permanently Delete This Connection", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from Sphere server and it won't be possible to recover later", method:"PUT"} %>
+            <div class="deleteButtonContainer" style='text-align:left;width:100%;'>
+            <input type='checkbox' id="confirm_delete" />
+            <label for="confirm_delete" class="textDarkGray m-r-md" style='font-size:15px;'>Check to confirm delete</label>
+            <%= link_to "DELETE CONNECTION", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed disabled", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from the server and it won't be possible to recover later", method:"PUT"} %>
             </div>
         </div>
         <div class="modalButtonContainer">

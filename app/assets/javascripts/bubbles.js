@@ -19,7 +19,7 @@
             return scale(bubbleRawSize,actualMinBubbleSize,actualMaxBubbleSize,minBubbleSize,maxBubbleSize);
         });
         var total_bubble_area = scaledSizeArrayForCanvasSizingPurposes.reduce(function(cumulativeArea,bubbleSize){return cumulativeArea + Math.pow(bubbleSize,2)*Math.PI},0);
-        var canvas_length_and_height = Math.max(Math.min(Math.sqrt(total_bubble_area/0.25),$('body').width()),450);
+        var canvas_length_and_height = Math.max(Math.sqrt(total_bubble_area/0.25),450);
         _this.width(canvas_length_and_height);
         _this.height(canvas_length_and_height);
         var canvasWidth = _this.width();

@@ -109,8 +109,9 @@ class UsersController < ApplicationController
             @raw_bubbles_data = User.find(9).get_raw_bubbles_data(nil,true) 
           end
           @all_tags = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq.to_json
-          if @setting_for_activity_entry_details = SystemSetting.search("activity_detail_level_to_be_shown")
-            @activity_definitions = ActivityDefinition.level(@setting_for_activity_entry_details.value_in_specified_type) #specify the specificity level of the activities shown 
+          @system_settings_used = SystemSetting.where(name:['activity_detail_level_to_be_shown','expiring_connection_notification_period_in_days']).inject({}) {|accumulator,system_setting| accumulator[system_setting.name.to_sym] = system_setting.value_in_specified_type; accumulator}
+          if @setting_for_activity_entry_details = @system_settings_used[:activity_detail_level_to_be_shown]
+            @activity_definitions = ActivityDefinition.level(@setting_for_activity_entry_details) #specify the specificity level of the activities shown 
           end
           # ----- this section contains all the variables needed to display Level, Challenge and Badge
             # --- badges
