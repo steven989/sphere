@@ -278,7 +278,7 @@ $(function(){
                         content = '<%= fa_icon "calendar" %>';
                     } else if (connectionNotification["notification_type"] == "user_created_reminder") {
                         backgroundColor = "#0099E5";
-                        content = '<%= fa_icon "exclamation" %>';
+                        content = '<%= fa_icon "bell" %>';
                     }
                     var coordinates = getNotificationCoordinate(325,$(this).parent('.connectBubbleContainer').width()/2,14);
                     $(this).parent('.connectBubbleContainer').append('<span class="badge" style="width:22px; height:22px; position:absolute;background-color:'+backgroundColor+';left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:13px;padding-top:1px;">'+content+'</span>');

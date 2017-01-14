@@ -53,7 +53,7 @@ class Plan < ActiveRecord::Base
                             event = Google::Apis::CalendarV3::Event.new({
                                 summary: summary,
                                 location:location,
-                                description:details,
+                                description:details.to_s + "\n\nSent from Sphere | usesphere.com",
                                 start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
                                 end: {date_time:end_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
                                 attendees: [{email: connection_email}],
@@ -192,7 +192,11 @@ class Plan < ActiveRecord::Base
                     end
 
                     if new_details != details
-                        event.description = new_details
+                        if notify
+                            event.description = new_details.to_s + "\n\nSent from Sphere | usesphere.com"
+                        else
+                            event.description = new_details
+                        end
                         self.details = new_details
                     end
                     # Create Google Calendar events
