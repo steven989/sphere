@@ -69,5 +69,7 @@ Rails.application.routes.draw do
   resources :password_resets
 
   # User Reminders controller
+  post 'user_reminders/create' => 'user_reminders#create', as: 'create_user_reminder'
+  put  'user_reminders/remove' => 'user_reminders#remove', as: 'remove_user_reminder'
 
 end

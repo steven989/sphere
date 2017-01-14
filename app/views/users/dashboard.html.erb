@@ -874,6 +874,14 @@ $(function(){
         }
     }
 
+    // Related to reminders
+    function setReminderCallback() {
+
+    }
+
+    function removeReminderCallback() {
+        
+    }
 
     // Specific callback functions for after modal population
     function populateBubblesModal() {
@@ -893,11 +901,12 @@ $(function(){
 
         $('[data-remodal-id=bubbleModal] .modalView#plans .default_photo').removeClass("formElement").removeClass('photo').addClass('photo');
         $('[data-remodal-id=bubbleModal] .modalView#plans .default_icon').removeClass("formElement").removeClass('icon').addClass('icon');
-        $('[data-remodal-id=bubbleModal] .submitButton').removeClass('hidden').addClass('hidden');
+        $('[data-remodal-id=bubbleModal] .modalView#plans .submitButton').removeClass('hidden').addClass('hidden');
         $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.name').val(name).data('id',returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans form .inputData[name=connection_id]').val(returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.email').val(email).data('id',returnedData.connection_id);
+        $('.reminders input[name=connection_id]').val(returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.phone').val(phone).data('id',returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         $('.modalView#makePlan .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
@@ -1134,10 +1143,14 @@ $(function(){
         // Related to the date and time pickers in the scheduling events modal view
         $('#scheduleDatePicker').datepicker({
             dateFormat: "yy-mm-dd",
-            minDate: new Date('<%= Date.today %>'),
+            minDate: new Date(),
             onSelect: function(){
                 $('#scheduleTimeFrom').focus();
             }
+        });
+        $('#dueDate').datepicker({
+            dateFormat: "yy-mm-dd",
+            minDate: new Date()
         });
 
         $('#scheduleTimeFrom').timepicker({'scrollDefault':'7:00am'});
@@ -1836,9 +1849,47 @@ $(function(){
                 <textarea name="notes" rows="4" placeholder="Notes" class="textDarkGray"></textarea>
             </form>
             <div class="reminders">
-                <div class="formElement reminder" data-reminder-id="0" >
-                    <span class="icon textDarkGray" ><%= fa_icon 'calendar-o' %></span>
-                    <input type="text" style="float:left" class="button inputData field textDarkGray" name="date" id="scheduleDatePicker" placeholder="Add a reminder" />
+                <div class="formElement reminderRow tallerInput noHover addReminder" >
+                    <span class="icon textDarkGray" ><%= fa_icon 'bell-o' %></span>
+                    <form action="<%= create_user_reminder_path %>" method="POST" id="reminderForm">
+                        <input type="text" class="inputData textDarkGray" name="reminder" id="scheduleDatePicker" placeholder="Add a reminder" />
+                        <input type="text" class="inputData textDarkGray" name="due_date" id="dueDate" placeholder="Due (Optional)">
+                        <input type="hidden" class="inputData" name="connection_id" />
+                    </form>
+                    <span style="float:left" class="button formElement setReminder sphereBlueBackground hoverable disableWhileProcessed submitButton" id='setReminder' data-submit-form=".modalView#editConnection #reminderForm" >ADD REMINDER</span>
+                </div>
+                <span style="font-size:15px;" class="textDarkGray">Current reminders</span>
+                <div class="existingReminders">
+                    <table>
+                        <tr class="formElement reminderRow noHover">
+                            <td class="icon">
+                                <span class="textDarkGray" ><%= fa_icon 'bell-o' %></span>
+                            </td>
+                            <td class="reminder">
+                                <span class="textDarkGray">Send Roman the stuff fdfdsf fsdfds awf waefl awefl ddfsdfa lwfiaj; adflis </span>
+                            </td>
+                            <td class="due_date">
+                                <span class="textDarkGray">No Due Date</span>
+                            </td>
+                            <td class="removeReminder button formElement sphereRedBackground hoverable disableWhileProcessed ajaxButton removeReminder">
+                                REMOVE
+                            </td>
+                        </tr> 
+                        <tr class="formElement reminderRow noHover">
+                            <td class="icon">
+                                <span class="textDarkGray" ><%= fa_icon 'bell-o' %></span>
+                            </td>
+                            <td class="reminder">
+                                <span class="textDarkGray">Send Roman the stuff f</span>
+                            </td>
+                            <td class="due_date">
+                                <span class="textDarkGray">No Due Date</span>
+                            </td>
+                            <td class="removeReminder button formElement sphereRedBackground hoverable disableWhileProcessed ajaxButton removeReminder">
+                                REMOVE
+                            </td>
+                        </tr> 
+                    </table>                                     
                 </div>
             </div>
             <div class="deleteButtonContainer" style='text-align:center;width:100%;'>

@@ -388,20 +388,21 @@ class ConnectionsController < ApplicationController
         data[:notes] = connection.notes
         data[:contact_frequency] = connection.frequency_word
         data[:target_contact_interval_in_days] = connection.target_contact_interval_in_days
+        data[:reminders] = connection.get_user_reminders(false)
 
         last_plan = Plan.last(current_user,connection)
         last_checkin = current_user.activities.where(activity:"Check In",connection_id:connection.id).order(created_at: :desc).take
 
         if last_plan || last_checkin
             if last_checkin && !last_plan
-                last_activity_time_string = Plan.to_human_time_difference_past((Date.today - last_checkin.created_at.to_date).to_i)
+                last_activity_time_string = Plan.to_human_time_difference_past((Date.today - timezone.utc_to_local(last_checkin.created_at).strftime("%Y-%m-%d").to_date).to_i)
                 last_activity_name_string = "Checked in"
             elsif !last_checkin && last_plan
                 last_activity_time_string = last_plan.last_activity_date_difference_humanized
                 last_activity_name_string = last_plan.name_with_parentheses_removed
             else
                 days_to_last_plan = last_plan.days_to_last_plan_string
-                days_to_last_checkin = (Date.today - last_checkin.created_at.to_date).to_i
+                days_to_last_checkin = (Date.today - timezone.utc_to_local(last_checkin.created_at).strftime("%Y-%m-%d").to_date).to_i
                 if days_to_last_plan < days_to_last_checkin
                     last_activity_time_string = Plan.to_human_time_difference_past(days_to_last_plan)
                     last_activity_name_string = last_plan.name_with_parentheses_removed

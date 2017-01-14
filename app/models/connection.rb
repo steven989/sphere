@@ -23,6 +23,15 @@ class Connection < ActiveRecord::Base
         first_name.to_s+" "+last_name.to_s
     end
 
+    def get_user_reminders(to_json=false)
+      result = self.user_reminders.set.order(due_date: :asc)
+      if to_json
+        result.to_json
+      else
+        result
+      end
+    end
+
     def self.parse_first_name(name)
       name.split(" ")[0].nil? ? nil : name.split(" ")[0].strip.humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
     end

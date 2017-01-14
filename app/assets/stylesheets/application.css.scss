@@ -17,9 +17,9 @@
  *= require_tree ../../../vendor/assets/stylesheets/.
  */
 
-/*Some standard components*/
+ /*Some standard components*/
 
-.introjs-overlay {
+ .introjs-overlay {
     display:none !important;
 }
 
@@ -52,7 +52,7 @@ h1,h2,h3,h4,h5,h6,p,div,span,body {
     float: left !important;
 }
 @media (min-width: 768px) {
-.col-sm-15 {
+    .col-sm-15 {
         width: 20% !important;
         float: left !important;
     }
@@ -144,7 +144,7 @@ td {
     text-align: center;
 }
 
-.no-touch .formElement:hover {
+.no-touch .formElement:not(.noHover):hover {
     background-color: #F1F1F1;
 }
 
@@ -360,76 +360,76 @@ td {
 
 
 /* --------------   Corner Ribbons --------------  */
-    .corner-ribbon{
-      width: 200px;
-      background: #e43;
-      position: absolute;
-      top: 25px;
-      left: -50px;
-      text-align: center;
-      line-height: 25px;
-      letter-spacing: 1px;
-      color: #f0f0f0;
-      transform: rotate(-45deg);
-      -webkit-transform: rotate(-45deg);
-    }
+.corner-ribbon{
+  width: 200px;
+  background: #e43;
+  position: absolute;
+  top: 25px;
+  left: -50px;
+  text-align: center;
+  line-height: 25px;
+  letter-spacing: 1px;
+  color: #f0f0f0;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
 
-    /* Ribbon Custom styles */
+/* Ribbon Custom styles */
 
-    .corner-ribbon.sticky{
-      position: absolute;
-    }
+.corner-ribbon.sticky{
+  position: absolute;
+}
 
-    .corner-ribbon.shadow{
-      box-shadow: 0 0 3px rgba(0,0,0,.3);
-    }
+.corner-ribbon.shadow{
+  box-shadow: 0 0 3px rgba(0,0,0,.3);
+}
 
-    /* Ribbon Different positions */
+/* Ribbon Different positions */
 
-    .corner-ribbon.top-left{
-      top: 25px;
-      left: -50px;
-      transform: rotate(-45deg);
-      -webkit-transform: rotate(-45deg);
-    }
+.corner-ribbon.top-left{
+  top: 25px;
+  left: -50px;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
 
-    .corner-ribbon.top-right{
-      top: 15px;
-      right: -75px;
-      left: auto;
-      transform: rotate(45deg);
-      -webkit-transform: rotate(45deg);
-    }
+.corner-ribbon.top-right{
+  top: 15px;
+  right: -75px;
+  left: auto;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
 
-    .corner-ribbon.bottom-left{
-      top: auto;
-      bottom: 25px;
-      left: -50px;
-      transform: rotate(45deg);
-      -webkit-transform: rotate(45deg);
-    }
+.corner-ribbon.bottom-left{
+  top: auto;
+  bottom: 25px;
+  left: -50px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
 
-    .corner-ribbon.bottom-right{
-      top: auto;
-      right: -50px;
-      bottom: 25px;
-      left: auto;
-      transform: rotate(-45deg);
-      -webkit-transform: rotate(-45deg);
-    }
+.corner-ribbon.bottom-right{
+  top: auto;
+  right: -50px;
+  bottom: 25px;
+  left: auto;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
 
-    /* Ribbon Colors */
+/* Ribbon Colors */
 
-    .corner-ribbon.white{background: #f0f0f0; color: #555;}
-    .corner-ribbon.black{background: #333;}
-    .corner-ribbon.grey{background: #999;}
-    .corner-ribbon.blue{background: #39d;}
-    .corner-ribbon.green{background: #2c7;}
-    .corner-ribbon.turquoise{background: #1b9;}
-    .corner-ribbon.purple{background: #95b;}
-    .corner-ribbon.red{background: #e43;}
-    .corner-ribbon.orange{background: #e82;}
-    .corner-ribbon.yellow{background: #ec0;}
+.corner-ribbon.white{background: #f0f0f0; color: #555;}
+.corner-ribbon.black{background: #333;}
+.corner-ribbon.grey{background: #999;}
+.corner-ribbon.blue{background: #39d;}
+.corner-ribbon.green{background: #2c7;}
+.corner-ribbon.turquoise{background: #1b9;}
+.corner-ribbon.purple{background: #95b;}
+.corner-ribbon.red{background: #e43;}
+.corner-ribbon.orange{background: #e82;}
+.corner-ribbon.yellow{background: #ec0;}
 
 /* --------------  End Corner Ribbons --------------  */
 
@@ -495,12 +495,12 @@ body {
 }
 
 #profile {
-        z-index: 2;
-        position: fixed !important;
-        height: 75px !important;
-        background-color: #0d9ddb !important;
-        float: none !important;
-        top: 0px !important;
+    z-index: 2;
+    position: fixed !important;
+    height: 75px !important;
+    background-color: #0d9ddb !important;
+    float: none !important;
+    top: 0px !important;
 }
 
 #logo {
@@ -1018,14 +1018,122 @@ form div.btn-group .btn.active {
 }
 
 /* reminders */
-.modalView#editConnection .reminders {
-    width: 100%;
+
+.modalView#editConnection .modalContentContainer {
+    height: 75%;
 }
 
-.modalView#editConnection .reminders .icon{
-    float:left;
-    width: 50px;
+.modalView#editConnection .reminders {
+    width: 100%;
+    
 }
+
+.modalView#editConnection .reminderRow {
+    padding: 0px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.modalView#editConnection .reminders .addReminder .icon{
+    float:left;
+    width: 10%;
+    vertical-align: middle;
+}
+
+.modalView#editConnection .reminders input[name=reminder] {
+    float:left;
+    height: 33px;
+    width: 50%;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    border:none !important;
+    background: none;
+}
+
+.modalView#editConnection .reminders input[name=due_date] {
+    float:left;
+    height: 33px;
+    width: 20%;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    border:none !important;
+    background: none;
+}
+
+.modalView#editConnection .reminders .setReminder {
+    float:left;
+    width: 20%;
+    padding-top: 2px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    font-size: 10px;
+    border: none;
+    height:100%;
+    color: #FFFFFF;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    font-weight:500;
+    overflow: hidden;
+}
+
+/* Existing reminders */
+
+.modalView#editConnection .reminders .existingReminders table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0px 5px;
+}
+
+.modalView#editConnection .reminders .existingReminders tr {
+    line-height: 20px;
+}
+
+
+.modalView#editConnection .reminders .existingReminders .icon{
+    width: 10%;
+    vertical-align: middle;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.modalView#editConnection .reminders td.reminder {
+    width: 50%;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background: none;
+    text-align: left;
+    font-size: 14px;
+    display:table-row;
+    vertical-align: middle;
+}
+
+.modalView#editConnection .reminders td.due_date {
+    width: 20%;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background: none;
+    text-align: left;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.modalView#editConnection .reminders td.removeReminder {
+    width: 20%;
+    padding: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    font-size: 11px;
+    border: none;
+    height:100%;
+    color: #FFFFFF;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    font-weight:500;
+    vertical-align: middle;
+}
+
 
 /* Challenges, Progress, Achievements UI*/
 
@@ -1299,8 +1407,8 @@ form div.btn-group .btn.active {
     }
 
     #helpHeader {
-    padding: 0px 5%;
-}
+        padding: 0px 5%;
+    }
 
     .smallCard {
         width: 100%;

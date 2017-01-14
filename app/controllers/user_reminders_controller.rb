@@ -2,19 +2,27 @@ class UserRemindersController < ApplicationController
     before_action :require_login
 
     def create
-        if user_reminder = current_user.user_reminders.create(
-                            connection_id:params[:connection_id],
-                            reminder:params[:reminder],
-                            status:"set",
-                            due_date:params[:due_date].to_date
-                        )
-            status = true
-            message = "Reminder set!"
-            data = nil
-            actions = [] #insert the reminder, clear and shift the box, make the modal taller, add height adjustment property to the preferences tab button
+
+        if !params[:reminder].blank?
+            if user_reminder = current_user.user_reminders.create(
+                                connection_id:params[:connection_id],
+                                reminder:params[:reminder],
+                                status:"set",
+                                due_date:params[:due_date].to_date
+                            )
+                status = true
+                message = "Reminder set!"
+                data = nil
+                actions = [] #insert the reminder, clear and shift the box, make the modal taller, add height adjustment property to the preferences tab button
+            else
+                status = false
+                message = "Could not set reminder: #{user_reminder.errors.full_messages.join(', ')}"
+                data = nil
+                actions = nil
+            end
         else
             status = false
-            message = "Could not set reminder: #{user_reminder.errors.full_messages.join(', ')}"
+            message = "Please enter the reminder text"
             data = nil
             actions = nil
         end
