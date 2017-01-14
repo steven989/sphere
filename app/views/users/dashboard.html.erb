@@ -876,11 +876,32 @@ $(function(){
 
     // Related to reminders
     function setReminderCallback() {
+        var reminder = $('#reminderForm input[name=reminder]').val();
+        prependExistingReminders(returnedData.user_reminder_id,reminder,returnedData.due_date);
+        $('#reminderForm input[name=reminder]').val("");
+        $('#reminderForm input[name=due_date]').val("");
+        if($('.existingReminders table tbody').children().length > 0) {
+            $('#currentReminderTitle').html("Current Reminders");
+        } 
+    }
 
+    function prependExistingReminders(userReminderId,reminder,dueDate) {
+        $('.existingReminders table tbody').prepend('<tr class="formElement reminderRow noHover" data-user-reminder-id="'+userReminderId+'"><td class="icon"><span class="textDarkGray" ><%= fa_icon "bell-o" %></span></td><td class="reminder"><span class="textDarkGray">'+reminder+'</span></td><td class="due_date"><span class="textDarkGray">'+dueDate+'</span></td><td class="removeReminder button formElement sphereRedBackground hoverable disableWhileProcessed ajaxButton" data-reminder-id="'+userReminderId+'" href="<%= remove_user_reminder_path %>" data-method="PUT" data-data-to-send="({user_reminder_id:'+userReminderId+'})">REMOVE</td></tr>');
+            ajaxButtonListener('.existingReminders table .removeReminder.ajaxButton[data-reminder-id='+userReminderId+']');
     }
 
     function removeReminderCallback() {
-        
+        var userReminderId = returnedData.user_reminder_id;
+        var matchedRow = $('.existingReminders table tr').filter(function(){
+            return $(this).data('user-reminder-id') == userReminderId;
+        });
+        matchedRow.fadeOut(600,function(){
+            $(this).remove();
+            if($('.existingReminders table tbody').children().length == 0) {
+                $('#currentReminderTitle').html("No Current Reminders");
+            } 
+        });
+
     }
 
     // Specific callback functions for after modal population
@@ -897,7 +918,7 @@ $(function(){
         var notes = returnedData.notes;
         var contact_frequency = returnedData.contact_frequency;
         var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
-
+        var reminders = returnedData.reminders;
 
         $('[data-remodal-id=bubbleModal] .modalView#plans .default_photo').removeClass("formElement").removeClass('photo').addClass('photo');
         $('[data-remodal-id=bubbleModal] .modalView#plans .default_icon').removeClass("formElement").removeClass('icon').addClass('icon');
@@ -917,6 +938,14 @@ $(function(){
         } else {
             $('[data-remodal-id=bubbleModal] .modalView#plans label.icon').removeClass('hidden').html('<%= fa_icon "user-circle" %><span class="edit_icon"><%= fa_icon "upload" %></span>');
             $('[data-remodal-id=bubbleModal] .modalView#plans label.photo').removeClass('hidden').addClass('hidden').html('<span class="edit_icon"><%= fa_icon "upload" %></span>');
+        }
+        if (reminders.length > 0) {
+            $('#currentReminderTitle').html("Current Reminders");
+            reminders.forEach(function(reminder){
+                prependExistingReminders(reminder.id,reminder.reminder,reminder.due_date);
+            });            
+        } else {
+            $('#currentReminderTitle').html("No Current Reminders");
         }
         searchClick = false;
         $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
@@ -1858,42 +1887,17 @@ $(function(){
                     </form>
                     <span style="float:left" class="button formElement setReminder sphereBlueBackground hoverable disableWhileProcessed submitButton" id='setReminder' data-submit-form=".modalView#editConnection #reminderForm" >ADD REMINDER</span>
                 </div>
-                <span style="font-size:15px;" class="textDarkGray">Current reminders</span>
+                <span style="font-size:15px;" class="textDarkGray"><i id="currentReminderTitle">Current Reminders</i></span>
                 <div class="existingReminders">
                     <table>
-                        <tr class="formElement reminderRow noHover">
-                            <td class="icon">
-                                <span class="textDarkGray" ><%= fa_icon 'bell-o' %></span>
-                            </td>
-                            <td class="reminder">
-                                <span class="textDarkGray">Send Roman the stuff fdfdsf fsdfds awf waefl awefl ddfsdfa lwfiaj; adflis </span>
-                            </td>
-                            <td class="due_date">
-                                <span class="textDarkGray">No Due Date</span>
-                            </td>
-                            <td class="removeReminder button formElement sphereRedBackground hoverable disableWhileProcessed ajaxButton removeReminder">
-                                REMOVE
-                            </td>
-                        </tr> 
-                        <tr class="formElement reminderRow noHover">
-                            <td class="icon">
-                                <span class="textDarkGray" ><%= fa_icon 'bell-o' %></span>
-                            </td>
-                            <td class="reminder">
-                                <span class="textDarkGray">Send Roman the stuff f</span>
-                            </td>
-                            <td class="due_date">
-                                <span class="textDarkGray">No Due Date</span>
-                            </td>
-                            <td class="removeReminder button formElement sphereRedBackground hoverable disableWhileProcessed ajaxButton removeReminder">
-                                REMOVE
-                            </td>
-                        </tr> 
+                        <tbody>
+                            
+                        </tbody>
                     </table>                                     
                 </div>
             </div>
             <div class="deleteButtonContainer" style='text-align:center;width:100%;'>
-            <%= link_to "Permanently Delete Connection", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from Sphere server and it won't be possible to recover later", method:"PUT"} %>
+            <%= link_to "Permanently Delete This Connection", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from Sphere server and it won't be possible to recover later", method:"PUT"} %>
             </div>
         </div>
         <div class="modalButtonContainer">

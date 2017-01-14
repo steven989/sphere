@@ -23,8 +23,8 @@ class Connection < ActiveRecord::Base
         first_name.to_s+" "+last_name.to_s
     end
 
-    def get_user_reminders(to_json=false)
-      result = self.user_reminders.set.order(due_date: :asc)
+    def get_user_reminders(to_json=false,timezone)
+      result = self.user_reminders.set.order(due_date: :desc).map {|reminder| {id:reminder.id,reminder:reminder.reminder,due_date:reminder.due_date_humanized(timezone)} }
       if to_json
         result.to_json
       else

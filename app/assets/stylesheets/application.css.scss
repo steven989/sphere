@@ -1020,7 +1020,7 @@ form div.btn-group .btn.active {
 /* reminders */
 
 .modalView#editConnection .modalContentContainer {
-    height: 75%;
+    height: 77%;
 }
 
 .modalView#editConnection .reminders {
@@ -1082,6 +1082,7 @@ form div.btn-group .btn.active {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0px 5px;
+    margin-bottom: 5px;
 }
 
 .modalView#editConnection .reminders .existingReminders tr {

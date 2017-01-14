@@ -388,7 +388,7 @@ class ConnectionsController < ApplicationController
         data[:notes] = connection.notes
         data[:contact_frequency] = connection.frequency_word
         data[:target_contact_interval_in_days] = connection.target_contact_interval_in_days
-        data[:reminders] = connection.get_user_reminders(false)
+        data[:reminders] = connection.get_user_reminders(false,timezone)
 
         last_plan = Plan.last(current_user,connection)
         last_checkin = current_user.activities.where(activity:"Check In",connection_id:connection.id).order(created_at: :desc).take
