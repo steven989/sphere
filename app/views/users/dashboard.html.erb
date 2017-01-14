@@ -258,10 +258,10 @@ $(function(){
 
         if ($('.profileButtonsContainer.hideOnMobile').css("display") != "none") {
             $('#settingLogoutToggle').css({"color":"#345C6F"});
-            $('html').on("click",toggleMobileTopMenu);
+            $('body').on("click",toggleMobileTopMenu);
         } else {
             $('#settingLogoutToggle').css({"color":"#FFFFFF"});
-            $('html').off("click",toggleMobileTopMenu);
+            $('body').off("click",toggleMobileTopMenu);
         }
     }
 
