@@ -272,10 +272,13 @@ $(function(){
                         content = connectionNotification["value"]["remaining_days_until_expiry"]+"d";
                     } else if (connectionNotification["notification_type"] == "checked_in") {
                         backgroundColor = "#34BF49";
-                        content = '<%= fa_icon 'check' %>';
+                        content = '<%= fa_icon "check" %>';
                     } else if (connectionNotification["notification_type"] == "upcoming_plan") {
                         backgroundColor = "#FFB900";
-                        content = '<%= fa_icon 'calendar' %>';
+                        content = '<%= fa_icon "calendar" %>';
+                    } else if (connectionNotification["notification_type"] == "user_created_reminder") {
+                        backgroundColor = "#0099E5";
+                        content = '<%= fa_icon "exclamation" %>';
                     }
                     var coordinates = getNotificationCoordinate(325,$(this).parent('.connectBubbleContainer').width()/2,14);
                     $(this).parent('.connectBubbleContainer').append('<span class="badge" style="width:22px; height:22px; position:absolute;background-color:'+backgroundColor+';left:'+coordinates.x+'px;bottom:'+coordinates.y+'px;font-size:13px;padding-top:1px;">'+content+'</span>');
@@ -898,7 +901,7 @@ $(function(){
         matchedRow.fadeOut(600,function(){
             $(this).remove();
             if($('.existingReminders table tbody').children().length == 0) {
-                $('#currentReminderTitle').html("No Current Reminders");
+                $('#currentReminderTitle').html("");
             } 
         });
 
@@ -946,7 +949,7 @@ $(function(){
                 prependExistingReminders(reminder.id,reminder.reminder,reminder.due_date);
             });            
         } else {
-            $('#currentReminderTitle').html("No Current Reminders");
+            $('#currentReminderTitle').html("");
         }
         searchClick = false;
         $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
@@ -1019,7 +1022,7 @@ $(function(){
             $('.modalView#makePlan form').attr('action',"<%= plans_path %>").attr('method','POST');
             submitButtonListener();
             $('.modalView#makePlan .modalBottomRightButton').html("CREATE ACTIVITY");
-            $('.modalView#plans .modalBottomLeftButton').html("MAKE PLANS");
+            $('.modalView#plans .modalBottomLeftButton').html('<%= fa_icon "calendar-plus-o" %>  MAKE PLANS');
             $('.modalView#plans .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
         }
 
@@ -1388,7 +1391,7 @@ $(function(){
         var changeToState = state == "true" ? true : false;
         _this = $('#checkinButton');
         if (changeToState) {
-            _this.html("CHECK IN");
+            _this.html('<%= fa_icon "check" %>  CHECK IN');
             _this.removeClass('disabled');
             if (_this.data('transition-button') != undefined ) {
                 _this.addClass('transitionButton');
@@ -1406,7 +1409,7 @@ $(function(){
             }
         } else {
             _this.off("click");
-            _this.html("CHECKED IN TODAY!");
+            _this.html('<%= fa_icon "check" %> CHECKED IN TODAY!');
             _this.removeClass('disabled').addClass('disabled');
             if (_this.hasClass('transitionButton')) {
                 _this.data("transition-button",true);
@@ -1769,8 +1772,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Click here to schedule events with your connection" data-step="8" data-position="top" id="makePlansButton">MAKE PLANS</div>
-            <div id="checkinButton" data-intro="Check in any time you interact with your connection. All check ins are logged by Sphere for points, and we will remind you to check in with your connection if you haven't done so in a while" data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> >CHECK IN</div>
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Click here to schedule events with your connection" data-step="8" data-position="top" id="makePlansButton"><%= fa_icon 'calendar-plus-o' %>  MAKE PLANS</div>
+            <div id="checkinButton" data-intro="Check in any time you interact with your connection. All check ins are logged by Sphere for points, and we will remind you to check in with your connection if you haven't done so in a while" data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details.value_in_specified_type > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> ><%= fa_icon 'check' %>  CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>

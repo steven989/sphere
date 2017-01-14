@@ -9,10 +9,12 @@ class UserRemindersController < ApplicationController
                                 status:"set",
                                 due_date:params[:due_date].to_date
                             )
+                Notification.create_reminder_notification(current_user,user_reminder)
+                notifications = current_user.get_notifications(false)
                 status = true
                 message = "Reminder set!"
-                data = {user_reminder_id:user_reminder.id,due_date:user_reminder.due_date_humanized(current_user.timezone ? TZInfo::Timezone.get(current_user.timezone) : TZInfo::Timezone.get('America/New_York'))}
-                actions = [{action:"function_call",function:"setReminderCallback()"}] #insert the reminder, clear and shift the box, make the modal taller, add height adjustment property to the preferences tab button
+                data = {user_reminder_id:user_reminder.id,due_date:user_reminder.due_date_humanized(current_user.timezone ? TZInfo::Timezone.get(current_user.timezone) : TZInfo::Timezone.get('America/New_York')),notifications:notifications}
+                actions = [{action:"function_call",function:"setReminderCallback()"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
             else
                 status = false
                 message = "Could not set reminder: #{user_reminder.errors.full_messages.join(', ')}"
@@ -38,10 +40,12 @@ class UserRemindersController < ApplicationController
         if user_reminder
             if user_reminder.belongs_to?(current_user)
                 user_reminder.update_attributes(status:"removed")
+                current_user.notifications.where("notification_type = 'user_created_reminder' and value ilike ?", "%user_reminder_id%#{user_reminder.id}%").destroy_all
+                notifications = current_user.get_notifications(false)
                 status = true
                 message = "Reminder removed!"
-                data = {user_reminder_id:params[:user_reminder_id]}
-                actions = [{action:"function_call",function:"removeReminderCallback()"}] #remove the reminder, shift the box, make the modal shorter, add height adjustment property to the preferences tab button
+                data = {user_reminder_id:params[:user_reminder_id],notifications:notifications}
+                actions = [{action:"function_call",function:"removeReminderCallback()"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
             else
                 status = false
                 message = "You do not have access to this reminder"

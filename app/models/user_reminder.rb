@@ -1,6 +1,7 @@
 class UserReminder < ActiveRecord::Base
     belongs_to :user
     belongs_to :connection
+    has_many :notifications, as: :notifiable
 
     scope :set, -> { where(status:"set") }
     scope :removed, -> { where(status:"removed") }

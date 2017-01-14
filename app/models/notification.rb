@@ -99,7 +99,7 @@ class Notification < ActiveRecord::Base
     end
 
     # This is a connection-level notification
-    def self.create_checked_in_notification(user,connection,expiry_days=3,date=Date.today)
+    def self.create_checked_in_notification(user,connection,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications
         connection.notifications.where(user_id:user.id,notification_type:"checked_in").destroy_all
         # Notification.where(user_id:user.id,connection_id:connection_id,notification_type:"checked_in").destroy_all
@@ -131,6 +131,33 @@ class Notification < ActiveRecord::Base
             value:"{plan_id:#{plan.id}}",
             priority: 1
             )
+        end
+    end
+
+    # This is a connection-level notification
+    def self.create_reminder_notification(user,reminder)
+        # 1) Destroy any existing notifications related to this reminder
+        reminder.notifications.destroy_all
+        # 2) Create a notification
+        if reminder.connection_id
+          reminder.connection.notifications.create(
+            user_id: user.id,
+            notification_type:"user_created_reminder",
+            notification_date:(reminder.due_date ? reminder.due_date - 1 : Date.today),
+            expiry_date:reminder.due_date,
+            data_type:nil,
+            value:{user_reminder_id:reminder.id},
+            priority: 0
+          )
+        else
+          user.notifications.create(
+            notification_type:"user_created_reminder",
+            notification_date:(reminder.due_date ? reminder.due_date - 1 : Date.today),
+            expiry_date:reminder.due_date,
+            data_type:nil,
+            value:{user_reminder_id:reminder.id},
+            priority: 0
+          )
         end
     end
 
