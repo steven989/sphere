@@ -10,6 +10,7 @@ namespace :system do
     task :daily_system_level_tasks => [:environment] do |t, args|
         Notification.destroy_expired_notifications
         UserChallenge.expire_uncompleted_challenges
+        UserReminder.remove_all_overdue_reminders(14)
     end
 
     desc 'Daily user and connection level tasks'

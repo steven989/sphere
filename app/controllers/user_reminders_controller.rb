@@ -39,8 +39,7 @@ class UserRemindersController < ApplicationController
         user_reminder = UserReminder.find(params[:user_reminder_id])
         if user_reminder
             if user_reminder.belongs_to?(current_user)
-                user_reminder.update_attributes(status:"removed")
-                current_user.notifications.where("notification_type = 'user_created_reminder' and value ilike ?", "%user_reminder_id%#{user_reminder.id}%").destroy_all
+                user_reminder.remove
                 notifications = current_user.get_notifications(false)
                 status = true
                 message = "Reminder removed!"

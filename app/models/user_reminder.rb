@@ -10,6 +10,17 @@ class UserReminder < ActiveRecord::Base
         self.user == user
     end
 
+    def self.remove_all_overdue_reminders(grace_period)
+        UserReminder.where("due_date < ?",Date.today - grace_period).each do |reminder|
+            reminder.remove
+        end
+    end
+
+    def remove
+        self.update_attributes(status:"removed")
+        self.user.notifications.where("notification_type = 'user_created_reminder' and value ilike ?", "%user_reminder_id%#{self.id}%").destroy_all        
+    end
+
     def due_date_humanized(timezone)
         if self.due_date.blank?
             "No Due Date"

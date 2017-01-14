@@ -144,7 +144,7 @@ class Notification < ActiveRecord::Base
             user_id: user.id,
             notification_type:"user_created_reminder",
             notification_date:(reminder.due_date ? reminder.due_date - 1 : Date.today),
-            expiry_date:reminder.due_date,
+            expiry_date:nil,
             data_type:nil,
             value:{user_reminder_id:reminder.id},
             priority: 0
