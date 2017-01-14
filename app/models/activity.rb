@@ -9,7 +9,7 @@ class Activity < ActiveRecord::Base
             activity.update_attributes(activity:ActivityDefinition.find(activity_definition_id).activity)
             connection = Connection.find(connection_id)
             result = connection.update_score
-            connection.update_attributes(active:true)
+            connection.update_attributes(active:true,times_degraded:0)
             StatisticDefinition.triggers("individual","create_activity",User.find(user.id))
             Notification.create_checked_in_notification(user,connection)
             connection.notifications.where(notification_type:"connection_expiration").destroy_all

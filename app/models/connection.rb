@@ -9,6 +9,7 @@ class Connection < ActiveRecord::Base
     has_many :tags, as: :taggable
     has_many :notifications, as: :notifiable
     has_many :user_reminders
+    has_many :penalties
     # Callbacks
     after_create :callbacks_after_create
     after_update :callbacks_after_update
@@ -82,8 +83,11 @@ class Connection < ActiveRecord::Base
           single_check_in_score += ActivityDefinition.where(activity:"Check In").sum("#{key.to_s}*#{value}").to_i
         end
         score += plans.completed.length * single_check_in_score
+
+        # 4) Subtract penalties
+        score -= self.penalties.where(penalty_statistic:'score_quality').sum(:amount).to_i
         
-        score *= bonus_multiplier        
+        score *= bonus_multiplier       
         score
     end
 
@@ -492,12 +496,39 @@ class Connection < ActiveRecord::Base
       end
     end
 
+    def degrade(batch=true)
+      allowable_degradation = SystemSetting.search('times_connection_can_be_degraded').value_in_specified_type
+      current_degradation = self.times_degraded.to_i
+      if current_degradation >= allowable_degradation
+        self.expire
+        self.update_attributes(times_degraded:0)
+      else
+        penalty_amount = self.connection_score.score_quality/[allowable_degradation,1].max
+        self.penalties.create(
+          user_id:self.user.id,
+          penalty_date:Date.today,
+          penalty_statistic:'score_quality',
+          penalty_type:"Connection degradation",
+          amount:penalty_amount
+          )
+        self.update_attributes(times_degraded:current_degradation+1)
+        self.notifications.destroy_all
+        Activity.create(user:self.user,connection_id:self.id,activity:"Connection downgraded",date:Date.today,initiator:0,activity_description:"No points")
+        unless batch
+          expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
+          self.check_if_connection_is_expiring_and_if_so_create_notification(self.user,expiring_connection_notification_period_in_days)
+          self.update_score
+          StatisticDefinition.triggers("individual","connection_degradation",self.user)
+        end
+      end
+    end
+
     def expire
         self.update_attributes(active:false,date_inactive:Date.today)
         self.notifications.destroy_all
     end
 
-    def check_if_conection_is_expiring_and_if_so_create_notification(user,expiring_connection_notification_period_in_days)
+    def check_if_connection_is_expiring_and_if_so_create_notification(user,expiring_connection_notification_period_in_days)
         target_contact_interval_in_days = self.target_contact_interval_in_days
         date_of_last_activity = self.activities.where("date is not null").order(date: :desc).first.date
         number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
@@ -517,9 +548,9 @@ class Connection < ActiveRecord::Base
           penalty_type:"Reviving expired connection",
           amount:penalty_amount
           )
-        self.update_attributes(active:true,date_inactive:nil)
+        self.update_attributes(active:true,date_inactive:nil,times_degraded:0)
         expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
-        self.check_if_conection_is_expiring_and_if_so_create_notification(self.user,expiring_connection_notification_period_in_days)
+        self.check_if_connection_is_expiring_and_if_so_create_notification(self.user,expiring_connection_notification_period_in_days)
         Activity.create(user:self.user,connection_id:self.id,activity:"Returned from expired connections",date:Date.today,initiator:0,activity_description:"No points")
         StatisticDefinition.triggers("individual","connection_revive",self.user)
         AppUsage.log_action("Re-added expired connection",self.user)

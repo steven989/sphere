@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170113185922) do
+ActiveRecord::Schema.define(version: 20170114045808) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -152,6 +152,7 @@ ActiveRecord::Schema.define(version: 20170113185922) do
     t.string   "frequency_word"
     t.text     "notes"
     t.date     "date_inactive"
+    t.integer  "times_degraded"
   end
 
   add_index "connections", ["user_id"], name: "index_connections_on_user_id", using: :btree
@@ -222,8 +223,10 @@ ActiveRecord::Schema.define(version: 20170113185922) do
     t.float    "amount"
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.integer  "connection_id"
   end
 
+  add_index "penalties", ["connection_id"], name: "index_penalties_on_connection_id", using: :btree
   add_index "penalties", ["statistic_definition_id"], name: "index_penalties_on_statistic_definition_id", using: :btree
   add_index "penalties", ["user_id"], name: "index_penalties_on_user_id", using: :btree
 

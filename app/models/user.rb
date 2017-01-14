@@ -237,7 +237,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def check_if_conection_is_expiring_and_if_so_create_notification(connection,expiring_connection_notification_period_in_days)
+  def check_if_connection_is_expiring_and_if_so_create_notification(connection,expiring_connection_notification_period_in_days)
       target_contact_interval_in_days = connection.target_contact_interval_in_days
       date_of_last_activity = connection.activities.where("date is not null").order(date: :desc).first.date
       number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
@@ -250,28 +250,38 @@ class User < ActiveRecord::Base
   def daily_connection_tasks # put all daily connection-level tasks here so that there is one loop that runs instead of multiple loops
     
     expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
-    
-    self.connections.each do |connection|
-      # 1) create upcoming expiry notifications
-      connection.check_if_conection_is_expiring_and_if_so_create_notification(self,expiring_connection_notification_period_in_days)
-      
-      # 2) create upcoming plans notifications
-      if self.plans.where(connection_id:connection.id).length > 0
-        plans = self.plans.where(connection_id:connection.id)
-        plan = plans.order(date: :desc).limit(1).take
-        Notification.create_upcoming_plan_notification(self,connection)
-      end
+    timezone = self.timezone ? TZInfo::Timezone.get(self.timezone) : TZInfo::Timezone.get('America/New_York')
 
-      # 3) update status of expired connections
+    self.connections.active.each do |connection|
+      # 1) Account for events 
+      if connection.plans.where("status ilike 'Planned' and date_time >= ? and date_time < ?",Date.today-1,Date.today).length > 0
+        connection.update_attributes(active:true,times_degraded:0)
+      end
+      # 2) update status of expired connections
       target_contact_interval_in_days = connection.target_contact_interval_in_days
-      date_of_last_activity = connection.activities.where("date is not null").order(date: :desc).first.date
-      number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
+      date_of_last_activity = timezone.utc_to_local(connection.activities.where("date is not null").order(date: :desc).first.created_at).strftime("%Y-%m-%d").to_date
+      date_of_last_plan = timezone.utc_to_local(Plan.last(self,connection).date_time).strftime("%Y-%m-%d").to_date
+      combined_date_of_last_activity = date_of_last_activity > date_of_last_plan ? date_of_last_activity : date_of_last_plan
+      number_of_days_since_last_activity = (timezone.now.strftime("%Y-%m-%d").to_date - combined_date_of_last_activity).to_i
       if number_of_days_since_last_activity > target_contact_interval_in_days
-        if connection.plans.where("date >= ?",Date.today).length == 0
-          connection.expire
+        if connection.plans.where("date_time >= ?",timezone.local_to_utc(timezone.now)).length == 0
+          connection.degrade
         end
       end
-      # 4) Update time score
+
+      if Connection.find(connection.id).active
+        # 3) create upcoming expiry notifications
+        connection.check_if_connection_is_expiring_and_if_so_create_notification(self,expiring_connection_notification_period_in_days)
+        
+        # 4) create upcoming plans notifications
+        if self.plans.where(connection_id:connection.id).length > 0
+          plans = self.plans.where(connection_id:connection.id)
+          plan = plans.order(date: :desc).limit(1).take
+          Notification.create_upcoming_plan_notification(self,connection)
+        end
+      end
+
+      # 5) Update quality and time score
       connection.update_score
     end
   end
