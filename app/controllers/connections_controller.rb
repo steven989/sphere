@@ -378,7 +378,7 @@ class ConnectionsController < ApplicationController
         data = {}
         connection = Connection.find(params[:connection_id])
         timezone = current_user.timezone ? TZInfo::Timezone.get(current_user.timezone) : TZInfo::Timezone.get('America/New_York')
-        date_of_last_activity_with_this_connection_utc = connection.activities.where("activity_definition_id is not null").last && connection.activities.where("activity_definition_id is not null").order(:date).last.created_at
+        date_of_last_activity_with_this_connection_utc = connection.activities.where("activity_definition_id is not null").last && connection.activities.where("activity_definition_id is not null").order(:created_at).last.created_at
         check_in_button_state =  date_of_last_activity_with_this_connection_utc.nil? || timezone.now.strftime("%Y-%m-%d").to_date > timezone.utc_to_local(date_of_last_activity_with_this_connection_utc).strftime("%Y-%m-%d").to_date
         data[:connection_id] = params[:connection_id]
         data[:photo] = connection.photo_url
