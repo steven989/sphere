@@ -51,6 +51,7 @@ Rails.application.routes.draw do
   put  'admins/update_sign_up_codes' => 'admins#update_sign_up_codes', as: 'update_sign_up_codes'
   put  'admins/generate_sign_up_codes' => 'admins#generate_sign_up_codes', as: 'generate_sign_up_codes'
   put  'admins/upload_graphics' => 'admins#upload_graphics', as: 'upload_graphics'
+  get 'admins/user_app_usage/:id' => 'admins#view_user_app_usage', as: 'view_user_app_usage'
   get 'admins/impersonate_user/:id' => 'admins#impersonate', as: 'impersonate_user'
 
   # Plans controller

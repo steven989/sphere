@@ -284,12 +284,14 @@ $(function(){
                         <thead>
                             <th>Email</th>
                             <th>Login As</th>
+                            <th>View Activities</th>
                         </thead>
                         <tbody>
                             <% @users.each do |user| %>
                                 <tr>
                                     <td><%= user.email %></td>
                                     <td><%= link_to 'login', impersonate_user_path(user) %></td>
+                                    <td><%= link_to 'View', view_user_app_usage_path(user.id) %></td>
                                 </tr>
                             <% end %>
                         </tbody>

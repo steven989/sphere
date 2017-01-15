@@ -404,9 +404,32 @@ class AdminsController < ApplicationController
           format.json {
             render json: {status:status, message:message,actions:actions,data:data}
           } 
-        end                
-
+        end
     end
+
+
+    def view_user_app_usage
+        user = User.find(params[:id])
+        user_app_usages = user.app_usages
+        user_activities = user.activities
+        user_plans = user.plans
+        user_reminders = user.user_reminders
+        @combined_app_usages = []
+        user_app_usages.each do |usage|
+            @combined_app_usages.push({timestamp:usage.created_at,usage:usage.action,additional_info:usage.additional_info})
+        end
+        user_activities.each do |activity|
+            @combined_app_usages.push({timestamp:activity.created_at,usage:activity.activity,additional_info:nil})
+        end
+        user_plans.each do |plan|
+            @combined_app_usages.push({timestamp:plan.created_at,usage:"Scheduled an event",additional_info:"Put on calendar:#{plan.put_on_calendar} | Invite sent: #{plan.invite_sent}"})
+        end
+        user_reminders.each do |reminder|
+            @combined_app_usages.push({timestamp:reminder.created_at,usage:"Set a reminder",additional_info:"Has due date: #{!reminder.due_date.nil?}"})
+        end
+        @combined_app_usages.sort! {|a,b| b[:timestamp] <=> a[:timestamp]}
+    end
+
 
     private
 
