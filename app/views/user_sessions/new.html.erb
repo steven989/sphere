@@ -25,13 +25,16 @@ $(function(){
     $('.googleLoginButton').off("click").on("click",function(){
             event.preventDefault();
             event.stopPropagation()
-            var win = window.open($(this).attr('href'),"_blank","width=500,height=600");
+            var signUpCode = $('#signup #sign_up_code').val();
+            var todo = $(this).data('to-do');
+            var win = window.open($(this).attr('href')+"?state="+signUpCode+"&todo="+todo,"_blank","width=500,height=600");
             var checkConnect = setInterval(function() {
                     if (!win || !win.closed) return;
                     clearInterval(checkConnect);
                     window.location.replace("<%= root_path %>");
                 }, 100);    
     });
+
     $('.transitionButton').off('click').on('click',function(){
         transition($($(this).data('current')),$($(this).data('target')));
         if($(this).data('height-adjust-element') != undefined) {
@@ -80,7 +83,7 @@ $(function(){
         <div class="p-h-xxlg p-v-xxlg" id="login">
             <%= form_tag user_sessions_path, method: 'POST' do %>
                 <div>
-                    <div class="formElement button textDarkGray tallerInput googleLoginButton" href=<%= "#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_login' : 'http://localhost:3000/auth/google_login'}" %>>
+                    <div class="formElement button textDarkGray tallerInput googleLoginButton" href=<%= "#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_login' : 'http://localhost:3000/auth/google_login'}" %> data-to-do="login">
                         <%= image_tag 'google-logo-small.png', width: 20 %>
                         <span class="m-l-xxxxxlg">
                             Login with Google
@@ -105,7 +108,7 @@ $(function(){
                     <% if @invite_required %>
                         <%= text_field_tag :sign_up_code, nil, placeholder:"Invite Code", class:"textDarkGray formElement m-b-xs tallerInput", value:flash[:sign_up_code] %>
                     <% end %>
-                    <div class="formElement button textDarkGray tallerInput googleLoginButton" href=<%= "#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_login' : 'http://localhost:3000/auth/google_login'}" %> >
+                    <div class="formElement button textDarkGray tallerInput googleLoginButton" href=<%= "#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_login' : 'http://localhost:3000/auth/google_login'}" %>  data-to-do="signup">
                         <%= image_tag 'google-logo-small', width: 20 %>
                         <span class="m-l-xxxxxlg">
                             Signup with Google

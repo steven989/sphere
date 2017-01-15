@@ -8,7 +8,8 @@ class AuthorizationsController < ApplicationController
             email = request.env['omniauth.auth']['extra']['raw_info']['email']
             first_name = request.env['omniauth.auth']['extra']['raw_info']['given_name']
             last_name = request.env['omniauth.auth']['extra']['raw_info']['family_name']
-
+            signup_code = request.env['omniauth.params']['state']
+            todo = request.env['omniauth.params']['todo']
         rescue => error
                 @action = "open"
                 @errors = "Authorization could not be completed. Please close this window and try again"
@@ -16,7 +17,7 @@ class AuthorizationsController < ApplicationController
             if email
                 # If email address matches an existing user, log that user in
                 existing_user = User.find_email(email)
-                if existing_user
+                if existing_user 
                       if existing_user.remember_me_token && (existing_user.remember_me_token_expires_at > Time.now.utc)
                         auto_login(existing_user,false)
                         set_remember_me_cookie!(existing_user)
@@ -25,14 +26,19 @@ class AuthorizationsController < ApplicationController
                       end
                     @action = "close"
                 else
-                    # add photo in here later
-                    result = User.create_user(email,first_name,last_name,"user",nil,nil,true)
-                    if result[:status]
-                        auto_login(result[:user],true)
-                        authorization = current_user.authorizations.create(provider:"google",scope:"['email','profile']",data:"{email:'#{request.env['omniauth.auth']['extra']['raw_info']['email']}',name:'#{request.env['omniauth.auth']['extra']['raw_info']['name']}'}",login:true)
-                        @action = "close"
+                    if todo == "signup"
+                        # add photo in here later
+                        result = User.create_user(email,first_name,last_name,"user",nil,nil,true,signup_code)
+                        if result[:status]
+                            auto_login(result[:user],true)
+                            authorization = current_user.authorizations.create(provider:"google",scope:"['email','profile']",data:"{email:'#{request.env['omniauth.auth']['extra']['raw_info']['email']}',name:'#{request.env['omniauth.auth']['extra']['raw_info']['name']}'}",login:true)
+                            @action = "close"
+                        else
+                            @errors = "We could not create your user account. #{result[:message]} <br><br>Close this window and try again"
+                            @action = "open"
+                        end
                     else
-                        @errors = "We could not create your user account for the following reasons: result[:message]. Please close this window and try again"
+                        @errors = "No user with email address #{email} found. Please close this window and create an account on the Sign Up tab"
                         @action = "open"
                     end
                 end

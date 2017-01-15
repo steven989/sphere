@@ -1,14 +1,13 @@
 <script>
-$(function(){
-    var action = '<%= @action %>';
-    if (action == "close") {
-        parent.close();    
-    } else if (action == "open") {
-        $('.alert').html(<%= @errors %>)
-        $('.alert').removeClass("hidden");
-    }
-})
-
+    $(function(){
+        var action = '<%= @action %>';
+        if (action == "close") {
+            parent.close();
+        }
+    })
 </script>
-
-<div class="alert alert-danger hidden"></div>
+<% if @action == "open" %>
+<div class="alert alert-danger" style="margin: 50px 50px;">
+    <%= raw @errors %>
+</div>
+<% end %>
