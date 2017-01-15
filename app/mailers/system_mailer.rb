@@ -42,9 +42,7 @@ class SystemMailer < ApplicationMailer
       @plans =  user.plans.where("status ilike 'Planned' and EXTRACT(MONTH FROM created_at) = ? and EXTRACT(YEAR FROM created_at) = ?", timezone.local_to_utc(timezone.now-1).month.to_i,timezone.local_to_utc(timezone.now-1).year.to_i).length
     end
 
-    mail(
-         :from 
-         :to => user.email,
+    mail(:to => user.email,
          :subject => "Your Sphere activities #{@frequency}!") do |format|
         format.html
     end     
