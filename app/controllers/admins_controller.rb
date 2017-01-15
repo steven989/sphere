@@ -23,6 +23,8 @@ class AdminsController < ApplicationController
             @activity_definitions = ActivityDefinition.all.order(specificity_level: :asc, created_at: :desc)
         elsif model_name == "system_setting"
             @system_settings = SystemSetting.all.order(created_at: :asc)
+        elsif model_name == "sign_up_code"
+            @sign_up_codes = SignUpCode.where(user_id:nil).order(created_at: :desc)
         end
 
         respond_to do |format|
@@ -67,6 +69,77 @@ class AdminsController < ApplicationController
         
     end
 
+    def generate_sign_up_codes
+        number_of_code = params[:number_of_code].to_i
+        quantity = params[:quantity].to_i
+        SignUpCode.create_sign_up_codes(number_of_code,quantity)
+
+        status = true
+        message = "Codes successfully created"
+        data = nil
+        actions = [{action:"function_call",function:"setTimeout(function(){ loadInputForm('sign_up_code')},2000)"}]
+
+        respond_to do |format|
+          format.json {
+            render json: {status:status, message:message,actions:actions,data:data}
+          } 
+        end  
+
+    end
+
+    def update_sign_up_codes
+        parsed_params = {}
+        params.each do |key,value|
+            if key.match /ID\$(\d+)\$ATTR\$(\w+)/ #The keys are all in the shape of ID$123$ATTR$some_attribute
+                object_id = $1
+                attribute = $2
+                parsed_params[object_id] = {} unless parsed_params[object_id]
+                parsed_params[object_id][attribute.to_sym] = value
+            end
+        end
+
+        error_array = []
+
+        parsed_params.values.each do |valueReceived| 
+
+            delete = valueReceived[:delete] == "true" ? true : false
+            id = valueReceived[:id].blank? ? nil : valueReceived[:id].to_i
+            inputID = valueReceived[:inputId]
+
+            code = valueReceived[:code]
+            quantity = valueReceived[:quantity].to_i
+            valid_after = valueReceived[:valid_after].to_date
+            valid_before = valueReceived[:valid_before].to_date
+            active = valueReceived[:active] == "true" ? true : false
+            description = valueReceived[:description]
+
+            result = SignUpCode.update_sign_up_code_non_user_codes(id,delete,code,quantity,valid_after,valid_before,active,description)
+
+            if !result[:status] 
+                error_array.push({inputId:inputID,message:result[:message],elements:result[:elements]})
+            end
+        end
+
+        if error_array.length > 0
+            status = false
+            message = "Encountered some errors while updating the signup codes. #{error_array.map{|error| error[:message]}.join(', ') }. Specific issues highlighted below"
+            data = {errorInputIds: error_array.map {|error| error[:inputId]}}
+            actions = error_array.map {|error| error[:elements] ? error[:elements].map{|element| {action:"change_css",element:"#sign_up_code .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } : {action:"change_css",element:"#sign_up_code .update-instance[data-instance-id=#{error[:inputId]}]",css:{attribute:"border",value:"1px solid red"} } }.flatten
+            actions.push({action:"function_call",function:"reCheck('sign_up_code',receivedDataFromAJAX.data.errorInputIds,'update')"})
+            actions.reject! {|action| action.nil?}
+        else
+            status = true
+            message = "Successfully saved"
+            data = nil
+            actions = [{action:"function_call",function:"setTimeout(function(){ loadInputForm('sign_up_code')},2000)"}]
+        end
+
+        respond_to do |format|
+          format.json {
+            render json: {status:status, message:message,actions:actions,data:data}
+          } 
+        end          
+    end
 
 
     def update_system_settings

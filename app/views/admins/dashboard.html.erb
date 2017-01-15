@@ -91,11 +91,17 @@ $(function(){
             });
 
             if (inc > 0) {
-                buttonAjax($(this),formData);
+                buttonAjax($(this),formData,false);
             } else {
                 toastr.warning("You must select at least 1 row to update", {timeOut: 3000,closeButton:true});
             }
         });
+
+        if (model.find('#generateCodes')) {
+            model.find('#generateCodes').off("click").on("click",function(){
+                buttonAjax($(this),{number_of_code:model.find('#number_of_codes_to_generate').val(),quantity:model.find('#number_of_redemptions_per_code').val()},true);
+            });
+        }
     }
 
     function loadInputForm(modelName) {
@@ -111,15 +117,16 @@ $(function(){
 }
 
     // Standard ajax call for buttons that retrieves JSON response
-    function buttonAjax(button,data) {
+    function buttonAjax(button,data,processData) {
         toastr.options.newestOnTop = true;
         var alertElement = $(button.data('alert-element'));
+        console.log(data);
           $.ajax({
             url: button.attr('href'),
             type: button.data('method'),
             data: data,
-            processData: false,
-            contentType: false,
+            processData: processData,
+            contentType: (processData ? "application/x-www-form-urlencoded; charset=UTF-8" : false),
             dataType: 'JSON'
           }).done(function(data){
             receivedDataFromAJAX = data;
@@ -246,6 +253,9 @@ $(function(){
                 <li class="tab loadInputForm" data-input-form-model="system_setting">
                     <a href="#system_settings"><i class="fa fa-tasks"></i><br>System Settings</a>
                 </li>
+                <li class="tab loadInputForm" data-input-form-model="sign_up_code">
+                    <a href="#sign_up_codes"><i class="fa fa-tasks"></i><br>Sign Up Codes</a>
+                </li>
                 <li class="tab loadInputForm" data-input-form-model="activity_definition">
                     <a href="#activity_definitions"><i class="fa fa-tasks"></i><br>Activity Definitions</a>
                 </li>
@@ -293,6 +303,12 @@ $(function(){
                   <div id="activity_definitions">
                     <h2>Activity Definitions</h2>
                     <div class="inputs" id="activity_definition" >
+
+                    </div>
+                  </div>
+                  <div id="sign_up_codes">
+                    <h2>Sign Up Codes</h2>
+                    <div class="inputs" id="sign_up_code" >
 
                     </div>
                   </div>

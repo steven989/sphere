@@ -1,0 +1,37 @@
+<%= number_field_tag :rows_to_add,10 %>
+<button class="addRows" data-model-name="sign_up_code">Add Rows</button>
+<label for="number_of_codes_to_generate">Generate</label>
+<%= number_field_tag :number_of_codes_to_generate,1, style:"width:30px;" %>
+<label for="number_of_redemptions_per_code">codes, each allowing</label>
+<%= number_field_tag :number_of_redemptions_per_code,20, style:"width:60px;" %>
+sign ups
+<button id="generateCodes" style="30px;" href="<%= generate_sign_up_codes_path %>" data-method="PUT">Click to Generate Codes</button>
+<button class="updateToServer" href="<%= update_sign_up_codes_path %>" data-method="put" data-alert-element=".inputs#sign_up_code .alert">Update all selected changes</button><br>
+<table>
+    <thead>
+        <th>Update? <%= check_box_tag :toggle_all_update, nil,nil, class:"toggleAll" %> </th>
+        <th>Code</th>
+        <th>Max Sign Ups</th>
+        <th>Used Sign Ups</th>
+        <th>Effective After Date</th>
+        <th>Expiry Date</th>
+        <th>Active?</th>
+        <th>Description</th>
+        <th>Delete? <%= check_box_tag :toggle_all_delete, nil,nil, class:"toggleAll" %> </th>
+    </thead>
+    <tbody>
+        <% @sign_up_codes.each do |sign_up_code| %>
+           <tr class="update-instance" data-instance-id=<%= sign_up_code.id %>>
+               <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,sign_up_code.id, class:"updateInput" %></td>
+               <td><%= text_field_tag :code, sign_up_code.code,class:"updateInput" %></td>
+               <td><%= number_field_tag :quantity, sign_up_code.quantity,class:"updateInput" %></td>
+               <td><span><%= sign_up_code.quantity_used.to_i %></span></td>
+               <td><%= date_field_tag :valid_after, sign_up_code.valid_after,class:"updateInput" %></td>
+               <td><%= date_field_tag :valid_before, sign_up_code.valid_before,class:"updateInput" %></td>
+               <td><%= check_box_tag :active, true,sign_up_code.active,class:"updateInput" %></td>
+               <td><%= text_field_tag :description, sign_up_code.description,class:"updateInput" %></td>
+               <td><%= check_box_tag :delete,nil,nil,class:"deleteCheck" %></td>
+           </tr> 
+        <% end %>
+    </tbody>
+</table>

@@ -10,6 +10,71 @@ class SignUpCode < ActiveRecord::Base
         SignUpCode.where(code:code).take.increment
     end
 
+    def self.update_sign_up_code_non_user_codes(id,delete,code,quantity,valid_after,valid_before,active,description)
+        if !id.blank?
+            sign_up_codeObj = SignUpCode.find(id)
+            if sign_up_codeObj
+                if delete
+                    sign_up_codeObj.destroy
+                    status = true
+                    message = "Signup code deleted"
+                    elements = nil
+                else
+                    # evaluate the criteria to make sure it's actually good
+                    evaluation_result = valid_before.nil? || valid_after.nil? || (valid_before && valid_after && valid_before >= valid_after)
+                    if evaluation_result
+                        sign_up_codeObj.assign_attributes(code:code,quantity:quantity,valid_after:valid_after,valid_before:valid_before,active:active,description:description)
+                        begin
+                            savedObj = sign_up_codeObj.save
+                        rescue => error
+                            status = false
+                            message = "Signup code could not be updated: #{error.message}"
+                            elements = nil                            
+                        else
+                            if savedObj
+                                status = true
+                                message = "Signup code successfully updated"
+                                elements = nil
+                            else
+                                status = false
+                                message = "Signup code could not be updated: #{sign_up_codeObj.errors.full_messages.join(', ')}"
+                                elements = sign_up_codeObj.errors.messages.keys
+                            end
+                        end
+                    else
+                        status = false
+                        message = "Expiry date can't be before the effective after date"
+                        elements = nil
+                    end
+                end
+            else
+                status = true
+                message = "Did not find ID. No action performed"
+                elements = nil
+            end 
+        else
+            # evaluate the criteria to make sure it's actually good
+            evaluation_result = valid_before.nil? || valid_after.nil? || (valid_before && valid_after && valid_before >= valid_after)
+            if evaluation_result
+                sign_up_codeObj = SignUpCode.new(code:code,quantity:quantity,valid_after:valid_after,valid_before:valid_before,active:active,description:description,code_type:"admin_manually_entered")
+                if sign_up_codeObj.save
+                    status = true
+                    message = "Signup code successfully updated"
+                    elements = nil
+                else
+                    status = false
+                    message = "Signup code could not be updated: #{sign_up_codeObj.errors.full_messages.join(', ')}"
+                    elements = sign_up_codeObj.errors.messages.keys
+                end
+            else
+                status = false
+                message = "Expiry date can't be before the effective after date"
+                elements = nil
+            end
+        end
+        {status:status,message:message,elements:elements}
+    end
+
     def self.check_if_code_is_valid(code)
         result = SignUpCode.where("code ilike ?", code)
         if result.length == 0
