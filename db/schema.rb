@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170114045808) do
+ActiveRecord::Schema.define(version: 20170114223547) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -269,6 +269,23 @@ ActiveRecord::Schema.define(version: 20170114045808) do
     t.string   "parameter_3_type"
     t.datetime "last_attempt_date"
   end
+
+  create_table "sign_up_codes", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "code"
+    t.integer  "quantity"
+    t.integer  "quantity_used"
+    t.string   "description"
+    t.date     "valid_after"
+    t.date     "valid_before"
+    t.string   "code_type"
+    t.boolean  "active"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "sign_up_codes", ["code"], name: "index_sign_up_codes_on_code", unique: true, using: :btree
+  add_index "sign_up_codes", ["user_id"], name: "index_sign_up_codes_on_user_id", using: :btree
 
   create_table "statistic_definitions", force: :cascade do |t|
     t.string   "name"

@@ -25,6 +25,7 @@ class User < ActiveRecord::Base
   has_many :penalties
   has_many :external_notifications
   has_many :user_reminders, dependent: :destroy
+  has_many :sign_up_codes
 
   # Validations
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
@@ -223,18 +224,43 @@ class User < ActiveRecord::Base
   end
 
 
-  def self.create_user(email,first_name,last_name,user_type="user",password=nil,password_confirmation=nil,oauth=false)
-    if oauth || !password.blank?
-      user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
-      if user.save
-        StatisticDefinition.new_user_base_statistics(user)
-        {status:true,user:user,message:nil}
+  def self.create_user(email,first_name,last_name,user_type="user",password=nil,password_confirmation=nil,oauth=false,invite_code=nil)
+    if SystemSetting.search('invite_code_required').value_in_specified_type 
+      if !invite_code.blank?
+        check_result = SignUpCode.check_if_code_is_valid(invite_code)
+        if check_result[:status]
+          if oauth || !password.blank?
+            user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
+            if user.save
+              StatisticDefinition.new_user_base_statistics(user)
+              SignUpCode.increment(invite_code)
+              {status:true,user:user,message:nil}
+            else
+              {status:false,user:nil,message:user.errors.full_messages.join(', ')}
+            end
+          else
+            {status:false,user:nil,message:"Password is required"}
+          end
+        else
+          {status:false,user:nil,message:check_result[:message]}
+        end
       else
-        {status:false,user:nil,message:user.errors.full_messages.join(', ')}
+        {status:false,user:nil,message:"Please enter your invite code!"}
       end
-    else
-      {status:false,user:nil,message:"Password is required"}
+    else 
+      if oauth || !password.blank?
+        user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
+        if user.save
+          StatisticDefinition.new_user_base_statistics(user)
+          {status:true,user:user,message:nil}
+        else
+          {status:false,user:nil,message:user.errors.full_messages.join(', ')}
+        end
+      else
+        {status:false,user:nil,message:"Password is required"}
+      end
     end
+
   end
 
   def check_if_connection_is_expiring_and_if_so_create_notification(connection,expiring_connection_notification_period_in_days)

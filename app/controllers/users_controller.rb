@@ -30,7 +30,8 @@ class UsersController < ApplicationController
           "user",
           user_params[:password],
           user_params[:password_confirmation],
-          false
+          false,
+          user_params[:sign_up_code]
           )
         if result[:status]
           auto_login(result[:user],true)
@@ -38,6 +39,10 @@ class UsersController < ApplicationController
         else
           redirect_to(login_path, alert: "Could not create user. #{result[:message]}")
           flash[:display] = "signup"
+          flash[:email_signup] = user_params[:email]
+          flash[:sign_up_code] = user_params[:sign_up_code]
+          flash[:first_name] = user_params[:first_name]
+          flash[:last_name] = user_params[:last_name]
         end
     end
 
@@ -351,7 +356,7 @@ class UsersController < ApplicationController
     end
 
     def user_params
-        params.permit(:email, :password, :password_confirmation,:first_name,:last_name)
+        params.permit(:email, :password, :password_confirmation,:first_name,:last_name,:sign_up_code)
     end
 
     def require_login

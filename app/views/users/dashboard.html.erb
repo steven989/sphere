@@ -1955,15 +1955,15 @@ $(function(){
                 <p class="textDarkGray" data-intro="This shows you the remaining number of connections you can still add to your Sphere" data-step="5" data-position="bottom">You can add <span class="reminingContactDisplay"><%= @remaining_number_of_connections %></span> more connections to your Sphere</p>
                 <form action="<%= create_connection_path %>" method="POST" data-intro="Enter a few basic information of your connection to add them to your Sphere. Once they're in, you can start tracking your interactions with them" data-step="3" data-position="top">
                     <div class="vex-custom-field-wrapper">
-                        <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="name" required>
-                        <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="email" >
+                        <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="Name" required>
+                        <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="Email" >
                         <div id="cropInCreateConnection" class='hidden default_hidden'></div>
                         <input name="photoUploaderInCreate" data-uploader-crop-var="cropVarInCreateConnection" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
                         <label for="photoUploaderInCreate" class="textDarkGray m-b-xs formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
                             <%= fa_icon 'id-badge' %>
                             Upload Photo
                         </label>                        
-                        <textarea class="formElement inputData clearInputAfterUpdate" name="notes" placeholder="notes" rows="2" required></textarea>
+                        <textarea class="formElement inputData clearInputAfterUpdate" name="notes" placeholder="Notes" rows="3" required></textarea>
                         <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox inputData tokenized clearInputAfterUpdate" data-token-variable="tokenInCreate">
                         </select>
                     </div>

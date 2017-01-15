@@ -21,6 +21,7 @@ $(function(){
             transition($(".loginScreen #login"),$(".loginScreen #signup"));
         <% end %>
     <% end %>
+
     $('.googleLoginButton').off("click").on("click",function(){
             event.preventDefault();
             event.stopPropagation()
@@ -86,8 +87,8 @@ $(function(){
                         </span>
                     </div>
                     <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or with email</span></h2>
-                    <%= text_field_tag :email, nil, placeholder:"email", class:"textDarkGray formElement m-b-md tallerInput" %>
-                    <%= password_field_tag :password, nil,  placeholder:"password", class:"textDarkGray formElement m-b-md tallerInput" %>
+                    <%= text_field_tag :email, nil, placeholder:"Email", class:"textDarkGray formElement m-b-md tallerInput", value:flash[:email_login] %>
+                    <%= password_field_tag :password, nil,  placeholder:"Password", class:"textDarkGray formElement m-b-md tallerInput" %>
                 </div>
                 <span style="font-size:12px;text-align:center; display:block; width:100%;">
                     <a class="transitionButton" data-current=".loginScreen #login" data-target=".loginScreen #signup" >Sign Up</a><br>
@@ -101,6 +102,9 @@ $(function(){
         <div class="p-h-xxlg p-v-xxlg hidden" id="signup">
             <%= form_tag create_user_path, method: 'POST' do %>
                 <div>
+                    <% if @invite_required %>
+                        <%= text_field_tag :sign_up_code, nil, placeholder:"Invite Code", class:"textDarkGray formElement m-b-xs tallerInput", value:flash[:sign_up_code] %>
+                    <% end %>
                     <div class="formElement button textDarkGray tallerInput googleLoginButton" href=<%= "#{Rails.env.production? ? ENV['PRODUCTION_HOST_DOMAIN']+'auth/google_login' : 'http://localhost:3000/auth/google_login'}" %> >
                         <%= image_tag 'google-logo-small', width: 20 %>
                         <span class="m-l-xxxxxlg">
@@ -109,19 +113,19 @@ $(function(){
                     </div>
                     <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:10px 0 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or create account</span></h2>
 
-                    <%= text_field_tag :email, nil, placeholder:"email", class:"textDarkGray formElement m-b-xs tallerInput" %>
-                    <%= text_field_tag :first_name, nil, placeholder:"first name", class:"textDarkGray formElement halfRow left m-b-xs tallerInput" %>
-                    <%= text_field_tag :last_name, nil, placeholder:"last name", class:"textDarkGray formElement halfRow right m-b-xs tallerInput" %>
-                    <%= password_field_tag :password, nil,  placeholder:"password", class:"textDarkGray formElement m-b-xs tallerInput" %>
-                    <%= password_field_tag :password_confirmation, nil,  placeholder:"retype password", class:"textDarkGray formElement m-b-xs tallerInput" %>
+                    <%= text_field_tag :email, nil, placeholder:"Email", class:"textDarkGray formElement m-b-xs tallerInput", value:flash[:email_signup] %>
+                    <%= text_field_tag :first_name, nil, placeholder:"First Name", class:"textDarkGray formElement halfRow left m-b-xs tallerInput", value:flash[:first_name] %>
+                    <%= text_field_tag :last_name, nil, placeholder:"Last Name", class:"textDarkGray formElement halfRow right m-b-xs tallerInput", value:flash[:last_name] %>
+                    <%= password_field_tag :password, nil,  placeholder:"Password", class:"textDarkGray formElement m-b-xs tallerInput" %>
+                    <%= password_field_tag :password_confirmation, nil,  placeholder:"Retype Password", class:"textDarkGray formElement m-b-xs tallerInput" %>
                 </div>
                 <span style="margin-bottom: 30px; font-size:12px;text-align:center; display:block; width:100%;">
-                    <a class="transitionButton" data-current=".loginScreen #signup" data-target=".loginScreen #login" >Back to Login</a>
+                    <a class="transitionButton" data-current=".loginScreen #signup" data-target=".loginScreen #login" >Back To Login</a>
                 </span>
                 <div class="modalButtonContainer">
                     <%= submit_tag 'SIGN UP', class:"modalBottomFullButton sphereBlueBackground hoverable" %> 
-                </div>                 
-            <% end %>            
+                </div>
+            <% end %>
         </div>
     </div>
 </div>

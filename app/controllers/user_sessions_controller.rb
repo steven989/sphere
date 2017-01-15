@@ -1,6 +1,6 @@
 class UserSessionsController < ApplicationController
   def new
-
+    @invite_required = SystemSetting.search('invite_code_required').value_in_specified_type
   end
 
   def create
@@ -19,7 +19,7 @@ class UserSessionsController < ApplicationController
     if oauth_alert
       redirect_to(login_path, alert: "You signed up with #{login_authorizations.map {|login| login.provider.capitalize}.to_sentence}. Please use #{ login_authorizations.length == 1 ? login_authorizations.take.provider.capitalize : 'one of these services'} to log in")
     else
-      if user.remember_me_token && (user.remember_me_token_expires_at > Time.now.utc)
+      if user && user.remember_me_token && (user.remember_me_token_expires_at > Time.now.utc)
         @user = login(params[:email], params[:password],false)
         set_remember_me_cookie!(@user)
       else
@@ -31,11 +31,13 @@ class UserSessionsController < ApplicationController
         redirect_back_or_to root_path
       else
         if user 
+          flash[:email_login] = params[:email]
           redirect_to(login_path, alert: "Password doesn't match what we have on file!")
           flash[:display] = "login"
         else
-          redirect_to(login_path, alert: "Hmm we can't seem to find your account. Create one today!")
           flash[:display] = "login"
+          flash[:email_signup] = params[:email]
+          redirect_to(login_path, alert: "Hmm we can't seem to find your account. Create one today!")
         end
       end
     end

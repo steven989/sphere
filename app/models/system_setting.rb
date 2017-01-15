@@ -151,12 +151,8 @@ class SystemSetting < ActiveRecord::Base
     end
 
     def value_in_specified_type
-        if self.data_type.downcase == 'hash'
+        if self.data_type.downcase == 'hash' || self.data_type.downcase == 'array' || self.data_type.downcase == 'boolean' || self.data_type.downcase == 'integer'
             result = eval(self.value)
-        elsif self.data_type.downcase == 'array'
-            result = eval(self.value)
-        elsif self.data_type.downcase == 'integer'
-            result = self.value.to_i
         else
             result = self.value
         end
