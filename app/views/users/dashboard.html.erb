@@ -1881,10 +1881,10 @@ $(function(){
             <span class="textDarkGray" style="font-size:17px;">Choose Activity and Date</span>
             <form action="<%= plans_path %>" method="POST" >
                 <div class="btn-group buttonGroupWithOther chooseActivity" data-intro="Choose what type of activity you want to schedule. The hover-over tooltip shows what will be the title of your event. Click the plus sign to enter your own activity" data-step="9" data-position="bottom"  style="height:50px;"  role="group">
-                    <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', width: 33 %></button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Food"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px"  data-toggle="tooltip" data-placement="top" data-html="true" title="Food"><%= image_tag 'food', width: 33 %></button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', width: 33 %></button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Catch up"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-toggle="tooltip" data-placement="top" data-html="true" title="Catch up"><%= image_tag 'phone', width: 33 %></button>
+                    <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', height: 35 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Food"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px"  data-toggle="tooltip" data-placement="top" data-html="true" title="Food"><%= image_tag 'food', height: 35 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', height: 35 %></button>
+                    <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Catch up"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-toggle="tooltip" data-placement="top" data-html="true" title="Catch up"><%= image_tag 'phone', height: 35 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;font-size:30px;" data-value="other" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]" data-height-adjust-value="460px"  data-slide-down=".modalView#makePlan .activityName"><%= fa_icon 'plus' %></button>
                 </div>
                 <div class="formElement m-t-sm activityName" style="display:none;min-height:none;">
@@ -2172,10 +2172,10 @@ $(function(){
     <% if @settings[:onboarding_progress] && !@settings[:onboarding_progress][1] %>
         <div class="modalView textDarkGray" id="welcomeMessage">
             <div class="modalContentContainer p-h-xxlg">
-                <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>Welcome to Sphere!</h1><br><p>It takes discipline to make and nurture meaningful relationships. Sphere will help you develop the right habit to grow your network</p><br><p>We'll give you a quick tour of the features so you can get started right away!</p><%= image_tag '1f388.svg' %>
+                <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>Welcome to Sphere!</h1><br><p>Sphere will help you develop the habits to nurture your relationships and grow your network.</p><br><p>Let’s do a quick tour of the features so you can get started right away!</p>
             </div>
             <div class="modalButtonContainer">
-                <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel" id="welcomeMessage">GOT IT</div>
+                <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel" id="welcomeMessage">GET STARTED</div>
             </div>
         </div>
     <% end %>

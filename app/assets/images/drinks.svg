@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="36px" viewBox="0 0 30 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>Icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Schedule-Plans" transform="translate(-144.000000, -55.000000)">
+            <g id="Activity-Bar" transform="translate(21.000000, 41.000000)">
+                <g id="Cocktail" transform="translate(91.004269, 0.000000)">
+                    <g id="Icon" transform="translate(33.000000, 15.000000)">
+                        <ellipse id="Oval-12" stroke="#3C3F43" stroke-width="2" fill="#FFFFFF" cx="21.3445446" cy="6.08695652" rx="6.09844133" ry="6.08695652"></ellipse>
+                        <polygon id="Triangle" stroke="#3C3F43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#FFFFFF" transform="translate(10.672272, 13.695652) scale(1, -1) translate(-10.672272, -13.695652) " points="10.6722723 6.08695652 21.3445446 21.3043478 0 21.3043478"></polygon>
+                        <polygon id="Triangle" fill="#B3BAC3" transform="translate(10.672272, 14.456522) scale(1, -1) translate(-10.672272, -14.456522) " points="10.6722723 10.6521739 16.7707136 18.2608696 4.57383099 18.2608696"></polygon>
+                        <rect id="Rectangle-91" fill="#3C3F43" x="9.14766199" y="16.7391304" width="3.04922066" height="18.2608696" rx="1.52461033"></rect>
+                        <rect id="Rectangle-91" fill="#3C3F43" x="4.57383099" y="31.9565217" width="12.1968827" height="3.04347826" rx="1.52173913"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
