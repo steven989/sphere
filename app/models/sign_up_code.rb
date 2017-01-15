@@ -95,7 +95,6 @@ class SignUpCode < ActiveRecord::Base
         end
     end
 
-
     def self.generate_code
         # in the shape of SR3ZAZ
         letters_to_use = ["A","C","D","E","F","G","H","J","K","L","M","N","P","Q","R","T","U","V","W","X","Y"]
@@ -124,13 +123,16 @@ class SignUpCode < ActiveRecord::Base
         code_candidate
     end
 
-    def self.create_sign_up_codes(number,quantity_for_each_code)
+    def self.create_sign_up_codes(number=1,quantity_for_each_code=10,user=nil)
+        user_id = user ? user.id : nil
+        actual_number = user ? 1 : number
+        actual_quantity = user ? user.user_setting.value_evaled[:number_of_invites] : quantity_for_each_code
         number.times do |number|
             code = SignUpCode.generate_duplicate_checked_code
             SignUpCode.create(
-                user_id:nil,
+                user_id:user_id,
                 code:code,
-                quantity:quantity_for_each_code,
+                quantity:actual_quantity,
                 description:nil,
                 valid_after:nil,
                 valid_before:nil,

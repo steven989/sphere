@@ -254,6 +254,14 @@ class UsersController < ApplicationController
     end
 
     def get_user_settings
+      invite_code = current_user.sign_up_codes.take
+      if invite_code && SystemSetting.search('invite_code_required').value_in_specified_type
+        code = invite_code.code
+        remaining_invite = invite_code.quantity.to_i - invite_code.quantity_used.to_i
+      else
+        code = nil
+        remaining_invite = nil
+      end
       current_user_settings = current_user.user_setting
       current_user_settings = current_user_settings.blank? ? UserSetting.create_from_system_settings(current_user) : current_user_settings
       current_user_settings_evaled = current_user_settings.value_evaled
@@ -263,7 +271,8 @@ class UsersController < ApplicationController
                                 default_contact_interval_in_days:{title:"Default number of days to connect with people",value:current_user_settings_evaled[:default_contact_interval_in_days],type:"number"},
                                 event_add_granularity:{title:"Granularity of adding events",value:current_user_settings_evaled[:event_add_granularity],type:"selection",options:["Detailed","Quick"]},
                                 timezone:{title:"Default timezone",value:current_user.timezone,type:"selection",options:TZInfo::Timezone.all.map {|zone| zone.name } },
-                                expiry_external_notification:{title:"Email reminder for expiring connections and other Sphere activities",value:current_user_settings_evaled[:expiry_notification_email_frequency],type:"selection",options:["Daily","Weekly","Monthly","Never"]}
+                                expiry_external_notification:{title:"Email reminder for expiring connections and other Sphere activities",value:current_user_settings_evaled[:expiry_notification_email_frequency],type:"selection",options:["Daily","Weekly","Monthly","Never"]},
+                                invites:{code:code,remaining_invite:remaining_invite}
                               }
         respond_to do |format|
           format.json {

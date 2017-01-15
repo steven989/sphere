@@ -1319,6 +1319,14 @@ $(function(){
         returnedData.expiry_external_notification.options.forEach(function(value){
             $('#expiry_external_notification_title').siblings('.options').find('select').append('<option value="'+value+'" '+(returnedData.expiry_external_notification.value == value ? 'selected=true' : '')+'>'+value+'</option>');
         });
+        if (returnedData.invites.code == null || returnedData.invites.code == "null") {
+            $('#inviteCodeDisplayContainer').addClass("hidden");
+        } else {
+            $('#inviteCode').html(returnedData.invites.code);
+            $('#remainingInviteQuantity').html(returnedData.invites.remaining_invite);
+            $('#inviteCodeDisplayContainer').removeClass("hidden");
+        }
+
         // form.find('#event_add_granularity_title').html(returnedData.event_add_granularity.title);
         // form.find('#event_add_granularity_detailed_value').prop("selected", (returnedData.event_add_granularity.value == 'detailed'));
         // form.find('#event_add_granularity_quick_value').prop("selected", (returnedData.event_add_granularity.value == 'quick'));
@@ -2015,6 +2023,12 @@ $(function(){
     <div class="modalView" id="settingsSelect">
         <div class="modalContentContainer p-h-xxlg">
             <div class="textDarkGray" id="settingsContainer" style="text-align:left">
+                <div class="m-b-md textCenter hidden" id="inviteCodeDisplayContainer">
+                    <span>Your invite code is</span>
+                    <h3 style="margin:3px;"><span id="inviteCode"></span></h3>
+                    <span>You have <span id="remainingInviteQuantity"></span> invites left</span>
+                </div>
+                <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs m-b-md" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <div class="m-b-md">
                     <div id="send_event_booking_notification_by_default_title"></div>
                     <div><input type='checkbox' class="settingInput inputData" name='send_event_booking_notification_by_default' id='send_event_booking_notification_by_default_value' value=''></div>
@@ -2043,7 +2057,6 @@ $(function(){
                         </select>
                     </div>
                 </div>
-                <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <% if current_user.tester? %>
                     <a href="<%= clear_connections_path %>">Clear contacts (testing button)</a>
                 <% end %>
