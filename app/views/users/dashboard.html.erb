@@ -2,6 +2,11 @@
 var test;
 
 $(function(){
+    $('#mask, .modalMask').on("click",function(){
+        event.stopPropagation();
+        return false;
+    })
+
     if (!("ontouchstart" in document.documentElement)) {
         $('html').addClass("no-touch");
         var canvasElement = document.getElementById('canvas');
@@ -1500,14 +1505,41 @@ $(function(){
 
     // Onboarding
     function showOnboarding(section,steps) {
+        $('#mask').show();
+        $('.modalMask').show();
+        $('.disableWhileProcessed, .transitionButton').addClass("disabled");
+        modalInstance.settings.closeOnEscape = false;
+        modalInstance.settings.closeOnOutsideClick = false;
         introJs(section).setOption("showBullets", false).setOption("exitOnOverlayClick",false).setOption("exitOnEsc",false).start().oncomplete(function(){
             if (steps == "3,4,5") {
                 onBoarding345 = true;
             } else if (steps == "9,10") {
                 onBoarding910 = true;
+            } else if (steps == "11,12,13") {
+                onBoarding111213 = true;
             }
             logFrontEndActions(steps,"onboarding");
+            $('#mask').hide();
+            $('.modalMask').hide();
+            $('.disableWhileProcessed, .transitionButton').removeClass("disabled");
+            modalInstance.settings.closeOnEscape = true;
+            modalInstance.settings.closeOnOutsideClick = true;
+        }).onexit(function(){
+            $('#mask').hide();
+            $('.modalMask').hide();
+            $('.disableWhileProcessed, .transitionButton').removeClass("disabled");
+            modalInstance.settings.closeOnEscape = true;
+            modalInstance.settings.closeOnOutsideClick = true;
+        }).onafterchange(function(){
+            if ($('a.introjs-skipbutton').html() == "Skip" || $('a.introjs-skipbutton').html() == "skip") {
+                $('a.introjs-skipbutton').hide();
+            } else if ($('a.introjs-skipbutton').html() == "Done" || $('a.introjs-skipbutton').html() == "done") {
+                $('a.introjs-skipbutton').html("Close");
+                $('a.introjs-skipbutton').show();
+            }
         });
+        $('a.introjs-skipbutton').hide();
+        $('.introjs-showElement').removeClass('introjs-showElement');
         // $('a.introjs-button.introjs-skipbutton').remove();
     }
     
@@ -1525,13 +1557,25 @@ $(function(){
     <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][9] || !@settings[:onboarding_progress][10]) %>
         var onBoarding910 = false;
         $('#makePlansButton').on("click",function(){
-            if (!onBoarding910) {
+            if (!onBoarding910 && !$(this).hasClass('disabled') ) {
                 setTimeout(function(){
                     showOnboarding("#makePlan","9,10");
                   },1200);
             };
         });
     <% end %>
+
+    <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][11] || !@settings[:onboarding_progress][12] || !@settings[:onboarding_progress][13])  %>
+        var onBoarding111213 = false;
+        $('#showManage').on("click",function(){
+            if (!onBoarding111213 && !$(this).hasClass('disabled')) {
+                setTimeout(function(){
+                    showOnboarding("#editConnection","11,12,13");
+                  },1200);
+            };
+        });
+    <% end %>
+
 
 // utility functions
 
@@ -1771,6 +1815,7 @@ $(function(){
     </div>
 </div>
 <div data-remodal-id="bubbleModal" class="bubbleModalOnboarding" data-default-css="([{'attribute':'height','value':'410px'}])">
+    <div class="modalMask"></div>
     <div class="modalView" id="plans">
         <div class="modalContentContainer">
             <div class="subTabNavigationContainer container" style="width:100%;">
@@ -1779,7 +1824,7 @@ $(function(){
                         <div class="subTabNavigationButton profile textDarkGray" style="font-size:14px;border-bottom:2px solid #e86f56;width:60%;display:inline-block;margin:auto;cursor:pointer;" >PROFILE</div>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <div class="subTabNavigationButton preferences textDarkGray transitionButton" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">MANAGE</div>
+                        <div class="subTabNavigationButton preferences textDarkGray transitionButton" id="showManage" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">MANAGE</div>
                     </div>
                 </div>
             </div>
@@ -1907,18 +1952,20 @@ $(function(){
                 </div>
             </div>
             <form id="connectionInfo">
-                <span class="textDarkGray m-t-md">How often do you want to stay in touch?</span>
-                <div class="btn-group contactFrequency buttonGroupWithOther" role="group">
-                    <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="weekly" data-slide-down=".modalView#editConnection .details" >WEEKLY</button>
-                    <button class="btn btn-light-grey btn-secondary" style="width:34%" data-value="monthly" data-slide-down=".modalView#editConnection .details" >MONTHLY</button>
-                    <button class="btn btn-light-grey btn-secondary" data-slide-down=".modalView#editConnection .details" style="width:33%" data-value="other">OTHER</button>
+                <div style="height:auto;width:100%;" data-intro="You can set a frequency to check in. A red circle will appear over your connection as the time to check in nears" data-step="11" data-position="top">
+                    <span class="textDarkGray m-t-md">How often do you want to stay in touch?</span>
+                    <div class="btn-group contactFrequency buttonGroupWithOther" role="group">
+                        <button class="btn btn-light-grey btn-secondary" style="width:33%" data-value="weekly" data-slide-down=".modalView#editConnection .details" >WEEKLY</button>
+                        <button class="btn btn-light-grey btn-secondary" style="width:34%" data-value="monthly" data-slide-down=".modalView#editConnection .details" >MONTHLY</button>
+                        <button class="btn btn-light-grey btn-secondary" data-slide-down=".modalView#editConnection .details" style="width:33%" data-value="other">OTHER</button>
+                    </div>
+                    <div class="details" style="display:none;" >
+                        Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
+                    </div>
                 </div>
-                <div class="details" style="display:none;" >
-                    Every <input type="number" name="other_days" id="other_days" size="3" min="1" value="14" data-skip-clear="true" data-default-class=""> days
-                </div>
-                <textarea name="notes" rows="4" placeholder="Notes about this connection" class="textDarkGray"></textarea>
+                <textarea name="notes" rows="4" placeholder="Notes about this connection" class="textDarkGray" data-intro="Add notes to this connection, like how you met, their interest, projects and pet's name. Anything to help you remember more about them" data-step="12" data-position="top"></textarea>
             </form>
-            <div class="reminders">
+            <div class="reminders" data-intro="Set reminders for things to follow up with this connection. A blue bell will appear over their bubble when the due date approaches" data-step="13" data-position="top">
                 <div class="formElement reminderRow tallerInput noHover addReminder" >
                     <span class="icon textDarkGray" ><%= fa_icon 'bell-o' %></span>
                     <form action="<%= create_user_reminder_path %>" method="POST" id="reminderForm">
@@ -1951,6 +1998,7 @@ $(function(){
 </div>
 
 <div data-remodal-id="importModal" class="importModalOnboarding" style="height:450px;" data-default-css="([{'attribute':'height','value':'450px'}])">
+    <div class="modalMask"></div>
     <div class="modalView" id="mainImportView">
         <div class="modalContentContainer">
             <div class="addConnectionPopupContent" >

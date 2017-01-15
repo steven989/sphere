@@ -19,6 +19,36 @@
 
  /*Some standard components*/
 
+
+#mask {
+    z-index:99999;
+    height:100vh;
+    width:100%;
+    background-color: transparent;
+    position:absolute;
+    float:left;
+    left:0px;
+    top:0px;
+    display:none;
+}
+
+.modalMask {
+    z-index:99999;
+    height:100%;
+    width:100%;
+    background-color: transparent;
+    position:absolute;
+    float:left;
+    left:0px;
+    top:0px;
+    display:none;
+}
+
+
+.introjs-tooltip {
+    z-index: 1000000;
+}
+
  .introjs-overlay {
     display:none !important;
 }
@@ -29,6 +59,10 @@
 
 .remodal-overlay.standardModal.remodal-is-opened {
     z-index: 0 !important;
+}
+
+.remodal-wrapper.standardModal.remodal-is-opened.introjs-fixParent {
+    z-index: 100000 !important;
 }
 
 h1,h2,h3,h4,h5,h6,p,div,span,body {
@@ -764,6 +798,7 @@ body {
     margin: auto;
     max-width:625px;
     overflow:hidden;
+    z-index:10;
 }
 
 .remodal.standardModal .modalView {

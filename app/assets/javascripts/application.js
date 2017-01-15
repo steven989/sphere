@@ -23,11 +23,13 @@
 $(function(){
 // Transitioning mechanism of different views within the bubble popup modal
 $('.transitionButton').off('click').on('click',function(){
-    transition($($(this).data('current')),$($(this).data('target')));
-    if($(this).data('height-adjust-element') != undefined) {
-        console.log($(this).data('height-adjust-element'));
-        $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-value')});        
-    }
+    if (!$(this).hasClass('disabled')) {
+        transition($($(this).data('current')),$($(this).data('target')));
+        if($(this).data('height-adjust-element') != undefined) {
+            console.log($(this).data('height-adjust-element'));
+            $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-value')});        
+        }
+    };
 });
   
 })
