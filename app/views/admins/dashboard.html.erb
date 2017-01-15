@@ -26,13 +26,14 @@ $(function(){
             _this = $(this);
             model.find("input.deleteCheck").each(function(){
                 $(this).prop('checked',_this.prop('checked'));
+                $(this).trigger('change');
             });
         });
         // individual update auto select upon editing fields
         model.find('.updateInput').off("input").on("input",function(){
             $(this).closest('.update-instance').find('input.updateCheck').prop('checked',true);
         });
-        model.find('.updateInput').off("change").on("change",function(){
+        model.find('.updateInput, .deleteCheck').off("change").on("change",function(){
             $(this).closest('.update-instance').find('input.updateCheck').prop('checked',true);
         });
         // add rows
