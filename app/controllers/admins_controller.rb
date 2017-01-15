@@ -414,20 +414,22 @@ class AdminsController < ApplicationController
         user_activities = user.activities
         user_plans = user.plans
         user_reminders = user.user_reminders
+        timezone = TZInfo::Timezone.get('America/New_York')
         @combined_app_usages = []
         user_app_usages.each do |usage|
-            @combined_app_usages.push({timestamp:usage.created_at,usage:usage.action,additional_info:usage.additional_info})
+            @combined_app_usages.push({raw_timestamp:usage.created_at,timestamp:timezone.utc_to_local(usage.created_at).strftime("%Y-%m-%d %l:%M%p EST"),usage:usage.action,additional_info:usage.additional_info})
         end
         user_activities.each do |activity|
-            @combined_app_usages.push({timestamp:activity.created_at,usage:activity.activity,additional_info:nil})
+            @combined_app_usages.push({raw_timestamp:activity.created_at,timestamp:timezone.utc_to_local(activity.created_at).strftime("%Y-%m-%d %l:%M%p EST"),usage:activity.activity,additional_info:nil})
         end
         user_plans.each do |plan|
-            @combined_app_usages.push({timestamp:plan.created_at,usage:"Scheduled an event",additional_info:"Put on calendar:#{plan.put_on_calendar} | Invite sent: #{plan.invite_sent}"})
+            @combined_app_usages.push({raw_timestamp:plan.created_at,timestamp:timezone.utc_to_local(plan.created_at).strftime("%Y-%m-%d %l:%M%p EST"),usage:"Scheduled an event",additional_info:"Put on calendar:#{plan.put_on_calendar} | Invite sent: #{plan.invite_sent}"})
         end
         user_reminders.each do |reminder|
-            @combined_app_usages.push({timestamp:reminder.created_at,usage:"Set a reminder",additional_info:"Has due date: #{!reminder.due_date.nil?}"})
+            @combined_app_usages.push({raw_timestamp:reminder.created_at,timestamp:timezone.utc_to_local(reminder.created_at).strftime("%Y-%m-%d %l:%M%p EST"),usage:"Set a reminder",additional_info:"Has due date: #{!reminder.due_date.nil?}"})
         end
-        @combined_app_usages.sort! {|a,b| b[:timestamp] <=> a[:timestamp]}
+
+        @combined_app_usages.sort! {|a,b| b[:raw_timestamp] <=> a[:raw_timestamp]}
     end
 
 
