@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: ENV['SYSTEM_EMAIL']
+  default from: "Sphere #{ENV['SYSTEM_EMAIL']}"
   layout 'mailer'
 end
