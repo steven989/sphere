@@ -308,7 +308,7 @@ class UsersController < ApplicationController
       expiry_notification_email_frequency = params[:data][:expiry_external_notification]
 
       user_setting = current_user.user_setting
-      if user_setting.update_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity,expiry_notification_email_frequency:expiry_notification_email_frequency})
+      if user_setting.update_hash_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity,expiry_notification_email_frequency:expiry_notification_email_frequency})
         current_user.update_attributes(timezone:timezone) unless timezone.blank?
         AppUsage.log_action("Updated settings",current_user)
         status = true
