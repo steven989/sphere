@@ -389,6 +389,7 @@ class ConnectionsController < ApplicationController
         data[:contact_frequency] = connection.frequency_word
         data[:target_contact_interval_in_days] = connection.target_contact_interval_in_days
         data[:reminders] = connection.get_user_reminders(false,timezone)
+        data[:default_notify] = current_user.user_setting.get_value("send_event_booking_notification_by_default").nil? ? true : current_user.user_setting.get_value("send_event_booking_notification_by_default")
 
         last_plan = Plan.last(current_user,connection)
         last_checkin = current_user.activities.where(activity:"Check In",connection_id:connection.id).order(created_at: :desc).take

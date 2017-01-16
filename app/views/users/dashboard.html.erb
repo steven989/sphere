@@ -951,6 +951,7 @@ $(function(){
         var contact_frequency = returnedData.contact_frequency;
         var target_contact_interval_in_days = returnedData.target_contact_interval_in_days;
         var reminders = returnedData.reminders;
+        var default_notify = returnedData.default_notify
 
         $('[data-remodal-id=bubbleModal] .modalView#plans .default_photo').removeClass("formElement").addClass('photo');
         $('[data-remodal-id=bubbleModal] .modalView#plans .default_icon').removeClass("formElement").addClass('icon');
@@ -960,6 +961,7 @@ $(function(){
         $('[data-remodal-id=bubbleModal] .modalView#plans input.email').val(email).data('id',returnedData.connection_id);
         $('.reminders input[name=connection_id]').val(returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.phone').val(phone).data('id',returnedData.connection_id);
+        $('.modalView#makePlan input[name=notify]').prop('checked',default_notify);
         $('[data-remodal-id=bubbleModal] .modalView#plans span.lastHangout').html(lastHangout);
         $('.modalView#makePlan .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
         $('.modalView#editConnection .subTabNavigationButton.profile').removeData('height-adjust-element').removeData('height-adjust-value');
@@ -984,7 +986,6 @@ $(function(){
         }
         searchClick = false;
         $('.modalView#makePlan label[for=notify]').html("Send invite to "+name.split(" ")[0]+"?");
-        $('.modalView#makePlan input[name=notify]').prop('checked',<%= @settings[:send_event_booking_notification_by_default] %>);
         $('.modalView#makePlan input[name=putOnGoogle]').prop('checked',true);
 
 
