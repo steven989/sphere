@@ -123,7 +123,7 @@ class SignUpCode < ActiveRecord::Base
         code_candidate
     end
 
-    def self.create_sign_up_codes(number=1,quantity_for_each_code=10,user=nil)
+    def self.create_sign_up_codes(user=nil,number=1,quantity_for_each_code=10)
         user_id = user ? user.id : nil
         actual_number = user ? 1 : number
         actual_quantity = user ? user.user_setting.value_evaled[:number_of_invites] : quantity_for_each_code

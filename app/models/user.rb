@@ -233,7 +233,7 @@ class User < ActiveRecord::Base
           if oauth || !password.blank?
             user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
             if user.save
-              SignUpCode.create_sign_up_codes(nil,nil,user)
+              SignUpCode.create_sign_up_codes(user)
               StatisticDefinition.new_user_base_statistics(user)
               SignUpCode.increment(invite_code)
               {status:true,user:user,message:nil}
@@ -253,7 +253,7 @@ class User < ActiveRecord::Base
       if oauth || !password.blank?
         user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
         if user.save
-          SignUpCode.create_sign_up_codes(nil,nil,user)
+          SignUpCode.create_sign_up_codes(user)
           StatisticDefinition.new_user_base_statistics(user)
           {status:true,user:user,message:nil}
         else
