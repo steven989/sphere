@@ -37,7 +37,7 @@ class UserSessionsController < ApplicationController
         else
           flash[:display] = "login"
           flash[:email_signup] = params[:email]
-          redirect_to(login_path, alert: "Hmm we can't seem to find your account. Create one today!")
+          redirect_to(login_path, alert: "Looks like you're a new user. Click Sign Up to create a profile!")
         end
       end
     end

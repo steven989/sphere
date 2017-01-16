@@ -38,7 +38,7 @@ class AuthorizationsController < ApplicationController
                             @action = "open"
                         end
                     else
-                        @errors = "No user with email address #{email} found. Please close this window and create an account on the Sign Up tab"
+                        @errors = "Looks like you're a new user. Please close this window and click Sign Up to create a profile!"
                         @action = "open"
                     end
                 end
