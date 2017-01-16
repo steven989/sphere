@@ -793,9 +793,9 @@ $(function(){
     function toggleAddToSphereButton() {
         checkIfAtImportLimit();
         if (remaining_connections <= 0) {
-            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').addClass("disabled").html("ADD TO SPHERE (LIMIT REACHED)");
+            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').addClass("disabled").html('<%= fa_icon "plus" %>  ADD TO SPHERE (LIMIT REACHED)');
         } else {
-            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').removeClass("disabled").html("ADD TO SPHERE");
+            $('.modalView#mainImportView .modalButtonContainer .modalBottomFullButton').removeClass("disabled").html('<%= fa_icon "plus" %>  ADD TO SPHERE');
         }
         
     }
@@ -1041,8 +1041,8 @@ $(function(){
             $('.modalView#makePlan label[for=notify]').html("Send an update to "+name.split(" ")[0]+"?");
             // ------ Change the modal button properties
             $('.modalView#makePlan form').attr('action',"<%= modify_plan_path %>").attr('method','PUT');
-            $('.modalView#makePlan .modalBottomRightButton').html("UPDATE");
-            $('.modalView#plans .modalBottomLeftButton').html("RESCHEDULE");
+            $('.modalView#makePlan .modalBottomRightButton').html('<%= fa_icon "calendar-check-o" %>  UPDATE');
+            $('.modalView#plans .modalBottomLeftButton').html('<%= fa_icon "calendar-check-o" %>  RESCHEDULE');
 
             // ------ Update the google calendar authorization status
             var authorized_by_google_calendar = returnedData.authorized_by_google_calendar == "true" ? true : false;
@@ -1052,7 +1052,7 @@ $(function(){
             $('.modalView#makePlan div#deleteEvent').addClass('hidden');
             $('.modalView#makePlan form').attr('action',"<%= plans_path %>").attr('method','POST');
             submitButtonListener();
-            $('.modalView#makePlan .modalBottomRightButton').html("CREATE ACTIVITY");
+            $('.modalView#makePlan .modalBottomRightButton').html('<%= fa_icon "calendar-plus-o" %>  CREATE ACTIVITY');
             $('.modalView#plans .modalBottomLeftButton').html('<%= fa_icon "calendar-plus-o" %>  MAKE PLANS');
             $('.modalView#plans .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
         }
@@ -1932,13 +1932,13 @@ $(function(){
                     </div>
                 </div>
                 
-                    <div class="btn btn-red disableWhileProcessed" style="display:block;color:#FFF;width:150px;" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent">CANCEL</div>
+                    <div class="btn btn-red disableWhileProcessed" style="display:block;color:#FFF;width:150px;" class="hidden" href="<%= cancel_plan_path %>" data-method="PUT" id="deleteEvent"><%= fa_icon "calendar-times-o" %>  CANCEL</div>
             
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]" data-height-adjust-value="410px" >BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed putInCalendar" data-submit-form=".modalView#makePlan form">CREATE ACTIVITY</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#makePlan" data-target="[data-remodal-id=bubbleModal] .modalView#plans" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]" data-height-adjust-value="410px" ><%= fa_icon "arrow-left" %>  BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed putInCalendar" data-submit-form=".modalView#makePlan form"><%= fa_icon "calendar-plus-o" %> CREATE ACTIVITY</div>
         </div>
     </div>
     <div class="modalView hidden" id="editConnection">
@@ -1975,7 +1975,7 @@ $(function(){
                         <input type="text" class="inputData textDarkGray" name="due_date" id="dueDate" placeholder="Due (Optional)">
                         <input type="hidden" class="inputData" name="connection_id" />
                     </form>
-                    <span style="float:left" class="button formElement setReminder sphereBlueBackground hoverable disableWhileProcessed submitButton" id='setReminder' data-submit-form=".modalView#editConnection #reminderForm" >ADD REMINDER</span>
+                    <span style="float:left" class="button formElement setReminder sphereBlueBackground hoverable disableWhileProcessed submitButton" id='setReminder' data-submit-form=".modalView#editConnection #reminderForm" ><%= fa_icon "plus" %>  ADD REMINDER</span>
                 </div>
                 <span style="font-size:15px;" class="textDarkGray"><i id="currentReminderTitle">Current Reminders</i></span>
                 <div class="existingReminders">
@@ -1989,12 +1989,15 @@ $(function(){
             <div class="deleteButtonContainer" style='text-align:left;width:100%;'>
             <input type='checkbox' id="confirm_delete" />
             <label for="confirm_delete" class="textDarkGray m-r-md" style='font-size:15px;'>Check to confirm delete</label>
-            <%= link_to "DELETE CONNECTION", destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed disabled", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from the server and it won't be possible to recover later", method:"PUT"} %>
+            <%= link_to destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed disabled", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from the server and it won't be possible to recover later", method:"PUT"} do %>
+                <%= fa_icon "exclamation-circle" %>  
+                DELETE CONNECTION
+            <% end %>
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed">UPDATE</div>
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans"><%= fa_icon "arrow-left" %>   BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed"><%= fa_icon "pencil" %>  UPDATE</div>
         </div>
     </div>
 </div>
@@ -2030,7 +2033,7 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomFullButton sphereBlueBackground hoverable  disableWhileProcessed submitButton" data-submit-form=".modalView#mainImportView form">
-                <span>ADD TO SPHERE</span>
+                <span><%= fa_icon 'plus' %>  ADD TO SPHERE</span>
             </div>
         </div>
     </div>
@@ -2061,8 +2064,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereRedBackground hoverable transitionButton" data-current="[data-remodal-id=importModal] .modalView#listSelect" data-target="[data-remodal-id=importModal] .modalView#mainImportView">BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable  disableWhileProcessed" href="<%= create_from_import_path %>" data-method="POST">IMPORT TO SPHERE</div>
+            <div class="modalBottomLeftButton sphereRedBackground hoverable transitionButton" data-current="[data-remodal-id=importModal] .modalView#listSelect" data-target="[data-remodal-id=importModal] .modalView#mainImportView"><%= fa_icon "arrow-left" %>  BACK</div>
+            <div class="modalBottomRightButton sphereBlueBackground hoverable  disableWhileProcessed" href="<%= create_from_import_path %>" data-method="POST"><%= fa_icon "plus" %>  IMPORT TO SPHERE</div>
         </div>
     </div>
 
@@ -2122,8 +2125,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereBlueBackground hoverable ajaxButton" href="<%= get_user_info_path %>" data-method="GET">MY INFO</div>
-            <div class="modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed" href="<%= update_user_settings_path %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert">UPDATE</div>
+            <div class="modalBottomLeftButton sphereBlueBackground hoverable ajaxButton" href="<%= get_user_info_path %>" data-method="GET"><%= fa_icon "info-circle" %>  MY INFO</div>
+            <div class="modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed" href="<%= update_user_settings_path %>" data-method="PUT" data-alert-element=".modalView#settingsSelect .alert"><%= fa_icon "pencil" %>  UPDATE</div>
         </div>
     </div>
 
@@ -2153,8 +2156,8 @@ $(function(){
             </form>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton sphereBlueBackground hoverable ajaxButton"  href="<%= get_user_settings_path %>" data-method="GET">SETTINGS</div>
-            <div class="modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed submitButton" data-submit-form=".modalView#userInfo form">UPDATE</div>
+            <div class="modalBottomLeftButton sphereBlueBackground hoverable ajaxButton"  href="<%= get_user_settings_path %>" data-method="GET"><%= fa_icon "gear" %>  SETTINGS</div>
+            <div class="modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed submitButton" data-submit-form=".modalView#userInfo form"><%= fa_icon "pencil" %>  UPDATE</div>
         </div>
     </div>
 </div>

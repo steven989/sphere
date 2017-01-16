@@ -1,7 +1,7 @@
 <div id="helpHeader" class="m-b-xxxlg">
     <h3>How to use Sphere</h3>
     <p>Sphere is a personal relationship manager made for everyday life. Our mission is to make sure you never let a new or existing person in your life slip through the cracks.</p>
-    <p>Your relationships will exist within Sphere in varying shapes and distance from your center bubble, kind of how you would visualize your social circle in real life. The size and shape of overall Sphere you’ll have will depend on how you use this app.</p>
+    <p>Your relationships will exist within Sphere in varying sizes and distance from your center bubble, kind of how you would visualize your social circle in real life. The size and shape of overall Sphere you’ll have will depend on how you use this app.</p>
 </div>
 <div class="container textLeft">
     <div class="row">
@@ -13,15 +13,17 @@
                         <%= image_tag "add-to-sphere", width:"80%" %>
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-9 textLeft">
-                        Add connections (import from Google or manually) to start tracking your activities with them                   
+                        Add connections (import from Google or manually) to start tracking your activities with them.
                     </div>
                 </div>
                 <div class="row m-b-xxxlg">
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
-                        Placeholder
+                        <%= image_tag "no-icon", width:"80%" %>
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-9 textLeft">
-                        Clicking on your connection bubbles lets you check-in, book hangouts, and update their info. Check-ins and hangouts are logged for you for social points!
+                        <p>Clicking on your connection bubbles lets you check in, book hangouts, and update their info. Check-ins and hangouts are logged for you for social points.</p>
+
+                        <p>The bigger and closer the bubble to the center, the stronger relationship you have with this connection. The size and distance are based on the frequency of your check-ins and schedueld hangouts.</p>
                     </div>
                 </div>
                 <div class="row m-b-xxxlg">
@@ -29,8 +31,8 @@
                         <%= image_tag "settings", width:"80%" %>
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-9 textLeft">
-                        <p>Change the app defaults settings</p>
-                        <p>View & restore any expired contacts</p>
+                        <p>Change the app defaults settings.</p>
+                        <p>View & restore any expired connections.</p>
                     </div>
                 </div>
             <!-- </div> -->
@@ -43,8 +45,18 @@
                         <%= image_tag "plans-small", width:"100%" %>
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-9 textLeft">
-                        <p>The orange calendar indicates you’ve made plans with a contact. Plans can be made be clicking on your contacts bubble. Sphere will add the plans to your Google Calendar and you even have the option to send your friend an invite.</p>
-                        <p>All plans and events you create will then be viewable in the Progress page and earn you social points.</p>
+                        <p>The orange calendar indicates you’ve made plans with this connection. Plans can be made in the "Make Plans" tab in the window that pops up after you click on your connection's bubble. Sphere will add the plans to your Google Calendar and you even have the option to send your friend an invite.</p>
+                        <p>All plans you create will count towards your social points, visible in the Progress page.</p>
+                    </div>
+                </div>
+                <div class="row m-b-xxxlg">
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                        <%= image_tag "reminder", width:"100%" %>
+                    </div>
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-9 textLeft">
+                        <p>A blue bell indicates you've set a reminder for this connection.</p>
+                        <p>If you have set a due date, the blue bell will appear the day before the due date. If no due date has been set, the blue bell will appear as soon as you set the reminder.</p>
+                        <p>Reminders will disappear once you remove them.</p>
                     </div>
                 </div>
                 <div class="row m-b-xxxlg">
@@ -52,8 +64,8 @@
                         <%= image_tag "checked-in-small", width:"100%" %>
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-9 textLeft">
-                        <p>The green check mark Indicates you’ve caught up with a contact, whether in person or otherwise. This will add points towards your relationship and your overall social score.</p>
-                        <p>The more often you check-in with someone the larger their face grows, and the closer they get to your center.</p>
+                        <p>The green check mark indicates you’ve checked in with this connection, after you press the Check In button. This will add points towards your relationship and your overall social score.</p>
+                        <p>The more often you check in with someone the larger their face grows, and the closer they get to your center.</p>
                         <p>Checking in with a friend resets their timer until your next hangout.</p>
                     </div>
                 </div>
@@ -63,8 +75,8 @@
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-9 textLeft">
                         <p>The red circle means it has been a while since you’ve checked in with a friend! Sphere will show how much time you have left to reach out.</p>
-                        <p>If you ignore the time, the contact will expire out of your Sphere.</p>
-                        <p>Users can restore expired connections in the Settings window while incurring a small points penalty.</p>
+                        <p>If you ignore the time, the first few times the connection will become smaller and farther, and eventually it will expire and disappear from your Sphere altogether.</p>
+                        <p>You can restore expired connections in the Settings window while incurring a small points penalty.</p>
                     </div>
                 </div>
             <!-- </div> -->
