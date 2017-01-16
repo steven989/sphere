@@ -236,6 +236,7 @@ class User < ActiveRecord::Base
               SignUpCode.create_sign_up_codes(user)
               StatisticDefinition.new_user_base_statistics(user)
               SignUpCode.increment(invite_code)
+              user.find_challenges
               {status:true,user:user,message:nil}
             else
               {status:false,user:nil,message:user.errors.full_messages.join(', ')}
@@ -255,6 +256,7 @@ class User < ActiveRecord::Base
         if user.save
           SignUpCode.create_sign_up_codes(user)
           StatisticDefinition.new_user_base_statistics(user)
+          user.find_challenges
           {status:true,user:user,message:nil}
         else
           {status:false,user:nil,message:user.errors.full_messages.join(', ')}
