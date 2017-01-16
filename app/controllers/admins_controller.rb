@@ -72,7 +72,7 @@ class AdminsController < ApplicationController
     def generate_sign_up_codes
         number_of_code = params[:number_of_code].to_i
         quantity = params[:quantity].to_i
-        SignUpCode.create_sign_up_codes(number_of_code,quantity)
+        SignUpCode.create_sign_up_codes(nil,number_of_code,quantity)
 
         status = true
         message = "Codes successfully created"
