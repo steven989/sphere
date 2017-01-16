@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="31px" height="37px" viewBox="0 0 31 37" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>Icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Schedule-Plans" transform="translate(-52.000000, -55.000000)">
+            <g id="Activity-Bar" transform="translate(21.000000, 41.000000)">
+                <g id="Coffee">
+                    <g id="Icon" transform="translate(32.000000, 15.000000)">
+                        <path d="M1.65639399,10.5433029 C1.62188548,9.99220647 2.03655571,9.54545455 2.59364188,9.54545455 L26.0967525,9.54545455 C26.6488888,9.54545455 27.0688183,9.98726585 27.0340004,10.5433029 L25.565056,34.0021517 C25.5305475,34.5532481 25.0568272,35 24.5004035,35 L4.18999089,35 C3.63650808,35 3.1601563,34.5581887 3.12533841,34.0021517 L1.65639399,10.5433029 Z" id="Rectangle-66" fill="#FFFFFF"></path>
+                        <rect id="Rectangle-88" fill="#B3BAC3" x="3.1878216" y="14.3181818" width="22.3147512" height="15.9090909"></rect>
+                        <path d="M1.65639399,10.5433029 C1.62188548,9.99220647 2.03655571,9.54545455 2.59364188,9.54545455 L26.0967525,9.54545455 C26.6488888,9.54545455 27.0688183,9.98726585 27.0340004,10.5433029 L25.565056,34.0021517 C25.5305475,34.5532481 25.0568272,35 24.5004035,35 L4.18999089,35 C3.63650808,35 3.1601563,34.5581887 3.12533841,34.0021517 L1.65639399,10.5433029 Z" id="Rectangle-66" stroke="#3C3F43" stroke-width="2"></path>
+                        <path d="M22.8460548,3.18181818 L20.7208404,0 L7.96955401,0 L5.8443396,3.18181818 L0,3.18181818 L0,9.54545455 L28.6903944,9.54545455 L28.6903944,3.18181818 L22.8460548,3.18181818 Z" id="Combined-Shape" stroke="#3C3F43" stroke-width="2" fill="#FFFFFF"></path>
+                        <ellipse id="Oval-11" fill="#FFFFFF" cx="14.3451972" cy="22.2727273" rx="4.7817324" ry="4.77272727"></ellipse>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
