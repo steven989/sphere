@@ -309,8 +309,23 @@ class Plan < ActiveRecord::Base
                 service.delete_event(calendar_id,calendar_event_id,send_notifications:notify)
             end
         rescue => error
-            status = false
-            message = error.message
+            if error.message.include?("delete")
+                if delete_local
+                    self.update_attributes(status:"Cancelled")
+                    self.user.notifications.where(notification_type:"upcoming_plan").each { |notification|
+                        if notification.value_in_specified_type[:plan_id] == self.id
+                            notification.destroy
+                        end
+                    }
+                else
+                    self.update_attributes(calendar_id:nil,calendar_event_id:nil,put_on_calendar:false)
+                end
+                status = true
+                message = "Event cancelled"                
+            else
+                status = false
+                message = error.message
+            end
         else
             if delete_local
                 self.update_attributes(status:"Cancelled")

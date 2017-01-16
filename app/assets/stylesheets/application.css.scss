@@ -19,7 +19,6 @@
 
  /*Some standard components*/
 
-
 #mask {
     z-index:99999;
     height:100vh;
@@ -59,6 +58,10 @@
 
 .remodal-overlay.standardModal.remodal-is-opened {
     z-index: 0 !important;
+}
+
+.remodal-wrapper.standardModal.remodal-is-opened {
+    z-index: 10 !important;
 }
 
 .remodal-wrapper.standardModal.remodal-is-opened.introjs-fixParent {

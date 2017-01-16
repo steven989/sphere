@@ -12,7 +12,7 @@ class UserRemindersController < ApplicationController
                 Notification.create_reminder_notification(current_user,user_reminder)
                 notifications = current_user.get_notifications(false)
                 status = true
-                message = "Reminder set!"
+                message = "Reminder set! A blue bell will appear over your connection when the due date approaches"
                 data = {user_reminder_id:user_reminder.id,due_date:user_reminder.due_date_humanized(current_user.timezone ? TZInfo::Timezone.get(current_user.timezone) : TZInfo::Timezone.get('America/New_York')),notifications:notifications}
                 actions = [{action:"function_call",function:"setReminderCallback()"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
             else

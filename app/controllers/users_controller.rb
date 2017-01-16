@@ -111,7 +111,7 @@ class UsersController < ApplicationController
           @notifications = current_user.get_notifications(true)
           @demo = (@settings[:onboarding_progress] && !@settings[:onboarding_progress][1] && @raw_bubbles_data == "[]") ? true : false
           if @demo 
-            @raw_bubbles_data = User.find(9).get_raw_bubbles_data(nil,true) 
+            @raw_bubbles_data = User.find(9) ? nil : User.find(9).get_raw_bubbles_data(nil,true)
           end
           @all_tags = current_user.tags.order(tag: :asc).map {|tag| tag.tag}.uniq.to_json
           @system_settings_used = SystemSetting.where(name:['activity_detail_level_to_be_shown','expiring_connection_notification_period_in_days']).inject({}) {|accumulator,system_setting| accumulator[system_setting.name.to_sym] = system_setting.value_in_specified_type; accumulator}
