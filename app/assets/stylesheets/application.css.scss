@@ -707,10 +707,8 @@ body {
 }
 
 .modalView#plans .photo .edit_icon,.modalView#plans .icon .edit_icon {
-    transition: opacity 0.2s ease;
-    opacity: 0;
+    transition: color 0.2s ease;
     font-size: 20px;
-    color: black;
     position:absolute;
     right: -5px;
     bottom: -3px;
@@ -718,7 +716,7 @@ body {
 }
 
 .no-touch .modalView#plans .photo:hover.photo .edit_icon,.no-touch  .modalView#plans .icon:hover.icon .edit_icon {
-    opacity: 1;
+    color: #A9A9A9;
 }
 
 
