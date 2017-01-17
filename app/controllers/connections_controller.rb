@@ -270,11 +270,16 @@ class ConnectionsController < ApplicationController
     end
 
     def create_from_import
+        first_time = false
         access_token = session ? session[:access_token] : nil
         expires_at = session ? session[:expires_at] : nil
         merge_name = params[:mergeName].blank? ? nil : (params[:mergeName] == "true" ? true : false)
         if params[:contactsToImport]
             contacts_imported = params[:contactsToImport].values
+            if (Time.now - current_user.created_at < 86400 && current_user.connections.length < 3 && current_user.connections.length + contacts_imported.length >=3)
+                first_time = true
+                current_user.completed_initial_add_three_connections_challenge 
+            end
             if contacts_imported.length > 15
                 max_connections = current_user.user_setting.get_value('max_number_of_connections')
                 max_connections = max_connections ? max_connections.to_i : 50
@@ -297,9 +302,20 @@ class ConnectionsController < ApplicationController
                   raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
                   notifications = current_user.get_notifications(false)
                   new_stats = current_user.stats
+                  if first_time
+                      level_num = new_stats[:level].to_i
+                      xp = new_stats[:xp]
+                      level_progress_lookup = Level.return_level_xps([level_num,level_num+1])
+                      points_gained_in_this_level = xp-level_progress_lookup[level_num]
+                      points_required_to_progress = level_progress_lookup[level_num+1]-level_progress_lookup[level_num]
+                      new_stats[:points_gained_in_this_level] = points_gained_in_this_level
+                      new_stats[:points_required_to_progress] = points_required_to_progress
+                  end
                   bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
                   message = result[:message]
                   actions=[{action:"function_call",function:"uncheckAllContactsImport()"},{action:"function_call",function:"updateBubblesData(returnedData.raw_bubbles_data)"},{action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"},{action:"function_call",function:"updateRealTimeStats(returnedData.new_stats);toggleAddToSphereButton()"},{action:"function_call",function:"updateUserLevelNotifications(returnedData.notifications.user_level)"},{action:"function_call",function:"closeModalInstance(100)"}]
+                  one_time_notification = current_user.get_one_time_popup_notification
+                  actions.push({action:"function_call",function:"oneTimeNotificationPopup('[data-remodal-id=notificationsModal] ##{one_time_notification[:element_id]}',#{one_time_notification[:id]},#{one_time_notification[:value_1]})"}) if one_time_notification
                   data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications,new_stats:new_stats}
                 else
                   status = result[:status]

@@ -67,6 +67,22 @@ class User < ActiveRecord::Base
     end
   end
 
+  def completed_initial_add_three_connections_challenge
+      UserChallengeCompleted.create(
+          user_id:self.id,
+          date_shown_to_user:Date.today,
+          date_completed:Date.today,
+          method_of_completion:"completed",
+          repeated_allowed:false,
+          date_started:Date.today,
+          reward:800,
+          date_to_be_completed:Date.today
+          )
+      StatisticDefinition.trigger("xp",self)
+      StatisticDefinition.trigger("level",self)
+      Notification.create_one_time_add_3_contacts_notification(self)
+  end
+
   def level_up
     current_level = self.stat("level")
     new_level = Level.find_level_for(self)
@@ -123,6 +139,9 @@ class User < ActiveRecord::Base
       elsif notification.notification_type == 'new_badges_one_time'
         element_id = 'newBadgePopup'
         value_1 = notification.value_in_specified_type
+      elsif notification.notification_type == 'added_first_3_users_in_time'
+        element_id = 'addedFirstThreeConnectionsPopup'
+        value_1 = 'null'
       end
       result = {id:notification.id,element_id:element_id,value_1:value_1}
     else
@@ -189,9 +208,6 @@ class User < ActiveRecord::Base
     level.blank? ? nil : level.take
   end
 
-  def find_xp_gap_to_progress
-    
-  end
 
   def stat(statistic)
     stat = user_statistics.find_statistic(statistic)

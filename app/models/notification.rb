@@ -26,7 +26,8 @@ class Notification < ActiveRecord::Base
           expiry_date:date+expiry_days.day,
           data_type:"hash",
           value:"{old_level:#{old_level},new_level:#{new_level}}",
-          one_time_display:true
+          one_time_display:true,
+          priority:2
           )
     end
 
@@ -61,7 +62,23 @@ class Notification < ActiveRecord::Base
           expiry_date:Date.today,
           data_type:"integer",
           value:number_of_badges,
-          one_time_display:true
+          one_time_display:true,
+          priority:1
+        )
+    end
+
+    # This is a user-level notification
+    def self.create_one_time_add_3_contacts_notification(user)
+        Notification.mark_all_one_time_notifications_as_read(user)
+        Notification.create(
+          user_id:user.id,
+          notification_type:'added_first_3_users_in_time',
+          notification_date:Date.today,
+          expiry_date:Date.today,
+          data_type:"integer",
+          value:nil,
+          one_time_display:true,
+          priority:0
         )
     end
 

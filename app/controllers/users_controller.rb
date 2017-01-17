@@ -166,6 +166,9 @@ class UsersController < ApplicationController
           result = Connection.insert_contact(current_user,name,email,nil,nil,nil,photo,tags,notes)
           if result[:status]
               StatisticDefinition.triggers("individual","post_create_connection",User.find(current_user.id))
+              if (Time.now - current_user.created_at < 86400 && current_user.connections.length ==3)
+                current_user.completed_initial_add_three_connections_challenge
+              end
               raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
               notifications = current_user.get_notifications(false)
               new_stats = current_user.stats

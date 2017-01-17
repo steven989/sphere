@@ -56,4 +56,24 @@ class StatisticDefinition < ActiveRecord::Base
         end
     end
 
+    def self.trigger(statistic_name,current_user)
+        statistic = StatisticDefinition.search(statistic_name)
+        if statistic.blank? 
+            true
+        else
+            begin
+                user_id = current_user.id
+                statistic_definition_id = statistic.id
+                data_type = statistic.start_value_type
+                command = statistic.definition
+                eval(command)
+            rescue => error
+                puts error.message
+                false
+            else
+                true
+            end
+        end
+    end
+
 end

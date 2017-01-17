@@ -166,11 +166,13 @@ $(function(){
         buttonAjax($(modalElement).parent(),{notification_id:notificationId});
     }
     <% if @one_time_notification %>
-        oneTimeNotificationPopup("[data-remodal-id=notificationsModal] #<%= @one_time_notification[:element_id] %>",<%= @one_time_notification[:id] %>,<%= @one_time_notification[:value_1] %>)
+        var value1 = <%= @one_time_notification[:value_1] ? @one_time_notification[:value_1] : 'null' %>;
+        oneTimeNotificationPopup("[data-remodal-id=notificationsModal] #<%= @one_time_notification[:element_id] %>",<%= @one_time_notification[:id] %>,value1)
     <% end %>
 
     // update "real-time" stats
     function updateRealTimeStats(stats) {
+        console.log(stats);
         for (var key in stats) {
             $('.statsToUpdate.'+key).each(function(){
                 $(this).html(stats[key]);
@@ -1464,7 +1466,7 @@ $(function(){
 
     // This function takes the JSON list of contacts and populate it onto the popup
     function populateImportSelectionList(list) {
-        $('.modalView#listSelect .importSelectionTable tbody').html("");
+        $('.modalView#listSelect #importSelectionTable tbody').html("");
         var incrementer = 0;
         var contacts = list;
         returnedData,list = null; //this is to clear up the reference to the object to make it available for garbage collection after we're done
@@ -1512,7 +1514,19 @@ $(function(){
         modalInstance.settings.closeOnEscape = false;
         modalInstance.settings.closeOnOutsideClick = false;
         introJs(section).setOption("showBullets", false).setOption("exitOnOverlayClick",false).setOption("exitOnEsc",false).start().oncomplete(function(){
-            if (steps == "3,4,5") {
+            if (steps == "1,2") {
+                setTimeout(function(){
+                    $("#welcomeMessageModalView").addClass('hidden');
+                    $("#challengeToAddThreeConnections").removeClass('hidden');
+                    initializeReModal('[data-remodal-id=notificationsModal]',"standardModal",0);
+                    $('#closeChallengeToAddThreeConnections').on("click",function(){
+                        setTimeout(function(){
+                            $('#addConnection').trigger("click"); 
+                          },600);
+                    });
+                  },600);
+
+            } else if (steps == "3,4,5") {
                 onBoarding345 = true;
             } else if (steps == "9,10") {
                 onBoarding910 = true;
@@ -1637,7 +1651,7 @@ $(function(){
         </div> 
         <div class="topTabsContent">
             <div id="mySphere" style="overflow:scroll;" class="tabView">
-                <div id="canvas" data-intro="This will be your Sphere of people! Your select relationships will live here and help you remember faces as you go. You can interact with each bubble to develop that relationship." data-step="1" style="position: relative; margin: auto;" ></div>
+                <div id="canvas" data-intro="This will be your Sphere of connections! Your select relationships will live here and help you remember faces as you go. You can interact with each bubble to develop that relationship." data-step="1" style="position: relative; margin: auto;" ></div>
                 <div id="searchBar">
                     <div class="result hidden">
                         <ul>
@@ -1831,7 +1845,7 @@ $(function(){
                     </div>
                 </div>
             </div>
-            <div data-intro="Easily add notes, tags and reminders to your contacts to remember key things about them." data-step="6" data-position="top" style="width:100%; height:auto;">
+            <div data-intro="Edit your connection info and tag interesting things about them to help you remember, like their employer, hobbies, strengths, location, etc." data-step="6" data-position="top" style="width:100%; height:auto;">
                 <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
                 <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"><input name="phone" class="phone hoverInput inPlaceField" href="<%= update_connection_phone_path %>" data-id="" data-method='PUT' placeholder="Add phone" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"></div>
                 <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
@@ -1857,8 +1871,8 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Don’t let your connections drift away! Make plans with connections" data-step="8" data-position="top" id="makePlansButton"><%= fa_icon 'calendar-plus-o' %>  MAKE PLANS</div>
-            <div id="checkinButton" data-intro="Check in anytime you interact with your connection! Sphere will keep track, and remind you to check in with your connection if you haven't done so in a while." data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> ><%= fa_icon 'check' %>  CHECK IN</div>
+            <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Don’t let your connections drift away! Make plans with your connections" data-step="8" data-position="top" id="makePlansButton"><%= fa_icon 'calendar-plus-o' %>  MAKE PLANS</div>
+            <div id="checkinButton" data-intro="Check in anytime you interact with your connection (digital or in person)! Sphere will keep track, and remind you to check in with your connection if you haven't done so in a while." data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> ><%= fa_icon 'check' %>  CHECK IN</div>
         </div>
     </div>
     <% if @activity_definitions %>
@@ -1883,7 +1897,7 @@ $(function(){
         <div class="modalContentContainer p-h-xxlg">
             <span class="textDarkGray" style="font-size:17px;">Choose Activity and Date</span>
             <form action="<%= plans_path %>" method="POST" >
-                <div class="btn-group buttonGroupWithOther chooseActivity" data-intro="Choose your preferred activity to book with contacts! Or click the plus sign to enter a custom activity." data-step="9" data-position="bottom"  style="height:50px;"  role="group">
+                <div class="btn-group buttonGroupWithOther chooseActivity" data-intro="Choose your preferred activity to book with your connections! Or click the plus sign to enter a custom activity." data-step="9" data-position="bottom"  style="height:50px;"  role="group">
                     <button class="btn btn-light-grey btn-secondary active" style="width:20%;height:100%;" data-value="Coffee" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Coffee"><%= image_tag 'coffee', height: 35 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Food"  data-slide-down=".modalView#makePlan .activityName" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px"  data-toggle="tooltip" data-placement="top" data-html="true" title="Food"><%= image_tag 'food', height: 35 %></button>
                     <button class="btn btn-light-grey btn-secondary" style="width:20%;height:100%;" data-value="Drinks" data-height-adjust-element=".remodal[data-remodal-id=bubbleModal]"  data-height-adjust-original-value="410px" data-slide-down=".modalView#makePlan .activityName" data-toggle="tooltip" data-placement="top" data-html="true" title="Drinks"><%= image_tag 'drinks', height: 35 %></button>
@@ -1923,7 +1937,7 @@ $(function(){
                 <input type="hidden" class="inputData" name="plan_id">
                 
                 <div class="row m-t-xs">
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" data-intro="You can add events to your Google calendar and even choose to send your contact an invite. If so, you will be prompted to authorize connection to Google calendar. Otherwise, Sphere will save this event internally." data-step="10" data-position="top">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" data-intro="You can add events to your Google calendar and even choose to send your connection an invite. If so, you will be prompted to connect to your Google Calendar. Otherwise, Sphere will save this event internally." data-step="10" data-position="top">
                         <%= check_box_tag 'putOnGoogle',true,true, style:"display:inline-box;", class:'inputData' %>
                         <label for="putOnGoogle" class="textDarkGray">Put in Google Calendar?</label>
                     </div>
@@ -2010,7 +2024,7 @@ $(function(){
             <div class="addConnectionPopupContent" >
                 <div class="import" data-intro="You can also import select connections from your Google Contacts" data-step="4" data-position="bottom">
                     <div class="formElement button textDarkGray disableWhileProcessed " href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Select from Google Contacts</div>
-                    <em style="font-size:11px;">We respect your privacy. Sphere uses secure encrypted connection and will never spam your contacts or share their information</em>
+                    <span class="textDarkGray" style="font-size:11px;">We respect your privacy. Sphere uses secure encrypted connection and will never spam your contacts or share their information</span>
                 </div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
@@ -2173,13 +2187,25 @@ $(function(){
 </div>
 
 <div data-remodal-id="notificationsModal" data-method="PUT" href="<%= showed_one_time_notification_path %>" data-default-css="([{'attribute':'height','value':'400px'}])" >
-    <% if @settings[:onboarding_progress] && !@settings[:onboarding_progress][1] %>
-        <div class="modalView textDarkGray" id="welcomeMessage">
+    <% if @settings[:onboarding_progress] && !@settings[:onboarding_progress][1]  %>
+        <div class="modalView textDarkGray" id="welcomeMessageModalView" >
             <div class="modalContentContainer p-h-xxlg textDarkGray">
                 <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>Welcome to Sphere!</h1><br><p>Sphere will help you develop the habits to nurture your relationships and grow your network.</p><br><p>Let’s do a quick tour of the features so you can get started right away!</p>
             </div>
             <div class="modalButtonContainer">
                 <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel" id="welcomeMessage">GET STARTED</div>
+            </div>
+        </div>
+        <div class="modalView textDarkGray hidden" id="challengeToAddThreeConnections">
+            <div class="modalContentContainer p-h-xxlg textDarkGray">
+                <h3>Start by adding 3 connections today</h3><br><p>Just like your real-world network is built person-by-person, your Sphere will ideally grow continuously. Keep following up with them regularly and watch the strength of your network grow!</p>
+                <br>
+                <br>
+                <p style="font-size:18px;font-weight:400;">Add 3 or more connections to your Sphere now and get 800 bonus points!</p>
+                <br><%= image_tag '1f3c5.svg' %>
+            </div>
+            <div class="modalButtonContainer">
+                <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel" id="closeChallengeToAddThreeConnections">LET'S DO IT</div>
             </div>
         </div>
     <% end %>
@@ -2196,6 +2222,14 @@ $(function(){
         <div class="modalContentContainer p-h-xxlg">
             <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h1>You earned <span class="value1" style="font-weight:600;"></span> new badges</h1><br><p>That's awesome!</p><br><%= image_tag '1f388.svg' %>
 
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
+        </div>
+    </div>
+    <div class="modalView textDarkGray" id="addedFirstThreeConnectionsPopup">
+        <div class="modalContentContainer p-h-xxlg">
+            <%= image_tag '1f389.svg' %><%= image_tag '1f44f-1f3fc.svg' %><h3>You added your first 3 connections!</h3><br><p>You just earned 800 points and on your way to building an awesome network!</p><p>Keep at it. Good luck :)</p><br><%= image_tag '1f388.svg' %>
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
