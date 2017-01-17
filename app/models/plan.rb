@@ -1,8 +1,8 @@
 class Plan < ActiveRecord::Base
     belongs_to :user
     belongs_to :connection
-    scope :upcoming, -> { where("status ilike 'Planned' and date >= ?", Date.today)}
-    scope :completed, -> { where("status ilike 'Planned' and date < ?", Date.today)}
+    scope :upcoming, -> { where("status ilike 'Planned' and date_time >= ?", Time.now)}
+    scope :completed, -> { where("status ilike 'Planned' and date_time < ?", Time.now)}
 
     def self.create_event(user,event_parameters,connection=nil,connection_email_override=nil,access_token=nil,expires_at=nil,calendar_id="primary",put_on_google=true)
         date = event_parameters[:date]
@@ -12,6 +12,15 @@ class Plan < ActiveRecord::Base
         location = event_parameters[:location]
         details = event_parameters[:details]
         notify = event_parameters[:notify]
+        if connection
+            if notify
+                summary_with_name = summary+" (#{connection.name} and #{user.display_name})"
+            else
+                summary_with_name = summary+" with #{connection.name}"
+            end
+        else 
+            summary_with_name = summary
+        end
 
         connection_email = !connection_email_override.blank? ? connection_email_override : connection.email
 
@@ -51,7 +60,7 @@ class Plan < ActiveRecord::Base
                     begin
                         if notify
                             event = Google::Apis::CalendarV3::Event.new({
-                                summary: summary,
+                                summary: summary_with_name,
                                 location:location,
                                 description:details.to_s + "\n\nSent from Sphere | usesphere.com",
                                 start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
@@ -61,7 +70,7 @@ class Plan < ActiveRecord::Base
                                 })
                         else
                             event = Google::Apis::CalendarV3::Event.new({
-                                summary: summary,
+                                summary: summary_with_name,
                                 location:location,
                                 description:details,
                                 start: {date_time:start_time.strftime("%Y-%m-%dT%H:%M:%S%z")},
@@ -142,6 +151,17 @@ class Plan < ActiveRecord::Base
 
         new_connection_email = !connection_email_override.blank? ? connection_email_override : connection.email
 
+        if connection
+            if notify
+                new_summary_with_name = new_summary+" (#{connection.name} and #{user.display_name})"
+            else
+                new_summary_with_name = new_summary+" with #{connection.name}"
+            end
+        else 
+            new_summary_with_name = new_summary
+        end
+
+
         if put_on_google_new && self.put_on_calendar
             # Authenticate with Google and retrieve primary calendar
             begin
@@ -182,7 +202,7 @@ class Plan < ActiveRecord::Base
                         self.end_date_time = new_end_time
                     end
                     if new_summary != name
-                        event.summary = new_summary
+                        event.summary = new_summary_with_name
                         self.name = new_summary
                     end
 

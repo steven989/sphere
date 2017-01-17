@@ -130,6 +130,25 @@ class User < ActiveRecord::Base
       end
   end
 
+  def get_timezone
+    self.timezone ? TZInfo::Timezone.get(self.timezone) : TZInfo::Timezone.get('America/New_York')
+  end
+
+  def send_events_and_reminder_email
+    if self.user_setting.get_value('send_events_reminders_emails')
+      timezone = self.get_timezone
+      date_today_in_timezone = timezone.now.strftime("%Y-%m-%d").to_date
+      date_tomorrow_in_timezone = date_today_in_timezone + 1.day
+      boundary_beginning_time_in_utc = timezone.local_to_utc(Time.local(date_today_in_timezone.year,date_today_in_timezone.month,date_today_in_timezone.day,0,0,0))
+      boundary_ending_time_in_utc = timezone.local_to_utc(Time.local(date_tomorrow_in_timezone.year,date_tomorrow_in_timezone.month,date_tomorrow_in_timezone.day,0,0,0))
+      events_today = self.plans.where("status ilike 'Planned' and date_time >= ? and date_time < ?", boundary_beginning_time_in_utc,boundary_ending_time_in_utc)
+      reminders_today = self.user_reminders.set.where(due_date:date_today_in_timezone)
+      if !events_today.blank? || !reminders_today.blank?
+        SystemMailer.events_and_reminders(self,events_today,reminders_today,timezone).deliver
+      end
+    end
+  end
+
   def get_one_time_popup_notification(json_or_not_json=false)
     notification = notifications.where(one_time_display:true).order(priority: :asc).take
     if notification

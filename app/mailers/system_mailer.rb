@@ -48,4 +48,26 @@ class SystemMailer < ApplicationMailer
     end     
   end
 
+  def events_and_reminders(user,events,reminders,timezone)
+    @timezone = timezone
+    @user = user
+    @events = events
+    @number_of_events = events.length
+    @reminders = reminders
+    @number_of_reminders = reminders.length
+
+    if @number_of_events > 0 && @number_of_reminders == 0 
+      subject = "You have #{@number_of_events} scheduled events on Sphere today"
+    elsif @number_of_events == 0 && @number_of_reminders > 0
+      subject = "You have #{@number_of_reminders} reminders due today"
+    elsif @number_of_events > 0 && @number_of_reminders > 0
+      subject = "You have #{@number_of_reminders} reminders and #{@number_of_events} scheduled events on Sphere today"
+    end
+
+    mail(:to => user.email,
+         :subject => subject) do |format|
+        format.html
+    end
+  end
+
 end

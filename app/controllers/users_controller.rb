@@ -275,6 +275,7 @@ class UsersController < ApplicationController
                                 event_add_granularity:{title:"Granularity of adding events",value:current_user_settings_evaled[:event_add_granularity],type:"selection",options:["Detailed","Quick"]},
                                 timezone:{title:"Default timezone",value:current_user.timezone,type:"selection",options:TZInfo::Timezone.all.map {|zone| zone.name } },
                                 expiry_external_notification:{title:"Email reminder for expiring connections and other Sphere activities",value:current_user_settings_evaled[:expiry_notification_email_frequency],type:"selection",options:["Daily","Weekly","Monthly","Never"]},
+                                send_events_reminders_emails:{title:"Send me reminder emails for my scheduled calendar events and reminders I set on my connections",value:current_user_settings_evaled[:send_events_reminders_emails],type:"boolean"},
                                 invites:{code:code,remaining_invite:remaining_invite}
                               }
         respond_to do |format|
@@ -309,9 +310,10 @@ class UsersController < ApplicationController
       event_add_granularity = params[:data][:event_add_granularity]
       timezone = params[:data][:adjust_timezone]
       expiry_notification_email_frequency = params[:data][:expiry_external_notification]
+      send_events_reminders_emails = params[:data][:send_events_reminders_emails] == "true" ? true : false
 
       user_setting = current_user.user_setting
-      if user_setting.update_hash_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity,expiry_notification_email_frequency:expiry_notification_email_frequency})
+      if user_setting.update_hash_value({send_event_booking_notification_by_default:send_event_booking_notification_by_default,share_my_calendar_with_contacts:share_my_calendar_with_contacts,default_contact_interval_in_days:default_contact_interval_in_days,event_add_granularity:event_add_granularity,expiry_notification_email_frequency:expiry_notification_email_frequency,send_events_reminders_emails:send_events_reminders_emails})
         current_user.update_attributes(timezone:timezone) unless timezone.blank?
         AppUsage.log_action("Updated settings",current_user)
         status = true

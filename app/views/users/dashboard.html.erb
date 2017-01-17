@@ -1319,6 +1319,8 @@ $(function(){
         form.find('#default_contact_interval_in_days_value').val(returnedData.default_contact_interval_in_days.value);
         form.find('#adjust_timezone_title').html(returnedData.timezone.title);
         form.find('#expiry_external_notification_title').html(returnedData.expiry_external_notification.title);
+        form.find('#send_events_reminders_emails_title').html(returnedData.send_events_reminders_emails.title);
+        form.find('#send_events_reminders_emails_value').prop('checked',returnedData.send_events_reminders_emails.value);
         $('#adjust_timezone_title').siblings('.options').find('select').html("");
         $('#expiry_external_notification_title').siblings('.options').find('select').html("")
         returnedData.timezone.options.forEach(function(timezone){
@@ -2124,6 +2126,10 @@ $(function(){
                             
                         </select>
                     </div>
+                </div>
+                <div class="m-b-md">
+                    <div id="send_events_reminders_emails_title"></div>
+                    <div><input type='checkbox' class="settingInput inputData" name='send_events_reminders_emails' id='send_events_reminders_emails_value' value=''></div>
                 </div>
 
 <!--                 <div class="m-b-md">

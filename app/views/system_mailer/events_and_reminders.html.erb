@@ -1,0 +1,23 @@
+<p>Hi <%= @user.first_name %>, you've created some reminders and calendar events for today:</p>
+<% if @number_of_events > 0 %>
+    <br>
+    <b>Calendar events:</b>
+    <ol>
+    <% @events.order(date_time: :asc).each do |event| %>
+        <li><%= event.name %><% if event.connection; %> with <%= event.connection.first_name %><%= ' '+event.connection.last_name %><% end %> at <%= @timezone.utc_to_local(event.date_time).strftime("%l:%M%p") %></li>
+    <% end %>
+    </ol>
+<% end %>
+<% if @number_of_reminders > 0  %>
+    <br>
+    <b>Reminders:</b>
+    <ol>
+        <% @reminders.each do |reminder| %>
+            <li><%= reminder.reminder %><% if reminder.connection; %> for <%= reminder.connection.first_name %><%= ' '+reminder.connection.last_name %><% end %></li>
+        <% end %>
+    </ol>
+<% end %>
+<br>
+<p>You can turn off these notifications through your dashboard. Have a great day!</p>
+<p>- Sphere Team</p>
+<p><a href="https://app.usesphere.com">app.usesphere.com</a></p>

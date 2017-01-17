@@ -14,7 +14,6 @@ class PlansController < ApplicationController
 
         unless params[:connection_id] == 0
             connection = Connection.find(params[:connection_id])
-            summary+=" (with #{connection.name})"
         end
 
         if !connection_email.blank? && connection.email.blank?
