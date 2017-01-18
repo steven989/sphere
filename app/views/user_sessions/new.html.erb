@@ -22,7 +22,7 @@ $(function(){
         <% end %>
     <% end %>
 
-    $('.googleLoginButton').off("click").on("click",function(){
+    $('.googleLoginButton').off("click").on("click",function(event){
             event.preventDefault();
             event.stopPropagation()
             var signUpCode = $('#signup #sign_up_code').val();
@@ -41,7 +41,7 @@ $(function(){
             $($(this).data('height-adjust-element')).animate({height:$(this).data('height-adjust-value')});        
         }
     });
-    $('#forgotPassword').off("click").on("click",function(){
+    $('#forgotPassword').off("click").on("click",function(event){
         event.preventDefault();
         vex.dialog.prompt({
             message:"Reset your password:",

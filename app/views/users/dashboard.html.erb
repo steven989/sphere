@@ -2,7 +2,7 @@
 var test;
 
 $(function(){
-    $('#mask, .modalMask').on("click",function(){
+    $('#mask, .modalMask').on("click",function(event){
         event.stopPropagation();
         return false;
     })
@@ -80,7 +80,7 @@ $(function(){
                 $(this).removeClass('hidden');
             });
 
-            $('#searchBar').on('click',function(){
+            $('#searchBar').on('click',function(event){
                 event.stopPropagation();
             });
 
@@ -197,7 +197,7 @@ $(function(){
             $(this).off("focusin").on("focusin",function(){
                 currentValue = $(this).val();
             });
-            $(this).off("keypress").on("keypress",function(){
+            $(this).off("keypress").on("keypress",function(event){
                 if (event.keyCode == 13) {
                     $(this).blur();
                 };
@@ -259,16 +259,16 @@ $(function(){
     // Navigation bar related
     $('#settingLogoutToggle').off("click").on("click",toggleMobileTopMenu);
 
-    function toggleMobileTopMenu() {
+    function toggleMobileTopMenu(event) {
         $('.profileButtonsContainer.hideOnMobile').toggle();
         event.stopPropagation();
 
         if ($('.profileButtonsContainer.hideOnMobile').css("display") != "none") {
             $('#settingLogoutToggle').css({"color":"#345C6F"});
-            $('body').on("click",toggleMobileTopMenu);
+            $('body').on("click",function(event){toggleMobileTopMenu(event)});
         } else {
             $('#settingLogoutToggle').css({"color":"#FFFFFF"});
-            $('body').off("click",toggleMobileTopMenu);
+            $('body').off("click",function(event){toggleMobileTopMenu(event)});
         }
     }
 
@@ -873,7 +873,7 @@ $(function(){
     ajaxButtonListener(null);
 
     // Standard ajax call for buttons
-    function buttonAjax(button,data) {
+    function buttonAjax(button,data,event) {
         if (event) {
             event.preventDefault();
             event.stopPropagation();            
@@ -1242,7 +1242,7 @@ $(function(){
     buttonGroupWithOther();
     function buttonGroupWithOther() {
         $('.buttonGroupWithOther button').each(function(){
-            $(this).off("click").on("click",function(){
+            $(this).off("click").on("click",function(event){
                 event.preventDefault();
                 event.stopPropagation();
                 $(this).siblings().each(function(){
@@ -1500,7 +1500,7 @@ $(function(){
             buttonAjax($(this),{contactsToImport:contactListToSend,mergeName:$('#importContacts #mergeName').prop('checked')});
         });
 
-        $('#importContacts #importSelectionTable .importCheck').off("click").on("click",function(){
+        $('#importContacts #importSelectionTable .importCheck').off("click").on("click",function(event){
             event.stopPropagation();
         }).off('change').on('change',function(){
             checkIfAtImportLimit();
