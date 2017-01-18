@@ -23,7 +23,7 @@ namespace :system do
             # 3) Find badges
             user.find_badges
             # 4) Send out expiring notifications email
-            ExternalNotification.send_external_notifications_for(user) if user.email == "roman.krem@gmail.com"
+            ExternalNotification.send_external_notifications_for(user)
             # 5) Send out events email
             user.send_events_and_reminder_email
         end
