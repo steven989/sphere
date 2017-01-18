@@ -2026,7 +2026,7 @@ $(function(){
             <div class="addConnectionPopupContent" >
                 <div class="import" data-intro="You can also import select connections from your Google Contacts" data-step="4" data-position="bottom">
                     <div class="formElement button textDarkGray disableWhileProcessed " href="<%= import_connection_path %>" data-method="put" data-data-to-send="({'provider':'google'})" id="importContactsGoogle" > <%= image_tag 'google-logo-small', width: 20 %> Select from Google Contacts</div>
-                    <span class="textDarkGray" style="font-size:11px;">We respect your privacy. Sphere uses secure encrypted connection and will never spam your contacts or share their information</span>
+                    <span class="textDarkGray" style="font-size:11px;">We respect your privacy. Sphere uses secure encrypted connection and will not spam your contacts or share their information</span>
                 </div>
                 <br>
                 <h2 style="width:100%;text-align:center;border-bottom:1px solid #E0E0E0;line-height:0.34em;margin:0px 0px 20px;"><span style="font-size:14px;color:#787878;background-color:#f0f0f0;padding:0 19px;background:#FFF;">Or enter manually</span></h2>
@@ -2047,6 +2047,7 @@ $(function(){
                     </div>
                 </form>
             </div>
+            <span class="textDarkGray" style="font-size:11px;">Adding to Sphere does <b>not</b> send out an invite to connect. Sphere is your private space to track your connections</span>
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomFullButton sphereBlueBackground hoverable  disableWhileProcessed submitButton" data-submit-form=".modalView#mainImportView form">
