@@ -1815,7 +1815,7 @@ $(function(){
                                 <div class="card badgeCard" data-id="<%= user_badge.badge.id %>">
                                     <div class="corner-ribbon top-right sticky yellow <%= "hidden" if user_badge.notifications.length == 0 %>">New!</div>
                                     <div class="title">
-                                        <h2 class="textDarkGray"><%= user_badge.badge.name %></h2>
+                                        <h2 class="textDarkGray m-b-none"><%= user_badge.badge.name %></h2>
                                     </div>
                                     <div class="graphic">
                                         <%= user_badge.badge.graphic.blank? ? "" :  (image_tag user_badge.badge.graphic, alt:"Badge Graphics")  %>
