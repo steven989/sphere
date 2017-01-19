@@ -14,7 +14,7 @@
     </thead>
     <tbody>
         <% @badges.each do |badge| %>
-           <tr class="update-instance" data-instance-id=<%= badge.id %>>
+           <tr class="update-instance" data-instance-id=<%= badge.id ? badge.id : Time.now.to_i %>>
                <td><%= check_box_tag :update,nil,nil,class:"updateCheck" %> <%= hidden_field_tag :id,badge.id, class:"updateInput" %></td>
                <td><%= text_field_tag :name, badge.name,class:"updateInput" %></td>
                <td><%= text_field_tag :description, badge.description,class:"updateInput" %></td>
