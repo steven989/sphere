@@ -18,7 +18,7 @@ class AdminsController < ApplicationController
         elsif model_name == "badge"
             @badges = Badge.all.order(created_at: :desc)
             if @badges.length == 0
-                @badges = Badge.new
+                @badges = [Badge.new]
             end
         elsif model_name == "challenge"
             @challenges = Challenge.all.order(created_at: :desc)
