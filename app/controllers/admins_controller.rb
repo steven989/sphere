@@ -17,6 +17,9 @@ class AdminsController < ApplicationController
             @levels = Level.all.order(level: :asc)
         elsif model_name == "badge"
             @badges = Badge.all.order(created_at: :desc)
+            if @badges.length == 0
+                @badges = Badge.new
+            end
         elsif model_name == "challenge"
             @challenges = Challenge.all.order(created_at: :desc)
         elsif model_name == "activity_definition"
@@ -285,9 +288,9 @@ class AdminsController < ApplicationController
 
         if error_array.length > 0
             status = false
-            message = "Encountered some errors while updating the levels. See the highlighted cells"
+            message = "Encountered some errors while updating the levels."
             data = {errorInputIds: error_array.map {|error| error[:inputId]}}
-            actions = error_array.map {|error| error[:elements].map{|element| {action:"change_css",element:"#level .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } }.flatten
+            actions = error_array.map {|error| error[:elements] ? error[:elements].map{|element| {action:"change_css",element:"#level .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } : nil }.flatten
             actions.push({action:"function_call",function:"reCheck('level',receivedDataFromAJAX.data.errorInputIds,'update')"})
         else
             status = true
@@ -391,7 +394,7 @@ class AdminsController < ApplicationController
             status = false
             message = "Encountered some errors while updating the badges. See the highlighted cells"
             data = {errorInputIds: error_array.map {|error| error[:inputId]}}
-            actions = error_array.map {|error| error[:elements].map{|element| {action:"change_css",element:"#badge .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } }.flatten
+            actions = error_array.map {|error| error[:elements] ? error[:elements].map{|element| {action:"change_css",element:"#badge .update-instance[data-instance-id=#{error[:inputId]}] .updateInput##{element.to_s}",css:{attribute:"border",value:"1px solid red"} } } : nil }.flatten
             actions.push({action:"function_call",function:"reCheck('badge',receivedDataFromAJAX.data.errorInputIds,'update')"})
         else
             status = true
