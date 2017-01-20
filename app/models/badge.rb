@@ -14,7 +14,7 @@ class Badge < ActiveRecord::Base
         #2) Find all the different statistics fields that will be required and save their values in a hash database isn't accessed for every comparison
         unique_list_of_user_statistics = subset.map{|badge_data| badge_data[:criteria].scan(/@[^@]+@/)}.flatten.uniq
         #3) Load these statistics
-        current_user_relevant_statistics = unique_list_of_user_statistics.map{|stat| {stat.gsub("@",'') => current_user.user_statistics.find_statistic(stat.gsub("@",'')).take.value.to_f}}.reduce Hash.new, :merge
+        current_user_relevant_statistics = unique_list_of_user_statistics.map{|stat| puts 'xxxxxxxxxxxxxxxxxxxx'; puts stat; {stat.gsub("@",'') => current_user.user_statistics.find_statistic(stat.gsub("@",'')).take.value.to_f}}.reduce Hash.new, :merge
         #4) Filter the subset of badges by their criteria and the loaded user statistics data
         new_set_that_user_qualifies_for = subset.select {|badge| eval(Badge.decode_criteria_into_executable_command(badge['criteria'])) }
         new_set_that_user_qualifies_for
