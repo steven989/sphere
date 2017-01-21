@@ -3,21 +3,17 @@ class UserRemindersController < ApplicationController
 
     def create
         if !params[:reminder].blank?
-            if user_reminder = current_user.user_reminders.create(
-                                connection_id:params[:connection_id],
-                                reminder:params[:reminder],
-                                status:"set",
-                                due_date:params[:due_date].to_date
-                            )
-                Notification.create_reminder_notification(current_user,user_reminder)
+            result = UserReminder.create_reminder(current_user,params[:connection_id],params[:reminder],params[:due_date])
+            if result[:status]
+                user_reminder=result[:data]
+                message = result[:message]
                 notifications = current_user.get_notifications(false)
                 status = true
-                message = "Reminder set! A blue bell will appear over your connection when the due date approaches"
                 data = {user_reminder_id:user_reminder.id,due_date:user_reminder.due_date_humanized(current_user.timezone ? TZInfo::Timezone.get(current_user.timezone) : TZInfo::Timezone.get('America/New_York')),notifications:notifications}
                 actions = [{action:"function_call",function:"setReminderCallback()"},{action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"}]
             else
                 status = false
-                message = "Could not set reminder: #{user_reminder.errors.full_messages.join(', ')}"
+                message = result[:message]
                 data = nil
                 actions = nil
             end

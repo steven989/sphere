@@ -887,6 +887,13 @@ body {
     transition:background-color 0.2s ease;
 }
 
+
+.sphereGreenBackground.pressed:not(.disabled) {
+    background-color: #109223 !important;
+}
+.sphereGreenBackground.pressed.disabled {
+    background-color: #659C6D;
+}
 .no-touch .sphereGreenBackground.hoverable:not(.disabled):hover {
     background-color: #37AF49;
 }

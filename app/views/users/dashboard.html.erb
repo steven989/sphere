@@ -172,7 +172,6 @@ $(function(){
 
     // update "real-time" stats
     function updateRealTimeStats(stats) {
-        console.log(stats);
         for (var key in stats) {
             $('.statsToUpdate.'+key).each(function(){
                 $(this).html(stats[key]);
@@ -968,6 +967,8 @@ $(function(){
         $('.modalView#makePlan .modalBottomLeftButton').removeData('height-adjust-element').removeData('height-adjust-value');
         $('.modalView#editConnection .subTabNavigationButton.profile').removeData('height-adjust-element').removeData('height-adjust-value');
         $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
+        $('.checkinButton').attr('href',"<%= create_activity_path %>"+"?connection_id="+returnedData.connection_id);
+        $('#checkInNotes').html("");
         $('#confirm_delete').prop('checked',false);
         $('#destroy_single_connection').addClass('disabled');
         if (photoUrl) {
@@ -1433,36 +1434,31 @@ $(function(){
 
     function checkInButtons(state,options) {
         var changeToState = state == "true" ? true : false;
-        _this = $('#checkinButton');
+        var checkInButtonPressDownTimer = null;
+        _this = $('.checkinButton');
+        _this.removeClass('pressed');
         if (changeToState) {
             _this.html('<%= fa_icon "check" %>  CHECK IN');
             _this.removeClass('disabled');
-            if (_this.data('transition-button') != undefined ) {
-                _this.addClass('transitionButton');
-                _this.removeData('transition-button');
-                _this.off("click").on("click",function(){
-                    transition($($(this).data('current')),$($(this).data('target')));
-                });
-            }
-            if( _this.data('ajax-button') != undefined ) {
-                _this.addClass('ajaxButton');
-                _this.removeData('ajax-button');
-                _this.off("click").on("click",function(){
-                    buttonAjax($(this),$(this).data('data-to-send'));                    
-                });
-            }
+            _this.off("mousedown").off("mouseup").on("mousedown",function(){
+                _this.addClass('pressed');
+                if (!_this.hasClass('disabled') && _this.hasClass('longPressTransition')) {
+                    checkInButtonPressDownTimer = setTimeout(function(){
+                        checkInButtonPressDownTimer = null;
+                        _this.removeClass('pressed');                     
+                        transition($(_this.data('current')),$(_this.data('target')));
+                    },1000);
+                }
+            }).on("mouseup",function(){
+                _this.removeClass('pressed');
+                clearTimeout(checkInButtonPressDownTimer);
+                if (checkInButtonPressDownTimer != null) {buttonAjax($(this),{activity_definition_id:$(this).data('activity-definition-id'),notes:$('#checkInNotes').val()});}
+                checkInButtonPressDownTimer = null;
+            });
         } else {
             _this.off("click");
             _this.html('<span id="checkedInToday"><%= fa_icon "check" %> CHECKED IN TODAY!</span>');
             _this.addClass('disabled');
-            if (_this.hasClass('transitionButton')) {
-                _this.data("transition-button",true);
-                _this.removeClass('transitionButton');
-            }
-            if (_this.hasClass('ajaxButton')) {
-                _this.data("ajax-button",true);
-                _this.removeClass('ajaxButton');
-            }
         }
     }
 
@@ -1874,27 +1870,20 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Don’t let your connections drift away! Make plans with your connections" data-step="8" data-position="top" id="makePlansButton"><%= fa_icon 'calendar-plus-o' %>  MAKE PLANS</div>
-            <div id="checkinButton" data-intro="Check in anytime you interact with your connection (digital or in person)! Sphere will keep track, and remind you to check in with your connection if you haven't done so in a while." data-step="7" data-position="top" class="modalBottomRightButton <%= if (@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "transitionButton" else "ajaxButton createActivity disableWhileProcessed doNotReenable"  end  %> sphereGreenBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" href="<%= create_activity_path %>"  <%= if !(@setting_for_activity_entry_details && @setting_for_activity_entry_details > 1); "data-data-to-send=({activity_definition_id:#{@activity_definitions.take.id}})" end %> ><%= fa_icon 'check' %>  CHECK IN</div>
+            <div data-intro="Check in anytime you interact with your connection (digital or in person)! Sphere will keep track, and remind you to check in with your connection if you haven't done so in a while." data-step="7" data-position="top" class="checkinButton longPressTransition modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" data-activity-definition-id="<%= @activity_definitions.take.id %>"><%= fa_icon 'check' %>  CHECK IN</div>
         </div>
     </div>
-    <% if @activity_definitions %>
-        <div class="modalView" id="detailedCheckIn">
-            <div class="modalContentContainer">
-                <ul>
-                    <% @activity_definitions.each do |activity_definition| %>
-                        <li>
-                            <div class="checkInButton ajaxButton createActivity" data-data-to-send="({activity_definition_id:<%= activity_definition.id %>})" href="<%= create_activity_path %>" data-method="POST" >
-                                <%= activity_definition.activity.capitalize %>
-                            </div>
-                        </li>
-                    <% end %>
-                </ul>
-            </div>
-            <div class="modalButtonContainer">
-                <div class="modalBottomFullButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-target="[data-remodal-id=bubbleModal] .modalView#plans">BACK</div>
-            </div>            
+    <div class="modalView" id="detailedCheckIn">
+        <div class="modalContentContainer p-h-xxlg">
+            <form>
+                <textarea name="checkInNotes" id="checkInNotes" rows="10" placeholder="Add any details to help you remember this check-in (e.g. what did you talk about, what is your connection up to now, etc). You can also create as many reminders as you want directly from within these notes by using the syntax: \remind(send her the article about AI)" class="formElement" style="height:100%;"></textarea>
+            </form>
         </div>
-    <% end %>
+        <div class="modalButtonContainer">
+            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-target="[data-remodal-id=bubbleModal] .modalView#plans"><%= fa_icon "arrow-left" %>  BACK</div>
+            <div class="checkinButton modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed" data-method="POST" data-activity-definition-id="<%= @activity_definitions.take.id %>" ><%= fa_icon 'check' %>  CHECK IN</div>
+        </div>            
+    </div>
     <div class="modalView hidden" id="makePlan">
         <div class="modalContentContainer p-h-xxlg">
             <span class="textDarkGray" style="font-size:17px;">Choose Activity and Date</span>

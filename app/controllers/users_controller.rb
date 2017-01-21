@@ -218,7 +218,7 @@ class UsersController < ApplicationController
 
     def create_activity
       if params[:activity_definition_id]
-        result = Activity.create_activity(current_user,params[:connection_id],params[:activity_definition_id],Date.today,0)
+        result = Activity.create_activity(current_user,params[:connection_id],params[:activity_definition_id],Date.today,0,params[:notes])
         if result[:status]
           raw_bubbles_data = current_user.get_raw_bubbles_data(nil,false)
           notifications = current_user.get_notifications(false)
