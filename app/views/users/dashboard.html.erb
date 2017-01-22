@@ -167,7 +167,6 @@ $(function(){
     }
 
     function oneTimeNotificationTooltip(element,message,position) {
-        console.log('here');
         $(element).data('placement',position).data('title',message).data('html',true);
         $(element).tooltip('show');
     }
@@ -977,7 +976,7 @@ $(function(){
         $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
         $('.checkinButton').attr('href',"<%= create_activity_path %>"+"?connection_id="+returnedData.connection_id);
         $('.subTabNavigationButton.log').data('data-to-send',"({connection_id:'"+returnedData.connection_id+"',page:1})");
-        $('#checkInNotes').html("");
+        $('#checkInNotes').val("");
         $('.modalView#connectionLog .activityTimeline dl').html("");
         ajaxButtonListener('.subTabNavigationButton.log');
         $('#confirm_delete').prop('checked',false);
