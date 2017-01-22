@@ -10,6 +10,13 @@ class SystemMailer < ApplicationMailer
     end 
   end
 
+  def user_feedback(user,message)
+      @user = user
+      @message = message
+      mail(:to => ENV['FEEDBACK_EMAIL'],
+           :subject => "New user feedback")
+  end
+
   def reset_password_email(user)
       @user = User.find user.id
       @url  = edit_password_reset_url(@user.reset_password_token)

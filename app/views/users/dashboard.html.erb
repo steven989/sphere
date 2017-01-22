@@ -5,7 +5,11 @@ $(function(){
     $('#mask, .modalMask').on("click",function(event){
         event.stopPropagation();
         return false;
-    })
+    });
+
+    $("#feedback-tab").click(function() {
+        $("#feedback-form").toggle("slide");
+    });
 
     if (!("ontouchstart" in document.documentElement)) {
         $('html').addClass("no-touch");
@@ -1864,6 +1868,18 @@ $(function(){
                     </div>
                 </div>            
                 <div class="bottomPadding"></div>
+            </div>
+            <div id="feedback">
+              <div id="feedback-form" style='display:none;' class="col-xs-4 col-md-4 panel panel-default">
+                <%= form_tag submit_feedback_path, method: 'POST', class:"form panel-body" do %>
+                      <div class="form-group">
+                        <textarea class="form-control inputData" name="body" required placeholder="Any feedback is appreciated! E.g. How are you using the app? What features do you wish you had? Which feature can be streamlined?" rows="5"></textarea>
+                      </div>
+                        <div class="formElement button sphereBlue sphereBlueBackground hoverable pull-right disableWhileProcessed submitButton" data-submit-form="#feedback form" style="color:white">Send</div>
+                <% end %>
+
+              </div>
+              <div id="feedback-tab">Feedback</div>
             </div>
         </div>
     </div>

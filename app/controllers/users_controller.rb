@@ -6,6 +6,16 @@ class UsersController < ApplicationController
         @user = User.new 
     end
 
+    def submit_feedback
+      SystemMailer.user_feedback(current_user,params[:body]).deliver
+      actions = [{action:"function_call",function:'$("#feedback-form").toggle("slide").find("textarea").val("")'}]
+      respond_to do |format|
+        format.json {
+          render json: {status:true, message:"Feedback submitted. Thank you!",actions:actions,data:nil}
+        } 
+      end
+    end
+
     def command
       # \add-note
       # \remind-me-to

@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   post 'users/create_connection' => 'users#create_connection', as: 'create_connection'
   get 'users/:connection_id/new_activity' => 'users#new_activity', as: 'new_activity'
   post 'users/create_activity' => 'users#create_activity', as: 'create_activity'
+  post 'users/submit_feedback' => 'users#submit_feedback', as: 'submit_feedback'
   post 'users/create' => 'users#create', as: 'create_user'
   post 'users/log_front_end_actions' => 'users#log_front_end_actions', as: 'log_front_end_actions'
   get 'users/new' => 'users#new', as: 'create_account'
