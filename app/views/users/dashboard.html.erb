@@ -353,7 +353,7 @@ $(function(){
                             $('.createActivity').each(function(){
                                 $(this).attr("href","<%= create_activity_path %>?connection_id="+_this.data('connection-id'));
                             });
-                            $('.modalView#editConnection .modalBottomRightButton').off('click').on('click',function(){
+                            $('.modalView#editConnection .modalBottomFullButton').off('click').on('click',function(){
                                 var button = $(this);
                                 if (!button.hasClass('disabled')) {
                                     var disabledButtonObject = disableButtonIfSpecifiedInClassName(button);                    
@@ -2047,8 +2047,7 @@ $(function(){
             </div>
         </div>
         <div class="modalButtonContainer">
-            <div class="modalBottomLeftButton transitionButton sphereRedBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans"><%= fa_icon "arrow-left" %>   BACK</div>
-            <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed"><%= fa_icon "refresh" %>  UPDATE</div>
+            <div class="modalBottomFullButton sphereBlueBackground hoverable disableWhileProcessed"><%= fa_icon "refresh" %>  UPDATE</div>
         </div>
     </div>
 
