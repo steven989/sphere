@@ -142,9 +142,12 @@ class User < ActiveRecord::Base
       boundary_beginning_time_in_utc = timezone.local_to_utc(Time.local(date_today_in_timezone.year,date_today_in_timezone.month,date_today_in_timezone.day,0,0,0))
       boundary_ending_time_in_utc = timezone.local_to_utc(Time.local(date_tomorrow_in_timezone.year,date_tomorrow_in_timezone.month,date_tomorrow_in_timezone.day,0,0,0))
       events_today = self.plans.where("status ilike 'Planned' and date_time >= ? and date_time < ?", boundary_beginning_time_in_utc,boundary_ending_time_in_utc)
-      reminders_today = self.user_reminders.set.where("due_date = ? or (due_date is null and (created_at::date = ? or created_at::date = ?))",date_today_in_timezone,Date.today-7.days,Date.today-21.days)
+      reminders_today = self.user_reminders.set.where("due_date = ? or (due_date is null and (created_at::date = ? or created_at::date = ?))",date_today_in_timezone,Date.today-1.days,Date.today-21.days)
       if !events_today.blank? || !reminders_today.blank?
-        SystemMailer.events_and_reminders(self,events_today,reminders_today,timezone).deliver
+        unless SentEmail.where(user_id:self.id,sent_date:Date.today,source:"send_events_and_reminder_email").length > 0
+          SystemMailer.events_and_reminders(self,events_today,reminders_today,timezone).deliver 
+          SentEmail.create(user_id:self.id,sent_date:Date.today,allowable_frequency:"daily",source:"send_events_and_reminder_email")
+        end
       end
     end
   end

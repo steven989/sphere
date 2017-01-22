@@ -11,6 +11,7 @@ namespace :system do
         Notification.destroy_expired_notifications
         UserChallenge.expire_uncompleted_challenges
         UserReminder.remove_all_overdue_reminders(14)
+        SentEmail.remove_all_useless_records
     end
 
     desc 'Daily user and connection level tasks'

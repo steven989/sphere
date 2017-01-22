@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170121183022) do
+ActiveRecord::Schema.define(version: 20170122172652) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -270,6 +270,17 @@ ActiveRecord::Schema.define(version: 20170121183022) do
     t.string   "parameter_3_type"
     t.datetime "last_attempt_date"
   end
+
+  create_table "sent_emails", force: :cascade do |t|
+    t.integer  "user_id"
+    t.date     "sent_date"
+    t.string   "allowable_frequency"
+    t.string   "source"
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
+  end
+
+  add_index "sent_emails", ["user_id"], name: "index_sent_emails_on_user_id", using: :btree
 
   create_table "sign_up_codes", force: :cascade do |t|
     t.integer  "user_id"

@@ -27,7 +27,10 @@ class ExternalNotification < ActiveRecord::Base
 
         if send_notification
             number_of_expiring_connections = user.notifications.where("notification_type ilike ? and expiry_date >= ?","connection_expiration",Date.today).length
-            SystemMailer.expiring_connections_notification(number_of_expiring_connections,user,frequency_word).deliver
+            unless SentEmail.where(user_id:user.id,sent_date:Date.today,source:"send_external_notifications_for").length > 0
+                SystemMailer.expiring_connections_notification(number_of_expiring_connections,user,frequency_word).deliver 
+                SentEmail.create(user_id:user.id,sent_date:Date.today,allowable_frequency:"daily",source:"send_external_notifications_for")
+            end
         end
     end
 
