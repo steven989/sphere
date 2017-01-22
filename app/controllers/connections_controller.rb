@@ -42,6 +42,35 @@ class ConnectionsController < ApplicationController
         end        
     end
 
+    def load_activities
+        if connection = Connection.find(params[:connection_id])
+            if connection.belongs_to?(current_user)
+                timezone = current_user.get_timezone
+                result = connection.load_activities(timezone,params[:page])
+                status = true
+                message = nil
+                data = {entries:result,page:params[:page],connection_id:params[:connection_id]}
+                actions = [{action:"function_call",function:"populateConnectionActivityTimeline()"}]
+            else
+                status = false
+                message = "You do not have access to this connection"
+                action = nil
+                data = nil
+            end
+        else
+            status = false
+            message = "We could not find this connection"
+            action = nil
+            data = nil
+        end
+        respond_to do |format|
+          format.json {
+            render json: {status:status,message:message,actions:actions,data:data}
+          } 
+        end  
+    end
+
+
     def update_email
         connection_id = params[:id]
         if !params[:value].blank?

@@ -80,6 +80,8 @@ gem 'tzinfo-data'
 gem 'delayed_job_active_record'
 # get user browser info
 gem 'browser'
+# pagination
+gem 'kaminari'
 
 
 # Use ActiveModel has_secure_password

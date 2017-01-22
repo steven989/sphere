@@ -968,7 +968,10 @@ $(function(){
         $('.modalView#editConnection .subTabNavigationButton.profile').removeData('height-adjust-element').removeData('height-adjust-value');
         $('#destroy_single_connection').attr('href',"<%= destroy_connection_path %>"+"?connection_id="+returnedData.connection_id);
         $('.checkinButton').attr('href',"<%= create_activity_path %>"+"?connection_id="+returnedData.connection_id);
+        $('.subTabNavigationButton.log').data('data-to-send',"({connection_id:'"+returnedData.connection_id+"',page:1})");
         $('#checkInNotes').html("");
+        $('.modalView#connectionLog .activityTimeline dl').html("");
+        ajaxButtonListener('.subTabNavigationButton.log');
         $('#confirm_delete').prop('checked',false);
         $('#destroy_single_connection').addClass('disabled');
         if (photoUrl) {
@@ -1314,8 +1317,6 @@ $(function(){
         var form = $('.modalView#settingsSelect #settingsContainer');
         form.find('#send_event_booking_notification_by_default_title').html(returnedData.send_event_booking_notification_by_default.title);
         form.find('#send_event_booking_notification_by_default_value').prop('checked',returnedData.send_event_booking_notification_by_default.value);
-        // form.find('#share_my_calendar_with_contacts_title').html(returnedData.share_my_calendar_with_contacts.title);
-        // form.find('#share_my_calendar_with_contacts_value').prop('checked',returnedData.share_my_calendar_with_contacts.value);
         form.find('#default_contact_interval_in_days_title').html(returnedData.default_contact_interval_in_days.title);
         form.find('#default_contact_interval_in_days_value').val(returnedData.default_contact_interval_in_days.value);
         form.find('#adjust_timezone_title').html(returnedData.timezone.title);
@@ -1337,10 +1338,6 @@ $(function(){
             $('#remainingInviteQuantity').html(returnedData.invites.remaining_invite);
             $('#inviteCodeDisplayContainer').removeClass("hidden");
         }
-
-        // form.find('#event_add_granularity_title').html(returnedData.event_add_granularity.title);
-        // form.find('#event_add_granularity_detailed_value').prop("selected", (returnedData.event_add_granularity.value == 'detailed'));
-        // form.find('#event_add_granularity_quick_value').prop("selected", (returnedData.event_add_granularity.value == 'quick'));
 
         initializeReModal("[data-remodal-id=settingsModal]","standardModal",1);
     }
@@ -1364,6 +1361,34 @@ $(function(){
         }
 
         transition($('.modalView#settingsSelect'),$('.modalView#expiredConnections'));
+    }
+
+
+    function populateConnectionActivityTimeline() {
+        var connectionActivityPage = parseInt(returnedData.page)+1;
+        var counter = 0;
+        $('.subTabNavigationButton.log').off("click").on("click",function(){
+            $("[data-remodal-id=bubbleModal] .modalView#editConnection").addClass('hidden');
+            $("[data-remodal-id=bubbleModal] .modalView#plans").addClass('hidden');
+            $("[data-remodal-id=bubbleModal] .modalView#connectionLog").removeClass('hidden');
+        });
+        if (returnedData.entries.length > 0) {
+            returnedData.entries.forEach(function(entry){
+                var position = counter%2 == 0 ? "left" : "right"
+                var margin = position == "right" ? "" : "margin:0px 15px;"
+                $('.modalView#connectionLog .activityTimeline dl').append('<dd class="pos-'+position+' clearfix textDarkGray"><div class="circ"></div><div class="time" style="'+margin+'">'+entry.date+'</div><div class="events"><div class="events-header">'+entry.title+'</div>'+(entry.details ? ('<div class="events-body"><div class="events-desc" style="text-indent:0px; padding:0px; text-align:left;">'+entry.details+'</div></div>') : '' )+'</div></dd>');
+                counter++;
+            });
+            $('.modalView#connectionLog .activityTimeline .viewMoreContainer').show();
+            $('.modalView#connectionLog .activityTimeline .viewMore').off("click").on("click",function(){
+                buttonAjax($(this),{connection_id:returnedData.connection_id,page:connectionActivityPage})
+            });
+        } else {
+            $('.modalView#connectionLog .activityTimeline .viewMoreContainer').hide();
+        }
+        $("[data-remodal-id=bubbleModal] .modalView#editConnection").addClass('hidden');
+        $("[data-remodal-id=bubbleModal] .modalView#plans").addClass('hidden');
+        $("[data-remodal-id=bubbleModal] .modalView#connectionLog").removeClass('hidden');
     }
 
     //Photo cropping area in create connection modal
@@ -1835,11 +1860,14 @@ $(function(){
         <div class="modalContentContainer">
             <div class="subTabNavigationContainer container" style="width:100%;">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <div class="subTabNavigationButton profile textDarkGray" style="font-size:14px;border-bottom:2px solid #e86f56;width:60%;display:inline-block;margin:auto;cursor:pointer;" >PROFILE</div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton profile textDarkGray" style="font-size:14px;border-bottom:2px solid #FFB900;width:90px;display:inline-block;margin:auto;cursor:pointer;" >PROFILE</div>
                     </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <div class="subTabNavigationButton preferences textDarkGray transitionButton" id="showManage" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">MANAGE</div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton preferences textDarkGray transitionButton" id="showManage" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">MANAGE</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton log textDarkGray ajaxButton disableWhileProcessed" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" href="<%= load_activities_path %>" data-method="PUT">LOG</div>
                     </div>
                 </div>
             </div>
@@ -1951,11 +1979,14 @@ $(function(){
         <div class="modalContentContainer">
             <div class="subTabNavigationContainer container" style="width:100%;">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <div class="subTabNavigationButton profile textDarkGray transitionButton" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">PROFILE</div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton profile textDarkGray transitionButton" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#editConnection" data-target="[data-remodal-id=bubbleModal] .modalView#plans">PROFILE</div>
                     </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <div class="subTabNavigationButton preferences textDarkGray" style="font-size:14px;width:60%;display:inline-block;margin:auto;cursor:pointer;border-bottom:2px solid #e86f56;">MANAGE</div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton preferences textDarkGray" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;border-bottom:2px solid #FFB900;">MANAGE</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton log textDarkGray ajaxButton disableWhileProcessed" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" href="<%= load_activities_path %>" data-method="PUT">LOG</div>
                     </div>
                 </div>
             </div>
@@ -2006,6 +2037,42 @@ $(function(){
             <div class="modalBottomRightButton sphereBlueBackground hoverable disableWhileProcessed"><%= fa_icon "refresh" %>  UPDATE</div>
         </div>
     </div>
+
+
+    <div class="modalView hidden" id="connectionLog">
+        <div class="modalContentContainer">
+            <div class="subTabNavigationContainer container" style="width:100%;">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton profile textDarkGray transitionButton" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#connectionLog" data-target="[data-remodal-id=bubbleModal] .modalView#plans">PROFILE</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton preferences textDarkGray transitionButton" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bubbleModal] .modalView#connectionLog" data-target="[data-remodal-id=bubbleModal] .modalView#editConnection">MANAGE</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="subTabNavigationButton log textDarkGray" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;border-bottom:2px solid #FFB900;">LOG</div>
+                    </div>
+                </div>
+            </div>
+            <div class="activityTimeline container" style="width:100%;padding-top:15px;">
+                <div class="row m-t-sm m-b-sm timeline">
+                    <div class="col-md-12">
+                        <div class="VivaTimeline">
+                            <dl>                                   
+
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-b-xs viewMoreContainer" style="width:100%;text-align:center;"><span class="viewMore textDarkGray disableWhileProcessed" href="<%= load_activities_path %>" data-method="PUT"><%= fa_icon "plus" %> View More</span></div>
+            </div>
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereRedBackground hoverable" data-remodal-action="cancel" class="remodal-cancel"><%= fa_icon "close" %>   CLOSE</div>
+        </div>
+    </div>
+
+
 </div>
 
 <div data-remodal-id="importModal" class="importModalOnboarding" style="height:450px;" data-default-css="([{'attribute':'height','value':'450px'}])">

@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   post  'connections/create_from_import' => 'connections#create_from_import', as: 'create_from_import'
   put  'connections/destroy' => 'connections#destroy', as: 'destroy_connection'
   get  'connections/destroy' => 'connections#destroy_all', as: 'clear_connections'
+  put  'connections/load_activities' => 'connections#load_activities', as: 'load_activities' 
   put 'connections/update_name' => 'connections#update_name', as: 'update_connection_name'
   put 'connections/update_email' => 'connections#update_email', as: 'update_connection_email'
   put 'connections/update_phone' => 'connections#update_phone', as: 'update_connection_phone'

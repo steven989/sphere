@@ -20,6 +20,20 @@ class Connection < ActiveRecord::Base
     # Validations
     validates :email, email: true, allow_blank: true
 
+    def load_activities(timezone,page)
+      activities = self.activities.where(activity:["Check In","Added to Sphere"]).order(created_at: :desc)
+      plans = self.plans.completed.order(created_at: :desc)
+      combined_result = []
+      activities.each do |activity|
+        combined_result.push({raw_timestamp:activity.created_at,date:timezone.utc_to_local(activity.created_at).strftime("%Y-%m-%d").to_date,title:activity.activity,details:activity.notes})
+      end
+      plans.each do |plan|
+        combined_result.push({raw_timestamp:plan.date_time,date:timezone.utc_to_local(plan.date_time).strftime("%Y-%m-%d").to_date,title:plan.name,details:plan.details})
+      end
+      combined_result.sort! {|a,b| b[:raw_timestamp] <=> a[:raw_timestamp]}
+      Kaminari.paginate_array(combined_result).page(page).per(20)
+    end
+
     def name
         first_name.to_s+" "+last_name.to_s
     end
