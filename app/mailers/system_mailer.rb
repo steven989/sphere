@@ -57,11 +57,11 @@ class SystemMailer < ApplicationMailer
     @number_of_reminders = reminders.length
 
     if @number_of_events > 0 && @number_of_reminders == 0 
-      subject = "You have #{@number_of_events} scheduled events on Sphere today"
+      subject = "You have #{@number_of_events} scheduled #{@number_of_events > 1 ? 'events' : 'event'} on Sphere today"
     elsif @number_of_events == 0 && @number_of_reminders > 0
-      subject = "You have #{@number_of_reminders} reminders due today"
+      subject = "You have #{@number_of_reminders} #{@number_of_reminders > 1 ? 'reminders' : 'reminder'} on Sphere"
     elsif @number_of_events > 0 && @number_of_reminders > 0
-      subject = "You have #{@number_of_reminders} reminders and #{@number_of_events} scheduled events on Sphere today"
+      subject = "You have #{@number_of_reminders} #{@number_of_reminders > 1 ? 'reminders' : 'reminder'} and #{@number_of_events} scheduled #{@number_of_events > 1 ? 'events' : 'event'} on Sphere today"
     end
 
     mail(:to => user.email,

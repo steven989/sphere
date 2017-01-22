@@ -13,7 +13,7 @@
     <b>Reminders:</b>
     <ol>
         <% @reminders.each do |reminder| %>
-            <li><%= reminder.reminder %><% if reminder.connection; %> for <%= reminder.connection.first_name %><%= ' '+reminder.connection.last_name %><% end %></li>
+            <li><%= reminder.reminder %><% if reminder.connection; %> for <%= reminder.connection.first_name %><%= ' '+reminder.connection.last_name %><% end %><% if reminder.due_date; %> due today<% else %> set up <%= (Date.today - reminder.created_at.to_date).to_i %> days ago (no due date)<% end %></li>
         <% end %>
     </ol>
 <% end %>
