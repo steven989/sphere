@@ -295,6 +295,8 @@ class User < ActiveRecord::Base
           if oauth || !password.blank?
             user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
             if user.save
+              SystemMailer.delay.welcome_email(user)
+              SystemMailer.welcome_email(user).deliver
               SignUpCode.create_sign_up_codes(user)
               StatisticDefinition.new_user_base_statistics(user)
               SignUpCode.increment(invite_code)
@@ -316,6 +318,7 @@ class User < ActiveRecord::Base
       if oauth || !password.blank?
         user = User.new(email:email,first_name:first_name,last_name:last_name,user_type:user_type,password:password,password_confirmation:password_confirmation)
         if user.save
+          SystemMailer.delay.welcome_email(user)
           SignUpCode.create_sign_up_codes(user)
           StatisticDefinition.new_user_base_statistics(user)
           user.find_challenges

@@ -26,6 +26,14 @@ class SystemMailer < ApplicationMailer
     end 
   end
 
+  def welcome_email(user)
+    @user = user
+    mail(:to => user.email,
+         :subject => "Welcome to Sphere!") do |format|
+        format.html
+    end 
+  end
+
   def expiring_connections_notification(number_of_expiring_connections,user,frequency)
     @user = user
     @number_of_expiring_connections = number_of_expiring_connections
