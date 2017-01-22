@@ -215,11 +215,11 @@
     .VivaTimeline dl dd.pos-left .events {
         float: right;
         width: 63%;
-        margin-right: 4%;
+        margin-right: 0%;
     }
     .VivaTimeline dl dd.pos-right .events {
         float: right;
         width: 63%;
-        margin-right: 4%;
+        margin-right: 0%;
     }
 }

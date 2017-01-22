@@ -46,10 +46,10 @@ class ConnectionsController < ApplicationController
         if connection = Connection.find(params[:connection_id])
             if connection.belongs_to?(current_user)
                 timezone = current_user.get_timezone
-                result = connection.load_activities(timezone,params[:page])
+                result = connection.load_activities(timezone,params[:page],20)
                 status = true
                 message = nil
-                data = {entries:result,page:params[:page],connection_id:params[:connection_id]}
+                data = {entries:result[:data],page:params[:page],connection_id:params[:connection_id],last_page:result[:last_page]}
                 actions = [{action:"function_call",function:"populateConnectionActivityTimeline()"}]
             else
                 status = false
@@ -480,7 +480,11 @@ class ConnectionsController < ApplicationController
         actions= [{action:"function_call",function:"populateBubblesModal()"},{action:"function_call",function:"checkInButtons('#{check_in_button_state}',{})"},{action:"function_call",function:"initializeReModal('[data-remodal-id=bubbleModal]','standardModal',0)"},{action:"function_call",function:"stopBubbleLoadingScreen()"}]
         onboarding = current_user.user_setting.get_value('onboarding_progress')
         actions.push({action:"function_call",function:"setTimeout(function(){showOnboarding('#plans','6,7,8');},1200);"}) if (onboarding && (!onboarding[6] || !onboarding[7] || !onboarding[8]))
-
+        tooltip_notifications = current_user.get_one_time_tooltip_notification
+        if tooltip_notifications
+            actions.push({action:"function_call",function:"oneTimeNotificationTooltip(\"#{tooltip_notifications[:element]}\",\"#{tooltip_notifications[:message]}\",\"#{tooltip_notifications[:position]}\")"})
+            tooltip_notifications[:notification].update_attributes(one_time_display:false)
+        end
         if params[:searchClick] == true || params[:searchClick] == "true"
             AppUsage.log_action("Opened connection through search",current_user)
         end

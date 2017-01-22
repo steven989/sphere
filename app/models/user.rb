@@ -150,19 +150,43 @@ class User < ActiveRecord::Base
   end
 
   def get_one_time_popup_notification(json_or_not_json=false)
-    notification = notifications.where(one_time_display:true).order(priority: :asc).take
+    notification = notifications.where("one_time_display = true and notification_type not ilike 'new_feature'").order(priority: :asc).take
     if notification
       if notification.notification_type == 'level_up'
         element_id = 'levelUpNotificationPopup'
         value_1 = notification.value_in_specified_type[:new_level]
+        result = {id:notification.id,element_id:element_id,value_1:value_1}
       elsif notification.notification_type == 'new_badges_one_time'
         element_id = 'newBadgePopup'
         value_1 = notification.value_in_specified_type
+        result = {id:notification.id,element_id:element_id,value_1:value_1}
       elsif notification.notification_type == 'added_first_3_users_in_time'
         element_id = 'addedFirstThreeConnectionsPopup'
         value_1 = 'null'
+        result = {id:notification.id,element_id:element_id,value_1:value_1}
+      else
+        result=nil
       end
-      result = {id:notification.id,element_id:element_id,value_1:value_1}
+    else
+      result = nil
+    end
+    if json_or_not_json
+      result.to_json
+    else
+      result
+    end
+  end
+
+  def get_one_time_tooltip_notification(json_or_not_json=false)
+    notification = notifications.where("one_time_display = 'true' and notification_type ilike 'new_feature'").take
+    if notification
+      if notification.notification_type == 'new_feature'
+        element = '.checkinButton.longPressTransition'
+        message = "Press and HOLD if you wan to add detailed notes to your check in"
+        result = {notification:notification,element:element,message:message,position:'top'}
+      else
+        result=nil
+      end
     else
       result = nil
     end

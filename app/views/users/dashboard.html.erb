@@ -165,10 +165,18 @@ $(function(){
         },1)
         buttonAjax($(modalElement).parent(),{notification_id:notificationId});
     }
+
+    function oneTimeNotificationTooltip(element,message,position) {
+        console.log('here');
+        $(element).data('placement',position).data('title',message).data('html',true);
+        $(element).tooltip('show');
+    }
+
     <% if @one_time_notification %>
         var value1 = <%= @one_time_notification[:value_1] ? @one_time_notification[:value_1] : 'null' %>;
         oneTimeNotificationPopup("[data-remodal-id=notificationsModal] #<%= @one_time_notification[:element_id] %>",<%= @one_time_notification[:id] %>,value1)
     <% end %>
+
 
     // update "real-time" stats
     function updateRealTimeStats(stats) {
@@ -1379,7 +1387,11 @@ $(function(){
                 $('.modalView#connectionLog .activityTimeline dl').append('<dd class="pos-'+position+' clearfix textDarkGray"><div class="circ"></div><div class="time" style="'+margin+'">'+entry.date+'</div><div class="events"><div class="events-header">'+entry.title+'</div>'+(entry.details ? ('<div class="events-body"><div class="events-desc" style="text-indent:0px; padding:0px; text-align:left;">'+entry.details+'</div></div>') : '' )+'</div></dd>');
                 counter++;
             });
-            $('.modalView#connectionLog .activityTimeline .viewMoreContainer').show();
+            if (returnedData.last_page) {
+                $('.modalView#connectionLog .activityTimeline .viewMoreContainer').hide();
+            } else {
+                $('.modalView#connectionLog .activityTimeline .viewMoreContainer').show();    
+            }
             $('.modalView#connectionLog .activityTimeline .viewMore').off("click").on("click",function(){
                 buttonAjax($(this),{connection_id:returnedData.connection_id,page:connectionActivityPage})
             });
@@ -1465,17 +1477,20 @@ $(function(){
         if (changeToState) {
             _this.html('<%= fa_icon "check" %>  CHECK IN');
             _this.removeClass('disabled');
-            _this.off("mousedown").off("mouseup").on("mousedown",function(){
+            _this.off("mousedown mouseup touchstart touchend").on("mousedown touchstart",function(){
                 _this.addClass('pressed');
+                _this.tooltip('show');
                 if (!_this.hasClass('disabled') && _this.hasClass('longPressTransition')) {
                     checkInButtonPressDownTimer = setTimeout(function(){
                         checkInButtonPressDownTimer = null;
-                        _this.removeClass('pressed');                     
+                        _this.removeClass('pressed');
+                        _this.tooltip('destroy');
                         transition($(_this.data('current')),$(_this.data('target')));
                     },1000);
                 }
-            }).on("mouseup",function(){
+            }).on("mouseup touchend",function(){
                 _this.removeClass('pressed');
+                _this.tooltip('destroy');
                 clearTimeout(checkInButtonPressDownTimer);
                 if (checkInButtonPressDownTimer != null) {buttonAjax($(this),{activity_definition_id:$(this).data('activity-definition-id'),notes:$('#checkInNotes').val()});}
                 checkInButtonPressDownTimer = null;
@@ -1898,13 +1913,13 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomLeftButton transitionButton sphereBlueBackground hoverable" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#makePlan" data-intro="Don’t let your connections drift away! Make plans with your connections" data-step="8" data-position="top" id="makePlansButton"><%= fa_icon 'calendar-plus-o' %>  MAKE PLANS</div>
-            <div data-intro="Check in anytime you interact with your connection (digital or in person)! Sphere will keep track, and remind you to check in with your connection if you haven't done so in a while." data-step="7" data-position="top" class="checkinButton longPressTransition modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" data-activity-definition-id="<%= @activity_definitions.take.id %>"><%= fa_icon 'check' %>  CHECK IN</div>
+            <div data-intro="Check in anytime you interact with your connection (digital or in person)! Press and HOLD if you wan to add detailed notes to your check in. Sphere will keep track, and remind you to check in with your connection if you haven't done so in a while." data-step="7" data-position="top" class="checkinButton longPressTransition modalBottomRightButton sphereGreenBackground hoverable disableWhileProcessed" data-current="[data-remodal-id=bubbleModal] .modalView#plans" data-target="[data-remodal-id=bubbleModal] .modalView#detailedCheckIn" data-method="POST" data-activity-definition-id="<%= @activity_definitions.take.id %>" data-toggle="tooltip" data-placement="top" data-html="true" title="Press and HOLD if you want to add notes" ><%= fa_icon 'check' %>  CHECK IN</div>
         </div>
     </div>
     <div class="modalView" id="detailedCheckIn">
         <div class="modalContentContainer p-h-xxlg">
             <form>
-                <textarea name="checkInNotes" id="checkInNotes" rows="10" placeholder="Add any details to help you remember this check-in (e.g. what did you talk about, what is your connection up to now, etc). You can also create as many reminders as you want directly from within these notes by using the syntax: \remind(send her the article about AI)" class="formElement" style="height:100%;"></textarea>
+                <textarea name="checkInNotes" id="checkInNotes" rows="10" placeholder="Add any details to help you remember this check-in (e.g. what did you talk about, what is your connection up to now, etc). You can also create as many reminders as you want directly from within these notes by using the syntax: \remind(send her the article about AI)   \remind(also ask her to connect me with Mike)" class="formElement" style="height:100%;"></textarea>
             </form>
         </div>
         <div class="modalButtonContainer">
@@ -2055,6 +2070,7 @@ $(function(){
                 </div>
             </div>
             <div class="activityTimeline container" style="width:100%;padding-top:15px;">
+                <div class="m-b-lg viewMoreContainer textDarkGray" style="width:100%;text-align:center;"><span>Activities history</span></div>
                 <div class="row m-t-sm m-b-sm timeline">
                     <div class="col-md-12">
                         <div class="VivaTimeline">
@@ -2064,7 +2080,7 @@ $(function(){
                         </div>
                     </div>
                 </div>
-                <div class="m-b-xs viewMoreContainer" style="width:100%;text-align:center;"><span class="viewMore textDarkGray disableWhileProcessed" href="<%= load_activities_path %>" data-method="PUT"><%= fa_icon "plus" %> View More</span></div>
+                <div class="m-b-lg viewMoreContainer" style="width:100%;text-align:center;"><span class="viewMore textDarkGray disableWhileProcessed" href="<%= load_activities_path %>" data-method="PUT"><%= fa_icon "plus" %> View More</span></div>
             </div>
         </div>
         <div class="modalButtonContainer">
