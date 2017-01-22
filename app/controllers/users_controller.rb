@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     end
 
     def submit_feedback
-      SystemMailer.user_feedback(current_user,params[:body]).deliver
+      SystemMailer.delay.user_feedback(current_user,params[:body])
       actions = [{action:"function_call",function:'$("#feedback-form").toggle("slide").find("textarea").val("")'}]
       respond_to do |format|
         format.json {
