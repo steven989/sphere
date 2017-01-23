@@ -250,10 +250,10 @@ $(function(){
                 var domElements = $('.userLevelNotificationDisplayElement.'+notification.notification_type);
                 if (notification.notification_type == "level_up") {
                     var backgroundColor = "#ED1C24";
-                    var content = '<%= fa_icon 'thumbs-up', style:'font-size:13px;color:#FFFFFF' %>';
+                    var content = '<%= fa_icon 'thumbs-up', style:'font-size:13px;color:#FFFFFF !important;' %>';
                 } else if (notification.notification_type == "my_sphere" || notification.notification_type == "new_challenge" || notification.notification_type == "new_badge") {
                     var backgroundColor = "#ED1C24";
-                    var content = "<span style='font-size:13px;color:#FFFFFF'>"+notification.count+"</span>";
+                    var content = "<span style='font-size:13px;color:#FFFFFF !important;'>"+notification.count+"</span>";
                 }
                 domElements.each(function(){
                     $(this).find('.notificationContainer').html('<span class="badge" style="width:20px; height:20px;background-color:'+backgroundColor+';">'+content+'</span>')
