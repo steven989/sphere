@@ -689,7 +689,7 @@ $(function(){
     <% end %>
     $('#addConnection').off('click').on('click',function(){
         initializeReModal('[data-remodal-id=importModal]','standardModal',1);
-        $('label[for=photoUploaderInCreate]').html('<%= fa_icon "id-badge" %> Upload Photo');
+        $('label[for=photoUploaderInCreate]').html('<%= fa_icon "id-badge" %> Upload Photo (optional)');
         <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][3] || !@settings[:onboarding_progress][4] || !@settings[:onboarding_progress][5] ) %>    
         if (!onBoarding345){
             setTimeout(function(){
@@ -2118,14 +2118,14 @@ $(function(){
                 <form action="<%= create_connection_path %>" method="POST" data-intro="Enter some basic information about your connection and add them to your Sphere. Once they're in, you can start tracking your interactions with them." data-step="3" data-position="top">
                     <div class="vex-custom-field-wrapper">
                         <input class="formElement halfRow left m-b-md inputData clearInputAfterUpdate" data-default-class="formElement m-b-xs inputData" name="name" type="text" placeholder="Name" required>
-                        <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="Email" >
+                        <input class="formElement m-b-xs inputData clearInputAfterUpdate" name="email" type="text" placeholder="Email (optional)" >
                         <div id="cropInCreateConnection" class='hidden default_hidden'></div>
                         <input name="photoUploaderInCreate" data-uploader-crop-var="cropVarInCreateConnection" class="inputData clearInputAfterUpdate hiddenUploader" id="photoUploaderInCreate" type="file" accept="image/*">
-                        <label for="photoUploaderInCreate" class="textDarkGray m-b-xs formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo'>
+                        <label for="photoUploaderInCreate" class="textDarkGray m-b-xs formElement button clearInputAfterUpdate" data-default-value='<%= h fa_icon 'id-badge' %> Upload Photo (optional)'>
                             <%= fa_icon 'id-badge' %>
-                            Upload Photo
+                            Upload Photo (optional)
                         </label>                        
-                        <textarea class="formElement inputData clearInputAfterUpdate" name="notes" placeholder="Notes" rows="3" required></textarea>
+                        <textarea class="formElement inputData clearInputAfterUpdate" name="notes" placeholder="Notes (optional)" rows="3" required></textarea>
                         <select name="tags" id="tokenizeInCreate" multiple="multiple" class="modalTokenBox inputData tokenized clearInputAfterUpdate" data-token-variable="tokenInCreate">
                         </select>
                     </div>
