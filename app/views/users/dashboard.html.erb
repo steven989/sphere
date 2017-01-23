@@ -2056,10 +2056,8 @@ $(function(){
             <div class="deleteButtonContainer" style='text-align:left;width:100%;'>
             <input type='checkbox' id="confirm_delete" />
             <label for="confirm_delete" class="textDarkGray m-r-md" style='font-size:15px;'>Check to confirm delete</label>
-            <%= link_to destroy_connection_path, id: "destroy_single_connection", class:"btn btn-red ajaxButton disableWhileProcessed disabled", style:"color:white", data: {toggle:"tooltip", placement:"top",html:"true",title:"Data will be deleted from the server and it won't be possible to recover later", method:"PUT"} do %>
-                <%= fa_icon "exclamation-circle" %>  
-                DELETE CONNECTION
-            <% end %>
+            <div class="btn btn-red ajaxButton disableWhileProcessed disabled" id="destroy_single_connection" href="<%= destroy_connection_path %>" style="color:white" data-toggle="tooltip" data-placement="top" data-html="true" data-title="Data will be deleted from the server and it won't be possible to recover later" data-method="PUT"><%= fa_icon "exclamation-circle" %>  
+                DELETE CONNECTION</div>
             </div>
         </div>
         <div class="modalButtonContainer">
