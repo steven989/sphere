@@ -1644,6 +1644,15 @@ form div.btn-group .btn.active {
         margin-top:10px;
     }
 
+    /*Reminders input field width */
+    .modalView#editConnection .reminders input[name=reminder] {
+        width: 40%;
+    }
+
+    .modalView#editConnection .reminders input[name=due_date] {
+        width: 30%;
+    }
+
 
 }
 
