@@ -21,7 +21,7 @@ class UserSessionsController < ApplicationController
     else
       if user && user.remember_me_token && (user.remember_me_token_expires_at > Time.now.utc)
         @user = login(params[:email], params[:password],false)
-        set_remember_me_cookie!(@user)
+        set_remember_me_cookie!(@user) if @user
       else
         @user = login(params[:email], params[:password],true)
       end
