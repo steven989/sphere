@@ -1,6 +1,6 @@
 <script>
 var test;
-
+var test2;
 $(function(){
     $('#mask, .modalMask').on("click",function(event){
         event.stopPropagation();
@@ -1960,7 +1960,7 @@ $(function(){
 
                 <div class="formElement button m-t-sm date" data-default-class="formElement button m-t-sm date">
                     <span class="icon textDarkGray" ><%= fa_icon 'calendar-o' %></span>
-                    <input type="text" style="float:left" class="button inputData field textDarkGray" name="date" id="scheduleDatePicker" placeholder="Date (YYYY-MM-DD)" />
+                    <input type="text" style="float:left;cursor:pointer;" class="button inputData field textDarkGray" name="date" id="scheduleDatePicker" placeholder="Date (YYYY-MM-DD)" readonly />
                 </div>
                 <div class="formElement halfRow left m-t-sm timeFrom" data-default-class="formElement halfRow left m-t-sm timeFrom" style="float:left;">
                     <span class="icon textDarkGray" ><%= fa_icon 'clock-o' %></span>
@@ -2038,8 +2038,8 @@ $(function(){
                 <div class="formElement reminderRow tallerInput noHover addReminder" >
                     <span class="icon textDarkGray" ><%= fa_icon 'bell-o' %></span>
                     <form action="<%= create_user_reminder_path %>" method="POST" id="reminderForm">
-                        <input type="text" class="inputData textDarkGray" name="reminder" id="scheduleDatePicker" placeholder="Add a reminder" />
-                        <input type="text" class="inputData textDarkGray" name="due_date" id="dueDate" placeholder="Due (Optional)">
+                        <input type="text" class="inputData textDarkGray" name="reminder" placeholder="Add a reminder" />
+                        <input type="text" style="cursor:pointer;" class="inputData textDarkGray field" name="due_date" id="dueDate" placeholder="Due (Optional)" readonly>
                         <input type="hidden" class="inputData" name="connection_id" />
                     </form>
                     <span style="float:left" class="button formElement setReminder sphereBlueBackground hoverable disableWhileProcessed submitButton" id='setReminder' data-submit-form=".modalView#editConnection #reminderForm" ><%= fa_icon "plus" %>  ADD REMINDER</span>
