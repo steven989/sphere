@@ -12,7 +12,8 @@
  *
  *= require_tree .
  *= require_self
- *= require jquery-ui
+ *= require jquery-ui/tooltip
+
  *= require font-awesome
  *= require_tree ../../../vendor/assets/stylesheets/.
  */

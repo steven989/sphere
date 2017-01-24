@@ -948,6 +948,24 @@ $(function(){
 
     }
 
+    // Related to the date and time pickers in the scheduling events modal view
+    var scheduleDatePicker = new Pikaday({ 
+        field: $('#scheduleDatePicker')[0],
+        minDate: new Date(),
+        firstDay:0,
+        onSelect: function(){
+        setTimeout(function(){
+                    $('#scheduleTimeFrom').focus();
+                },100);
+        }
+    });
+
+    var dueDate = new Pikaday({ 
+        field: $('#dueDate')[0],
+        minDate: new Date(),
+        firstDay:0
+    });
+
     // Specific callback functions for after modal population
     function populateBubblesModal() {
         // Main screen
@@ -1222,18 +1240,6 @@ $(function(){
             });
         });
 
-        // Related to the date and time pickers in the scheduling events modal view
-        $('#scheduleDatePicker').datepicker({
-            dateFormat: "yy-mm-dd",
-            minDate: new Date(),
-            onSelect: function(){
-                $('#scheduleTimeFrom').focus();
-            }
-        });
-        $('#dueDate').datepicker({
-            dateFormat: "yy-mm-dd",
-            minDate: new Date()
-        });
 
         $('#scheduleTimeFrom').timepicker({'scrollDefault':'7:00am'});
         $('#scheduleTimeTo').timepicker({'scrollDefault':'7:00am'});
@@ -1243,8 +1249,9 @@ $(function(){
                 'scrollDefault':'7:00am',
                 'disableTimeRanges': [['12:00am',$(this).val()]]
             });
-            $('#scheduleTimeTo').focus();
-
+            setTimeout(function(){
+                        $('#scheduleTimeTo').focus();
+                    },100);
         });
         $('#scheduleTimeTo').timepicker({'scrollDefault':'7:00am'});
         $('#scheduleTimeTo').on('changeTime',function(){

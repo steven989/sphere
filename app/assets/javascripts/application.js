@@ -12,7 +12,9 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery-ui
+//= require jquery-ui/button
+//= require jquery-ui/tooltip
+//= require jquery-ui/effect-slide
 //= require typekit
 //= require_tree .
 //= require_tree ../../../vendor/assets/javascripts/priority/.

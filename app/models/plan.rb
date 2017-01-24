@@ -45,12 +45,11 @@ class Plan < ActiveRecord::Base
                 timezone_used = user.timezone ? user.timezone : calendar.time_zone
                 Time.zone = timezone_used
                 Chronic.time_class = Time.zone
-                start_time = Chronic.parse("#{date} #{start_time_only}")
-                end_time = Chronic.parse("#{date} #{end_time_only}")
+                start_time = Chronic.parse("#{date.to_date.strftime('%Y-%m-%d')} #{start_time_only}")
+                end_time = Chronic.parse("#{date.to_date.strftime('%Y-%m-%d')} #{end_time_only}")
                 timezone_object = TZInfo::Timezone.get(timezone_used)
                 start_time_utc = timezone_object.local_to_utc(start_time)
                 end_time_utc = timezone_object.local_to_utc(end_time)
-
                 if start_time.blank?
                     status = false
                     message = "We can't seem to understand your time input '#{start_time_only}'. Try something else? (e.g. 4:30pm, 15:00)"
@@ -113,8 +112,8 @@ class Plan < ActiveRecord::Base
             timezone_used = user.get_timezone
             Time.zone = timezone_used
             Chronic.time_class = Time.zone
-            start_time = Chronic.parse("#{date} #{start_time_only}")
-            end_time = Chronic.parse("#{date} #{end_time_only}")
+            start_time = Chronic.parse("#{date.to_date.strftime('%Y-%m-%d')} #{start_time_only}")
+            end_time = Chronic.parse("#{date.to_date.strftime('%Y-%m-%d')} #{end_time_only}")
             timezone_object = timezone_used
             start_time_utc = timezone_object.local_to_utc(start_time)
             end_time_utc = timezone_object.local_to_utc(end_time)
@@ -192,8 +191,8 @@ class Plan < ActiveRecord::Base
                 # Calculate start time
                 Time.zone = timezone
                 Chronic.time_class = Time.zone
-                new_start_time = Chronic.parse("#{new_date} #{new_start_time_only}")
-                new_end_time = Chronic.parse("#{new_date} #{new_end_time_only}")
+                new_start_time = Chronic.parse("#{new_date.to_date.strftime('%Y-%m-%d')} #{new_start_time_only}")
+                new_end_time = Chronic.parse("#{new_date.to_date.strftime('%Y-%m-%d')} #{new_end_time_only}")
                 timezone_object = TZInfo::Timezone.get(timezone)
                 new_start_time_utc = timezone_object.local_to_utc(new_start_time)
                 new_end_time_utc = timezone_object.local_to_utc(new_end_time)
@@ -280,8 +279,8 @@ class Plan < ActiveRecord::Base
         else #update local event
                 Time.zone = timezone
                 Chronic.time_class = Time.zone
-                new_start_time = Chronic.parse("#{new_date} #{new_start_time_only}")
-                new_end_time = Chronic.parse("#{new_date} #{new_end_time_only}")
+                new_start_time = Chronic.parse("#{new_date.to_date.strftime('%Y-%m-%d')} #{new_start_time_only}")
+                new_end_time = Chronic.parse("#{new_date.to_date.strftime('%Y-%m-%d')} #{new_end_time_only}")
                 timezone_object = TZInfo::Timezone.get(timezone)
                 new_start_time_utc = timezone_object.local_to_utc(new_start_time)
                 new_end_time_utc = timezone_object.local_to_utc(new_end_time)

@@ -37,13 +37,7 @@ $(window).load(function(){
   		transitionOut: 'slideUp'
 	});
 
-	
-	$('.small-calendar').datepicker({
-		showOtherMonths: true,
-			selectOtherMonths: true,
-			altField: "#calendar-date",
-			dateFormat:"dd/mm/yy"
-	});
+
 
 	$('.ttip').hover(
 		function(){
