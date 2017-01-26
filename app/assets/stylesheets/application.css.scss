@@ -1546,12 +1546,11 @@ form div.btn-group .btn.active {
     }
 
     .profileButtonsContainer.hideOnMobile {
-        width: 170px;
-        right: 50px;
-        top: 60px;
-        background-color: rgb(246,246,246);
-        border-radius: 5px;
-        border: 1px solid #E9E9E9;
+        width: 100%;
+        position:absolute;
+        right: 0px;
+        top:75px;
+        background-color: #0d9ddb;
         padding: 10px;
         padding-bottom: 0px;
     }
@@ -1563,10 +1562,11 @@ form div.btn-group .btn.active {
     .profileButtonsContainer.hideOnMobile .profileButton {
         font-size:25px;
         height:45px;
-        text-align: right;
+        text-align: left;
         width: 100%;
-        color: #707070;
+        color: #FFF;
         display: block;
+        padding-left: 20px;
     }
 
     .profileButtonsContainer.hideOnMobile .profileButton p {
@@ -1580,7 +1580,7 @@ form div.btn-group .btn.active {
     }
 
     .profileButtonsContainer.hideOnMobile .profileButton i {
-        color: #707070;
+        color: #FFF;
         transition:color 0.2s ease;
     }
 

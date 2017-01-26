@@ -80,6 +80,7 @@ $(function(){
     function searchBarListener() {
 
         $('#searchBar input').off("focus").on("focus",function(){
+            closeMobileProfileNavDropdown();
             $('#searchBar .result, #searchBar .speechBubbleThingy').each(function(){
                 $(this).removeClass('hidden');
             });
@@ -271,16 +272,22 @@ $(function(){
 
     function toggleMobileTopMenu(event) {
         $('.profileButtonsContainer.hideOnMobile').toggle();
-        event.stopPropagation();
 
         if ($('.profileButtonsContainer.hideOnMobile').css("display") != "none") {
             $('#settingLogoutToggle').css({"color":"#345C6F"});
-            $('body').on("click",function(event){toggleMobileTopMenu(event)});
         } else {
             $('#settingLogoutToggle').css({"color":"#FFFFFF"});
-            $('body').off("click",function(event){toggleMobileTopMenu(event)});
         }
     }
+
+    function closeMobileProfileNavDropdown() {
+        if ($('#settingLogoutToggle').css("display") != "none") {
+            $('.profileButtonsContainer.hideOnMobile').hide();
+            $('#settingLogoutToggle').css({"color":"#FFFFFF"});
+        }
+    }
+
+    $('.etabs .tab').on("click",closeMobileProfileNavDropdown);
 
     // Paint the bubbles
     paintBubbles(<%= raw @raw_bubbles_data %>,<%= raw @notifications %>,<%= raw @bubbles_parameters %>,prettifyBubbles,<%= @demo %>);
@@ -336,6 +343,7 @@ $(function(){
             // 3) Modal on clicking each bubble
             if (!demo) {
                 $(this).off("click").on("click",function(){
+                    closeMobileProfileNavDropdown();
                     if (!$(this).hasClass('disabled')) {
                         overLayHtml = $(this).find('.overlayWithName span').html();
                         openBubble = $(this);
@@ -688,6 +696,7 @@ $(function(){
     var onBoarding345 = false;
     <% end %>
     $('#addConnection').off('click').on('click',function(){
+        closeMobileProfileNavDropdown();
         initializeReModal('[data-remodal-id=importModal]','standardModal',1);
         $('label[for=photoUploaderInCreate]').html('<%= fa_icon "id-badge" %> Upload Photo (optional)');
         <% if @settings[:onboarding_progress] && (!@settings[:onboarding_progress][3] || !@settings[:onboarding_progress][4] || !@settings[:onboarding_progress][5] ) %>    
@@ -845,9 +854,11 @@ $(function(){
     }
 
     // Account settings
-    $('#accountSettings').off("click").on("click",function(){
+    $('#accountSettings,#helpButton').off("click").on("click",function(){
         buttonAjax($(this),{});
+        closeMobileProfileNavDropdown();
     });
+
 
     $('.modalView#settingsSelect .modalBottomRightButton').off("click").on("click",function(){
         var dataObject = {}
@@ -1671,17 +1682,17 @@ $(function(){
             </div>
             <div class="profileButtonsContainer hideOnMobile showOnDesktop" >
                 <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path %>" data-method="GET">
-                    <p class="showOnMobile" style="display:none;">SETTINGS</p>
                     <%= fa_icon 'cog' %>
+                    <p class="showOnMobile" style="display:none;">SETTINGS</p>
                 </div>
-                <div class="profileButton ajaxButton" href="<%= help_page_path %>" data-method="GET">
-                    <p class="showOnMobile" style="display:none;">HELP</p>
+                <div class="profileButton" id="helpButton" href="<%= help_page_path %>" data-method="GET">
                     <%= fa_icon 'question-circle' %>
+                    <p class="showOnMobile" style="display:none;">HELP</p>
                 </div>
                 <div class="divider showOnMobile" style="display:none;"></div>
                 <div class="profileButton" id="logout">
-                    <p class="showOnMobile" style="display:none;">LOG OUT</p>
                     <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
+                    <p class="showOnMobile" style="display:none;">LOG OUT</p>
                 </div>
             </div>    
     </div>
