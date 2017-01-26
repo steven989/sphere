@@ -839,6 +839,21 @@ body {
     left: 0px;
 }
 
+.externalContactButton {
+    font-size:14px;
+    color:#0099E5;
+    transition:color 0.2s ease;
+}
+
+#phoneCallContainer .externalContactButton {
+    font-size:15px;
+    font-weight: 500;
+}
+
+.no-touch .externalContactButton:hover {
+    color:#0584C3;
+}
+
 .sphereRedBackground {
     background-color:#FE0000;
     transition:background-color 0.2s ease;
