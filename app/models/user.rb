@@ -333,16 +333,6 @@ class User < ActiveRecord::Base
 
   end
 
-  def check_if_connection_is_expiring_and_if_so_create_notification(connection,expiring_connection_notification_period_in_days)
-      target_contact_interval_in_days = connection.target_contact_interval_in_days
-      date_of_last_activity = connection.activities.where("date is not null").order(date: :desc).first.date
-      number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
-      remaining_days_until_expiry = [target_contact_interval_in_days - number_of_days_since_last_activity,0].max
-      if remaining_days_until_expiry <= expiring_connection_notification_period_in_days
-        Notification.create_expiry_notification(self,connection,date_of_last_activity+target_contact_interval_in_days.days,remaining_days_until_expiry)
-      end
-  end
-
   def daily_connection_tasks # put all daily connection-level tasks here so that there is one loop that runs instead of multiple loops
     
     expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type

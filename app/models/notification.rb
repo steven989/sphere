@@ -115,6 +115,10 @@ class Notification < ActiveRecord::Base
           )
     end
 
+    def self.clear_expiry_notifications_for(connecti)
+      
+    end
+
     # This is a connection-level notification
     def self.create_checked_in_notification(user,connection,expiry_days=1,date=Date.today)
         # 1) Destroy any existing notifications

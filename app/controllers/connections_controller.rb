@@ -159,7 +159,7 @@ class ConnectionsController < ApplicationController
                     usage_log_message = "Updated photo for connection (#{connection.first_name}  #{connection.last_name})"
                     message = "#{connection.first_name}'s photo updated!"
                 end
-                
+                current_connection_frequency = connection.target_contact_interval_in_days
                 if params[:contact_frequency] || params[:notes]
                     target_contact_interval_in_days = (params[:contact_frequency] == "monthly" ? 30 : ( params[:contact_frequency] == "weekly" ? 7 : params[:custom_frequency].to_i ) )
                     connection.assign_attributes(
@@ -184,6 +184,13 @@ class ConnectionsController < ApplicationController
                       bubbles_parameters = current_user.get_bubbles_display_system_settings(false)
                       data = {raw_bubbles_data:raw_bubbles_data,bubbles_parameters:bubbles_parameters,notifications:notifications}
                       actions.push({action:"function_call",function:"paintBubbles(returnedData.raw_bubbles_data,returnedData.notifications,returnedData.bubbles_parameters,prettifyBubbles,false)"})
+                    elsif current_connection_frequency != connection.target_contact_interval_in_days
+                      connection.activities.where(activity:"Placeholder activity for negative remaining days until expiry").destroy_all
+                      expiring_connection_notification_period_in_days = SystemSetting.search("expiring_connection_notification_period_in_days").value_in_specified_type
+                      connection.check_if_connection_is_expiring_and_if_so_create_notification(current_user,expiring_connection_notification_period_in_days)
+                      notifications = current_user.get_notifications(false)
+                      data = {notifications:notifications}
+                      actions.push({action:"function_call",function:"prettifyBubbles($('#canvas'),returnedData.notifications)"})
                     end
                 else
                     status = false

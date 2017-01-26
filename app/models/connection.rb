@@ -544,12 +544,27 @@ class Connection < ActiveRecord::Base
     end
 
     def check_if_connection_is_expiring_and_if_so_create_notification(user,expiring_connection_notification_period_in_days)
+        timezone = user.get_timezone
         target_contact_interval_in_days = self.target_contact_interval_in_days
-        date_of_last_activity = self.activities.where("date is not null").order(date: :desc).first.date
-        number_of_days_since_last_activity = (Date.today - date_of_last_activity).to_i
-        remaining_days_until_expiry = [target_contact_interval_in_days - number_of_days_since_last_activity,0].max
-        if remaining_days_until_expiry <= expiring_connection_notification_period_in_days
-          Notification.create_expiry_notification(user,self,date_of_last_activity+target_contact_interval_in_days.days,remaining_days_until_expiry)
+        date_of_last_activity = timezone.utc_to_local(self.activities.order(date: :desc).first.created_at).strftime("%Y-%m-%d").to_date
+        date_of_last_plan = Plan.last(user,self) ? timezone.utc_to_local(Plan.last(user,self).date_time).strftime("%Y-%m-%d").to_date : nil
+        if date_of_last_plan.nil?
+          combined_date_of_last_activity = date_of_last_activity
+        else
+          combined_date_of_last_activity = date_of_last_activity > date_of_last_plan ? date_of_last_activity : date_of_last_plan
+        end
+        number_of_days_since_last_activity = (timezone.now.strftime("%Y-%m-%d").to_date - combined_date_of_last_activity).to_i
+
+        remaining_days_until_expiry = target_contact_interval_in_days - number_of_days_since_last_activity
+        if remaining_days_until_expiry < 0
+          self.activities.create(user_id:user.id,activity:"Placeholder activity for negative remaining days until expiry",activity_description:"Automatically created",created_at:(timezone.now-(target_contact_interval_in_days-5).days))
+          self.check_if_connection_is_expiring_and_if_so_create_notification(user,expiring_connection_notification_period_in_days)
+        else
+          if remaining_days_until_expiry <= expiring_connection_notification_period_in_days
+            Notification.create_expiry_notification(user,self,date_of_last_activity+target_contact_interval_in_days.days,remaining_days_until_expiry)
+          else
+            self.notifications.where(user_id:user.id,notification_type:"connection_expiration").destroy_all
+          end
         end
     end
 
