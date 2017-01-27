@@ -2246,7 +2246,7 @@ $(function(){
                     <h3 style="margin:3px;"><span id="inviteCode"></span></h3>
                     <span>You have <span id="remainingInviteQuantity"></span> invites left</span>
                 </div>
-               <a href="<%= logout_path %>"><div class="formElement button textDarkGray m-t-xs m-b-md" ><%= fa_icon 'sign-out' %>Log Out</div></a>
+               <a href="<%= logout_path %>" style="text-decoration:none;"><div class="formElement button textDarkGray m-t-xs m-b-md"><%= fa_icon 'sign-out' %>Log Out</div></a>
                 <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs m-b-md" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <div class="m-b-md">
                     <div id="send_event_booking_notification_by_default_title"></div>
