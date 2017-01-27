@@ -1003,6 +1003,17 @@ $(function(){
         $('[data-remodal-id=bubbleModal] .modalView#plans input.name').val(name).data('id',returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans form .inputData[name=connection_id]').val(returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.email').val(email).data('id',returnedData.connection_id);
+        <% if current_user.tester? %>
+
+        if (email) {
+            $('#mailToContainer').html('<a href="mailto:'+email+'" class="externalContactButton" data-toggle="tooltip" data-placement="top" data-html="true" title="Email '+name+'"><%= fa_icon "mail-forward" %></a>');    
+        } else {
+            $('#mailToContainer').html('');
+        }
+
+
+        $('.no-touch .externalContactButton').tooltip();
+        <% end %>
         $('.reminders input[name=connection_id]').val(returnedData.connection_id);
         $('[data-remodal-id=bubbleModal] .modalView#plans input.phone').val(phone).data('id',returnedData.connection_id);
         $('.modalView#makePlan input[name=notify]').prop('checked',default_notify);
@@ -1955,7 +1966,7 @@ $(function(){
             </div>
             <div data-intro="Edit your connection info and tag interesting things about them to help you remember, like their employer, hobbies, strengths, location, etc." data-step="6" data-position="top" style="width:100%; height:auto;">
                 <div style="color:#656268; font-size:20px;"><input name="name" class="name hoverInput inPlaceField" href="<%= update_connection_name_path %>" data-id="" data-method='PUT' style="border:none;text-align:center; width:80%; border-radius:10px;font-size:23px;"></div>
-                <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"><input name="phone" class="phone hoverInput inPlaceField" href="<%= update_connection_phone_path %>" data-id="" data-method='PUT' placeholder="Add phone" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"></div>
+                <div style="color:#656268; font-size:12px;font-style:italic;"><input name="email" class="email hoverInput inPlaceField" href="<%= update_connection_email_path %>" data-id="" data-method='PUT' placeholder="Add email" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"><span id="mailToContainer"></span><input name="phone" class="phone hoverInput inPlaceField" href="<%= update_connection_phone_path %>" data-id="" data-method='PUT' placeholder="Add phone" data-skip-clear="true" style="border:none;text-align:center; width:40%; border-radius:10px;font-size:15px;font-weight:300;"></div>
                 <div style="color:#656268; margin-top: 5px; font-size:15px;"><span class="lastHangout"></span></div>
                 <div style="min-height:135px;margin-top:10px;">
                     <div id="cropInEditConnection" class='hidden'></div>
