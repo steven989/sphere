@@ -450,20 +450,19 @@ class Plan < ActiveRecord::Base
         "#{date_humanized} at #{hour_in_12}:#{minute}#{am_pm}"
     end
 
-    def last_activity_date_difference_humanized
-        Plan.to_human_time_difference_past(days_to_last_plan_string)
+    def last_activity_date_difference_humanized(timezone=nil)
+        Plan.to_human_time_difference_past(days_to_last_plan_string(timezone))
     end
 
-    def days_to_last_plan_string
-        plan_date = date_time.to_date
-        timezone_offset_int = date_time.strftime('%z').gsub("0","").to_i
-        timezone_object = ActiveSupport::TimeZone[timezone_offset_int]
-        current_date_in_timezone = Time.now.in_time_zone(timezone_object).to_date
+    def days_to_last_plan_string(timezone_passed=nil)
+        timezone_to_use = timezone_passed ? timezone_passed : TZInfo::Timezone.get(self.timezone)
+        plan_date = timezone_to_use.utc_to_local(self.date_time).strftime("%Y-%m-%d").to_date
+        current_date_in_timezone = timezone_to_use.now.strftime("%Y-%m-%d").to_date
         days_diff = (current_date_in_timezone - plan_date).to_i
         days_diff
     end
 
-    def self.to_human_time_difference_past(days)
+    def self.to_human_time_difference_past(days,timezone=nil)
         if days == 0
             date_diff_humanized = "earlier today"
         elsif days == 1
