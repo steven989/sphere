@@ -67,7 +67,7 @@ class UsersController < ApplicationController
     end
 
     def add_to_home_screen_instructions
-      data = {ios1:ActionController::Base.helpers.asset_path("iphone-1.png"),ios2:ActionController::Base.helpers.asset_path("iphone-2.png"),ios3:ActionController::Base.helpers.asset_path("iphone-3.png"),android1:ActionController::Base.helpers.asset_path("android-1.png"),android2:ActionController::Base.helpers.asset_path("android-2.png"),android3:ActionController::Base.helpers.asset_path("android-3.png")}
+      data = {ios1:ActionController::Base.helpers.asset_path("iphone-1.png"),ios2:ActionController::Base.helpers.asset_path("iphone-2.png"),ios3:ActionController::Base.helpers.asset_path("iphone-3.png"),android1:ActionController::Base.helpers.asset_path("android-1-instruction.png"),android2:ActionController::Base.helpers.asset_path("android-2-instruction.png"),android3:ActionController::Base.helpers.asset_path("android-3-instruction.png")}
       respond_to do |format|
         format.json {
           render json: {status:true, message:nil,actions:[{action:"function_call",function:"populateBookmarkModal()"}],data:data}
