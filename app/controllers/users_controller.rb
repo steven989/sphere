@@ -66,6 +66,15 @@ class UsersController < ApplicationController
       end
     end
 
+    def add_to_home_screen_instructions
+      data = {ios1:ActionController::Base.helpers.asset_path("iphone-1.png"),ios2:ActionController::Base.helpers.asset_path("iphone-2.png"),ios3:ActionController::Base.helpers.asset_path("iphone-3.png"),android1:ActionController::Base.helpers.asset_path("android-1.png"),android2:ActionController::Base.helpers.asset_path("android-2.png"),android3:ActionController::Base.helpers.asset_path("android-3.png")}
+      respond_to do |format|
+        format.json {
+          render json: {status:true, message:nil,actions:[{action:"function_call",function:"populateBookmarkModal()"}],data:data}
+        } 
+      end
+    end
+
     def update_user_info
 
       first_name = params[:firstName] ? params[:firstName] : current_user.first_name
@@ -110,6 +119,7 @@ class UsersController < ApplicationController
           redirect_to admin_dashboard_path
         else
           AppUsage.log_action("Accessed dashboard",current_user,"{browser_name:#{browser.name if browser},browser_version:#{browser.version if browser},browser_is_modern:#{browser.modern? if browser},device_name:#{browser.device.name if (browser && browser.device)},platform_name:#{browser.platform.name if (browser && browser.platform)}}")
+          @isIPhone = browser.platform.ios?
           @timezone = current_user.timezone
           @current_user_email = current_user.email
           @one_time_notification = current_user.get_one_time_popup_notification(false)

@@ -74,7 +74,7 @@
 }
 
 h1,h2,h3,h4,h5,h6,p,div,span,body {
-  font-family: 'brandon-grotesque' !important;
+  font-family:'brandon-grotesque', sans-serif !important;
 }
 
 /* 5 column definition a la bootstrap */
@@ -1561,12 +1561,13 @@ form div.btn-group .btn.active {
 
     .profileButtonsContainer.hideOnMobile .profileButton {
         font-size:25px;
-        height:45px;
+        height:50px;
         text-align: left;
         width: 100%;
         color: #FFF;
         display: block;
         padding-left: 20px;
+        line-height:45px;
     }
 
     .profileButtonsContainer.hideOnMobile .profileButton p {

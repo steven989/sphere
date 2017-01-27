@@ -15,10 +15,12 @@ $(function(){
         $('html').addClass("no-touch");
         var canvasElement = document.getElementById('canvas');
         canvasElement.setAttribute('data-position','right');
+        var noTouch = true;
     } else {
         $('html').removeClass("no-touch");
         var canvasElement = document.getElementById('canvas');
         canvasElement.setAttribute('data-position','bottom');
+        var noTouch = false;
     }
 
     $('.no-touch .buttonGroupWithOther.chooseActivity [data-toggle="tooltip"]').tooltip({container: '.buttonGroupWithOther.chooseActivity'});
@@ -45,6 +47,7 @@ $(function(){
     var maxConnectionsAllowed = <%= @settings[:max_number_of_connections].to_i %>;
     var remaining_connections = <%= @remaining_number_of_connections %>;
     var remaining_connections_real_time = remaining_connections;
+    var isIPhone = <%= @isIPhone %>;
 
     <% unless @timezone %>
         $('#profile').data('data-to-send','({timezone:"'+timezone+'"})').attr("href","<%= put_timezone_path %>").data("method","PUT");
@@ -1297,6 +1300,31 @@ $(function(){
         })        
     }
 
+
+    $('#bookmark').off('click').on('click',function(e){
+        if (noTouch) {
+              toastr.success('Press ' + (/Mac/i.test(navigator.userAgent) ? 'Cmd' : 'Ctrl') + '+D to bookmark Sphere');        
+        } else {
+            closeMobileProfileNavDropdown();
+            buttonAjax($(this),{});
+        }
+    });
+
+    function populateBookmarkModal() {
+        $('.modalView#ios .firstPanel').append("<img src='"+returnedData.ios1+"' height='300'>")
+        $('.modalView#ios .secondPanel').append("<img src='"+returnedData.ios2+"' height='300'>")
+        $('.modalView#ios .thirdPanel').append("<img src='"+returnedData.ios3+"' height='300'>")
+        $('.modalView#android .firstPanel').append("<img src='"+returnedData.android1+"' height='300'>")
+        $('.modalView#android .secondPanel').append("<img src='"+returnedData.android2+"' height='300'>")
+        $('.modalView#android .thirdPanel').append("<img src='"+returnedData.android3+"' height='300'>")
+        if (isIPhone) {
+            transition($('.modalView#android'),$('.modalView#ios'));
+        } else {
+            transition($('.modalView#ios'),$('.modalView#android'));
+        }
+        initializeReModal("[data-remodal-id=bookmarkModal]","standardModal",1);
+    }
+
     function populateUserInfoForm() {
         resetModal($('[data-remodal-id=settingsModal]'),1);
         $('#photoUploaderInUserInfo').val("");
@@ -1681,17 +1709,22 @@ $(function(){
                 </div>
             </div>
             <div class="profileButtonsContainer hideOnMobile showOnDesktop" >
-                <div class="profileButton" id="accountSettings" href="<%= get_user_settings_path %>" data-method="GET">
-                    <%= fa_icon 'cog' %>
-                    <p class="showOnMobile" style="display:none;">SETTINGS</p>
-                </div>
-                <div class="divider showOnMobile" style="display:none;"></div>
-                <div class="profileButton" id="helpButton" href="<%= help_page_path %>" data-method="GET">
+                <div class="profileButton disableWhileProcessed" id="helpButton" href="<%= help_page_path %>" data-method="GET">
                     <%= fa_icon 'question-circle' %>
                     <p class="showOnMobile" style="display:none;">HELP</p>
                 </div>
                 <div class="divider showOnMobile" style="display:none;"></div>
-                <div class="profileButton" id="logout">
+                <div class="profileButton disableWhileProcessed" id="bookmark" href="<%= add_to_home_screen_instructions_path %>" method="GET">
+                    <%= fa_icon 'bookmark' %>
+                    <p class="showOnMobile" style="display:none;">SAVE TO HOMESCREEN</p>
+                </div>
+                <div class="divider showOnMobile" style="display:none;"></div>
+                <div class="profileButton disableWhileProcessed" id="accountSettings" href="<%= get_user_settings_path %>" data-method="GET">
+                    <%= fa_icon 'cog' %>
+                    <p class="showOnMobile" style="display:none;">SETTINGS</p>
+                </div>
+                <div class="divider showOnMobile" style="display:none;"></div>
+                <div class="profileButton showOnMobile hideOnDesktop" style="display:none" id="logout">
                     <a href="<%= logout_path %>"><%= fa_icon 'sign-out' %></a>
                     <p class="showOnMobile" style="display:none;">LOG OUT</p>
                 </div>
@@ -2202,6 +2235,7 @@ $(function(){
                     <h3 style="margin:3px;"><span id="inviteCode"></span></h3>
                     <span>You have <span id="remainingInviteQuantity"></span> invites left</span>
                 </div>
+               <a href="<%= logout_path %>"><div class="formElement button textDarkGray m-t-xs m-b-md" ><%= fa_icon 'sign-out' %>Log Out</div></a>
                 <div class="formElement button textDarkGray disableWhileProcessed ajaxButton m-t-xs m-b-md" href="<%= list_expired_connections_path %>"><%= fa_icon 'users' %> Re-add Expired Connections</div>
                 <div class="m-b-md">
                     <div id="send_event_booking_notification_by_default_title"></div>
@@ -2292,6 +2326,67 @@ $(function(){
         </div>
         <div class="modalButtonContainer">
             <div class="modalBottomFullButton sphereGreenBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
+        </div>
+    </div>
+</div>
+
+<div data-remodal-id="bookmarkModal" data-default-css="([{'attribute':'height','value':'490px'}])" style="height:490px;">
+    <div class="modalView" id="ios">
+        <div class="modalContentContainer p-h-xxlg">
+            <div class="subTabNavigationContainer container" style="width:100%;">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton profile textDarkGray" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;border-bottom:2px solid #FFB900;"><%= fa_icon 'apple' %> iOS</div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton preferences textDarkGray transitionButton" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bookmarkModal] .modalView#ios" data-target="[data-remodal-id=bookmarkModal] .modalView#android"><%= fa_icon 'android' %> Android</div>
+                    </div>
+                </div>
+                <span class="textDarkGray m-t-sm m-b-sm"  style="display:block;">Add Sphere to Your Home Screen</span>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 firstPanel textDarkGray m-b-sm">
+                        Step 1<br>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 secondPanel textDarkGray m-b-sm">
+                        Step 2<br>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 thirdPanel textDarkGray m-b-sm">
+                        Step 3<br>
+                    </div>
+                </div>
+            </div>            
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
+        </div>
+    </div>
+    <div class="modalView" id="android">
+        <div class="modalContentContainer p-h-xxlg">
+            <div class="subTabNavigationContainer container" style="width:100%;">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton profile textDarkGray transitionButton" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;" data-current="[data-remodal-id=bookmarkModal] .modalView#android" data-target="[data-remodal-id=bookmarkModal] .modalView#ios"><%= fa_icon 'apple' %> iOS</div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="subTabNavigationButton preferences textDarkGray" style="font-size:14px;width:90px;display:inline-block;margin:auto;cursor:pointer;border-bottom:2px solid #FFB900;" ><%= fa_icon 'android' %> Android</div>
+                    </div>
+                </div>
+                <span class="textDarkGray m-t-sm m-b-sm" style="display:block;">Add Sphere to Your Home Screen</span>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 firstPanel textDarkGray m-b-sm">
+                        Step 1<br>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 secondPanel textDarkGray m-b-sm">
+                        Step 2<br>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 thirdPanel textDarkGray m-b-sm">
+                        Step 3<br>
+                    </div>
+                </div>
+            </div>            
+        </div>
+        <div class="modalButtonContainer">
+            <div class="modalBottomFullButton sphereBlueBackground hoverable" data-remodal-action="cancel" class="remodal-cancel">GOT IT</div>
         </div>
     </div>
 </div>

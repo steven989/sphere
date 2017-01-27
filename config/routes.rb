@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get 'users/redirect_to_root' => 'users#redirect_to_root', as: 'redirect_to_root'
   post 'users/create_connection' => 'users#create_connection', as: 'create_connection'
   get 'users/:connection_id/new_activity' => 'users#new_activity', as: 'new_activity'
+  get 'users/add_to_home_screen_instructions' => 'users#add_to_home_screen_instructions', as: 'add_to_home_screen_instructions'
   post 'users/create_activity' => 'users#create_activity', as: 'create_activity'
   post 'users/submit_feedback' => 'users#submit_feedback', as: 'submit_feedback'
   post 'users/create' => 'users#create', as: 'create_user'
